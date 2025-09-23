@@ -1,0 +1,349 @@
+Page 28:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Result : LOH Detection
+
+### **Visualizations**
+
+The slide presents two bar charts, labeled (a) and (b), comparing the performance of three different computational pipelines for Loss of Heterozygosity (LOH) detection across eight different cancer cell line samples. The pipelines are differentiated by the somatic variant caller used as input for a tool named `LongPhase-TO`. The three pipelines are:
+1.  `LongPhase-TO(ClairS-TO-ssrs)` (light teal)
+2.  `LongPhase-TO(DeepSomatic-TO)` (light purple)
+3.  `LongPhase-TO(ClairS-TO-ss)` (dark blue)
+
+The x-axis of both charts lists the cancer cell line samples, such as COLO829, H1437, H2009, etc., which were introduced in the previous slide.
+
+**Figure (a): LOH Ratio**
+
+*   **Figure Legend:** This bar chart compares the total LOH ratio detected by the three different pipelines for each sample. The y-axis represents the "LOH Ratio," which is the proportion of the genome identified as having lost heterozygosity, with a scale from 0.0 to 0.8. Each group of bars corresponds to a specific cancer cell line sample.
+*   **Key Message of the Visualization:** The chart shows that the `LongPhase-TO(ClairS-TO-ssrs)` and `LongPhase-TO(DeepSomatic-TO)` pipelines detect a consistently higher LOH ratio across most samples compared to the `LongPhase-TO(ClairS-TO-ss)` pipeline. The LOH ratios vary significantly between cell lines, with HCC1395 and HCC1937 showing the highest ratios (around 0.5), and HCC1954 showing the lowest (around 0.1). This suggests that the choice of the underlying variant caller significantly impacts the quantity of LOH regions detected.
+
+**Figure (b): Largest Block (MB)**
+
+*   **Figure Legend:** This bar chart compares the size of the largest contiguous phased block (in Megabases, MB) identified by each of the three pipelines. The y-axis, "Largest Block (MB)," scales from 0 to 160. This metric is an indicator of the phasing contiguity, which is crucial for identifying long-range LOH events.
+*   **Key Message of the Visualization:** Similar to the LOH ratio, the `LongPhase-TO(ClairS-TO-ssrs)` and `LongPhase-TO(DeepSomatic-TO)` pipelines consistently produce larger phased blocks than the `LongPhase-TO(ClairS-TO-ss)` pipeline. For example, in the COLO829 samples, the former two methods identify a largest block of approximately 110 MB, while the latter identifies one around 100 MB. This indicates that the `ssrs` and `DeepSomatic-TO` variant callers provide better input for `LongPhase-TO`, enabling the detection of longer, more contiguous LOH regions.
+
+### **Summary of Key Messages**
+
+This slide presents results comparing three computational pipelines for LOH detection, building upon the tools and data introduced previously. The key takeaways are:
+
+*   **Performance Comparison:** The pipelines using `ClairS-TO-ssrs` and `DeepSomatic-TO` as inputs for `LongPhase-TO` outperform the pipeline using `ClairS-TO-ss`.
+*   **Quantitative and Qualitative Superiority:** This outperformance is demonstrated both quantitatively (higher total LOH ratio detected) and qualitatively (longer contiguous LOH blocks identified).
+*   **Methodological Implication:** The results strongly suggest that the choice of somatic variant caller is a critical factor for accurate and comprehensive LOH detection when using the `LongPhase-TO` tool. The `ssrs` mode of ClairS-TO and the tumor-only mode of DeepSomatic appear to be better suited for this application than the `ss` mode of ClairS-TO.
+
+
+
+
+Page 29:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Result : Comparison of Germline and Somatic Phasing
+
+### **Visualizations**
+
+The slide presents two bar charts, labeled (a) and (b), that compare the performance of four different phasing pipelines across eight cancer cell line datasets. The pipelines are differentiated by the phasing tool used (`LongPhase` for germline vs. `LongPhase-TO` for somatic) and the mode of the variant caller (`ClairS-TO-ssrs` vs. `ClairS-TO-ss`) that provides the input variants.
+
+The four pipelines compared are:
+1.  `LongPhase-TO(ClairS-TO-ssrs)` (light teal): A somatic-specific phaser.
+2.  `LongPhase(ClairS-TO-ssrs)` (green): A standard germline phaser using the same input as #1.
+3.  `LongPhase-TO(ClairS-TO-ss)` (light blue): A somatic-specific phaser with a different input variant set.
+4.  `LongPhase(ClairS-TO-ss)` (dark blue): A standard germline phaser using the same input as #3.
+
+The x-axis of both charts lists the different cancer cell line samples, such as COLO829_NYGC, H1437_UCSC, etc.
+
+**Figure (a): Phased Ratio**
+
+*   **Figure Legend:** This bar chart illustrates the "Phased Ratio," which represents the proportion of heterozygous variants that were successfully phased (assigned to a specific parental chromosome). The y-axis scales from 0.0 to 1.0. A higher ratio indicates more complete phasing.
+*   **Key Message of the Visualization:** The chart demonstrates that the somatic-specific phaser, `LongPhase-TO` (light teal and light blue bars), consistently achieves a higher phased ratio (around 0.5-0.6) across all samples compared to its germline counterpart, `LongPhase` (green and dark blue bars). The performance of the germline phaser is lower and more variable, indicating that the somatic-aware model is more effective at phasing variants identified in tumor samples.
+
+**Figure (b): Block N50 (bp)**
+
+*   **Figure Legend:** This bar chart compares the contiguity of phasing using the "Block N50" metric, measured in base pairs (bp). The y-axis scales up to 30 million bp (3e7). Block N50 is a standard measure where 50% of the total phased length is contained in blocks of this size or larger. A higher Block N50 value signifies longer, more contiguous phased blocks.
+*   **Key Message of the Visualization:** This chart shows a dramatic performance difference. The `LongPhase-TO` pipelines produce significantly larger Block N50 values (often between 10-25 million bp) than the `LongPhase` pipelines, for which the Block N50 is consistently very low (typically under 1 million bp). This result strongly suggests that `LongPhase-TO` is far superior at reconstructing long, continuous haplotypes from tumor sequencing data, which is essential for analyzing large-scale genomic events like LOH.
+
+### **Summary of Key Messages**
+
+This slide provides a crucial comparison justifying the choice of a somatic-specific phasing tool for analyzing tumor data. The key findings are:
+
+*   **Somatic Phasing Superiority:** The `LongPhase-TO` tool, designed specifically for somatic variant phasing, significantly outperforms the standard `LongPhase` (germline) tool when applied to tumor-only data.
+*   **Improved Completeness and Contiguity:** This superiority is evident in two key metrics: `LongPhase-TO` achieves a higher Phased Ratio (more variants are phased) and a dramatically higher Block N50 (the resulting phased blocks are much longer and more contiguous).
+*   **Methodological Justification:** The results validate the use of `LongPhase-TO` for downstream analyses like Loss of Heterozygosity (LOH) detection, as long-range phase information is critical for accurately identifying large regions of allelic loss. The performance of `LongPhase-TO` makes it a suitable foundation for the LOH detection results shown on the previous slide.
+
+
+
+
+Page 30:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Result : LOH Detection (HCC1395_HKU)
+
+### **Visualizations**
+
+The slide presents a series of 24 plots, each corresponding to a human chromosome (chr1-22, chrX, and chrY) for the HCC1395_HKU cancer cell line. These plots are used to visually compare the detection of Loss of Heterozygosity (LOH) regions by two different methods.
+
+Each chromosome plot consists of three horizontal tracks:
+1.  **Reference:** The top track is a chromosome ideogram, providing a standard cytogenetic map with banding patterns (G-bands) and the centromere (indicated in red). This serves as a positional reference.
+2.  **CytoScan HD:** The middle track displays the LOH regions detected by the Affymetrix CytoScan HD array, a well-established microarray-based platform for detecting copy number variations and LOH. Detected LOH regions are colored purple.
+3.  **LongPhase-TO:** The bottom track shows the LOH regions detected using the `LongPhase-TO` phasing tool, which, as established in the previous slide, is optimized for somatic variant phasing from long-read sequencing data. Detected LOH regions are colored blue.
+
+A legend at the bottom of the slide clarifies the color coding for the analysis tracks.
+
+**Figure Legend:** Genome-wide comparison of Loss of Heterozygosity (LOH) detection in the HCC1395_HKU cell line. Each panel represents a chromosome, from 1 to 22, X, and Y. Within each panel, LOH regions detected by the CytoScan HD array method are shown in purple, while LOH regions detected by the sequencing-based `LongPhase-TO` method are shown in blue. Uncolored regions represent areas with no LOH detected (Non-LOH). The top track in each panel is the reference chromosome ideogram.
+
+**Key Message of the Visualization:** The visualization demonstrates a very high level of concordance between the LOH regions identified by the novel `LongPhase-TO` method and the established `CytoScan HD` reference method. Across most of the genome (e.g., chromosomes 1, 2, 6, 8, 10, 11, 13, 14, 17, and X), the blue bars (`LongPhase-TO`) almost perfectly overlap with the purple bars (`CytoScan HD`), indicating that the new method successfully identifies the same large-scale LOH events. The `LongPhase-TO` results appear as long, contiguous blocks, which is a direct result of the superior long-range phasing capability demonstrated on the previous slide. This visual validation confirms the effectiveness of using `LongPhase-TO` for accurate LOH analysis from tumor sequencing data.
+
+### **Tables**
+
+The slide includes a legend that functions as a key for interpreting the visualization.
+
+**Table Legend:** This legend explains the color coding used in the chromosome plots to represent the status of LOH detection by different methods.
+
+| Color/Symbol | Description         |
+| :----------- | :------------------ |
+| ☐ White      | Non-LOH             |
+| 🟪 Purple     | CytoScan HD LOH     |
+| 🟦 Blue       | LongPhase-TO LOH    |
+
+### **Summary of Key Messages**
+
+This slide presents the successful application of the `LongPhase-TO` pipeline, which was previously shown to be superior for phasing somatic variants. The key takeaways are:
+
+*   **Validation of LOH Detection:** The `LongPhase-TO` based method for LOH detection is validated by showing strong agreement with results from the gold-standard `CytoScan HD` microarray platform.
+*   **High Concordance:** The method accurately identifies known large-scale LOH events across the entire genome of the HCC1395_HKU cancer cell line.
+*   **Demonstration of Utility:** The slide effectively demonstrates that the high-quality, long-range phasing from `LongPhase-TO` can be successfully translated into an accurate and reliable downstream application like LOH detection, reinforcing the methodological choices made earlier in the research.
+
+
+
+
+Page 31:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Result : Somatic Calling (Trained on Real Data)
+
+### **Visualizations**
+
+The slide presents a comprehensive benchmark of four different somatic variant calling methods across eight distinct cancer cell line datasets. The results are displayed in a grid of 24 line plots, organized into three rows and eight columns.
+
+*   **Rows (Metrics):** Each row represents a standard performance metric for classification tasks.
+    *   The top row shows the **F1-score**, which is the harmonic mean of precision and recall, providing a single measure of a test's accuracy.
+    *   The middle row shows **Precision**, which measures the proportion of true positive calls among all positive calls (i.e., accuracy of positive predictions).
+    *   The bottom row shows **Recall** (or sensitivity), which measures the proportion of true positives that were correctly identified.
+    All metrics range from 0.0 to 1.0 on the y-axis, where higher values indicate better performance.
+
+*   **Columns (Datasets):** Each column corresponds to a different real-world cancer dataset, including `COLO829_NYGC`, `COLO829_ONT`, `H1437_UCSC`, `H2009_UCSC`, `HCC1395_HKU`, `HCC1395_NYGC`, `HCC1937_UCSC`, and `HCC1954_UCSC`. This demonstrates the robustness of the methods across various sample types and sequencing centers.
+
+*   **Axes and Lines:** For each plot, the x-axis represents the **Purity** of the tumor sample, ranging from 0.2 (20%) to 1.0 (100%). The lines within each plot track the performance of four different methods as purity changes. The methods are combinations of two base somatic variant callers (`ClairS-TO-ssrs` and `DeepSomatic-TO`) with and without the addition of the `LongPhase-TO` tool.
+
+**Figure Legend:** Performance comparison of four somatic variant calling pipelines across eight cancer cell line datasets. Each column represents a unique dataset, and each row corresponds to a performance metric (F1-score, Precision, Recall). The x-axis shows the tumor purity, while the y-axis shows the metric score. The performance of four methods is plotted: `LongPhase-TO(ClairS-TO-ssrs)` (solid light-blue), `ClairS-TO-ssrs` (dashed green), `LongPhase-TO(DeepSomatic-TO)` (solid purple), and `DeepSomatic-TO` (dashed purple).
+
+**Key Message of the Visualization:** The primary message is that integrating `LongPhase-TO` has a significant and distinct impact on the performance of different base callers.
+1.  **Enhancement of ClairS:** `LongPhase-TO` consistently improves the F1-score and Precision of `ClairS-TO-ssrs` across nearly all datasets and purity levels. This suggests that `LongPhase-TO` effectively refines the output of `ClairS`, increasing its overall accuracy and reliability. The `LongPhase-TO(ClairS-TO-ssrs)` combination (light blue line) is often the top-performing method in terms of F1-score.
+2.  **Precision/Recall Trade-off for DeepSomatic:** When applied to `DeepSomatic-TO`, `LongPhase-TO` dramatically increases its Precision (middle row) but at a significant cost to its Recall (bottom row). `DeepSomatic-TO` alone (dashed purple line) exhibits very high recall but poor precision. Adding `LongPhase-TO` corrects the low precision but over-penalizes recall, leading to a lower overall F1-score compared to `DeepSomatic-TO` alone.
+3.  **Effect of Purity:** As expected, the performance of all methods generally improves with increasing tumor purity, as somatic variants become easier to detect against the germline background.
+
+### **Tables**
+
+The slide contains a legend at the bottom that defines the line styles and colors for the four methods benchmarked in the plots.
+
+**Table Legend:** This key identifies the four computational methods evaluated in the performance benchmark.
+
+| Line Style and Color                                 | Method Name                    |
+| :--------------------------------------------------- | :----------------------------- |
+| <span style="color:light-blue;">—●—</span>            | LongPhase-TO(ClairS-TO-ssrs)   |
+| <span style="color:green;">--▲--</span>                | ClairS-TO-ssrs                 |
+| <span style="color:mediumpurple;">—●—</span>          | LongPhase-TO(DeepSomatic-TO)   |
+| <span style="color:rebeccapurple;">--■--</span>      | DeepSomatic-TO                 |
+
+### **Summary of Key Messages**
+
+This slide evaluates the impact of the `LongPhase-TO` tool on somatic variant calling by integrating it with two existing callers, `ClairS` and `DeepSomatic`. The key takeaways are:
+
+*   **`LongPhase-TO` Improves `ClairS`:** Adding `LongPhase-TO` to `ClairS-TO-ssrs` consistently boosts its F1-score and precision, making the combined pipeline a robust and accurate method for somatic calling.
+*   **`LongPhase-TO` Modulates `DeepSomatic`:** `LongPhase-TO` significantly improves the low precision of `DeepSomatic-TO` but at the expense of its high recall. This highlights a classic precision-recall trade-off, indicating that while `LongPhase-TO` can filter false positives from `DeepSomatic-TO`, it may be too stringent for this specific caller.
+*   **Methodological Validation:** The results validate the utility of `LongPhase-TO` as a refinement step for specific variant callers. The `LongPhase-TO(ClairS-TO-ssrs)` combination emerges as a superior method, justifying its use in downstream applications like the LOH detection shown on the previous slide.
+
+
+
+
+Page 32:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Result : Somatic Calling (Trained on Simulated)
+
+### **Visualizations**
+
+This slide presents a performance benchmark of two somatic variant calling pipelines, evaluated across eight different cancer cell line datasets. The results are shown in a grid of 24 line plots, arranged in three rows and eight columns. These results are for models that were trained on simulated data, which contrasts with the previous slide where models were trained on real data.
+
+*   **Rows (Metrics):** Each row represents a different performance metric for evaluating the variant callers.
+    *   The top row displays the **F1-score**, a balanced measure of a test's accuracy that combines precision and recall.
+    *   The middle row displays **Precision**, indicating the proportion of identified variants that are actual true variants (the accuracy of positive calls).
+    *   The bottom row displays **Recall**, also known as sensitivity, which shows the proportion of all true variants that were correctly identified by the caller.
+    The y-axis for all metrics ranges from 0.0 to 1.0, with higher values signifying better performance.
+
+*   **Columns (Datasets):** Each column corresponds to a specific cancer cell line dataset used for testing the pipelines. The datasets are: `COLO829_NYGC`, `COLO829_ONT`, `H1437_UCSC`, `H2009_UCSC`, `HCC1395_HKU`, `HCC1395_NYGC`, `HCC1937_UCSC`, and `HCC1954_UCSC`.
+
+*   **Axes and Lines:** In each individual plot, the x-axis represents the tumor **Purity**, ranging from 0.2 (20%) to 1.0 (100%). The lines track the performance of two distinct methods as this purity changes: `ClairS-TO-ss` alone, and `ClairS-TO-ss` combined with `LongPhase-TO`.
+
+**Figure Legend:** Performance comparison of two somatic variant calling pipelines across eight cancer cell line datasets, using models trained on simulated data. Each column represents a unique dataset, and each row corresponds to a performance metric (F1-score, Precision, Recall). The x-axis indicates tumor purity, and the y-axis shows the metric score. The performance of two methods is plotted: `LongPhase-TO(ClairS-TO-ss)` (solid blue line) and `ClairS-TO-ss` (dashed green line).
+
+**Key Message of the Visualization:** The visualization clearly illustrates the effect of adding `LongPhase-TO` to the `ClairS-TO-ss` pipeline.
+1.  **Precision Improvement:** The most consistent trend across all eight datasets is that the `LongPhase-TO(ClairS-TO-ss)` pipeline (blue line) achieves significantly higher precision than `ClairS-TO-ss` alone (green line). This indicates that `LongPhase-TO` is effective at filtering out false-positive variant calls.
+2.  **Recall Reduction:** Conversely, the `ClairS-TO-ss` pipeline alone (green line) consistently shows higher recall than the combined pipeline. This means that while `LongPhase-TO` improves precision, it does so at the cost of missing some true-positive variants.
+3.  **F1-Score Trade-off:** The F1-score (top row) reveals the net effect of this precision-recall trade-off. In several datasets (e.g., `H1437_UCSC`, `HCC1937_UCSC`, `HCC1954_UCSC`), the gain in precision from `LongPhase-TO` outweighs the loss in recall, resulting in a better overall F1-score. In other datasets, the F1-scores are very similar, or `ClairS-TO-ss` alone performs slightly better, suggesting the optimal choice may be dataset-dependent.
+
+### **Tables**
+
+A legend at the bottom of the slide identifies the two methods being compared in the plots.
+
+**Table Legend:** This key defines the line styles and colors for the two computational methods benchmarked.
+
+| Line Style and Color                 | Method Name                  |
+|:-------------------------------------|:-----------------------------|
+| <span style="color:blue;">—●—</span> | LongPhase-TO(ClairS-TO-ss)   |
+| <span style="color:green;">--▲--</span> | ClairS-TO-ss                 |
+
+### **Summary of Key Messages**
+
+This slide evaluates the impact of adding the `LongPhase-TO` tool to the `ClairS-TO-ss` somatic variant caller, using models that were trained on simulated data. The key findings are:
+
+*   **`LongPhase-TO` Acts as a Precision-Enhancing Filter:** Integrating `LongPhase-TO` consistently boosts the precision of `ClairS-TO-ss` across all tested datasets.
+*   **A Clear Precision-Recall Trade-off:** The improvement in precision comes at the expense of recall. `LongPhase-TO` filters out some true variants along with the false ones.
+*   **Overall Performance is Context-Dependent:** The net effect on the F1-score varies. The combined `LongPhase-TO(ClairS-TO-ss)` pipeline provides a better balance and higher overall accuracy in several cases, particularly where the baseline precision of `ClairS-TO-ss` is lower. This validates `LongPhase-TO` as a useful post-processing step for refining somatic variant calls, though its application may lead to a more conservative set of results.
+
+
+
+
+Page 33:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Result : Tumor Purity Prediction
+
+### **Visualizations**
+
+This slide presents an evaluation of four different methods for predicting tumor purity. The results are displayed in a grid of eight scatter plots, arranged in two rows and four columns, with each plot corresponding to a specific cancer cell line dataset.
+
+*   **Grid Layout:** The slide is structured as a 2x4 grid. Each cell contains a plot for a unique dataset: `COLO829_ONT`, `COLO829_NYGC`, `H1437_UCSC`, `H2009_UCSC` in the top row, and `HCC1395_HKU`, `HCC1395_NYGC`, `HCC1937_UCSC`, `HCC1954_UCSC` in the bottom row.
+
+*   **Axes:**
+    *   The **x-axis** of each plot is labeled "Simulated Purity" and represents the known, ground-truth tumor purity of the sample, ranging from 0.0 (0%) to 1.0 (100%).
+    *   The **y-axis** of each plot is labeled "Estimated Purity" and shows the purity value predicted by the different computational methods, also ranging from 0.0 to 1.0.
+
+*   **Data Representation:**
+    *   Each colored line tracks the performance of a specific purity estimation method across different simulated purity levels (0.2, 0.4, 0.6, 0.8, and 1.0).
+    *   A dashed grey line, labeled "Ideal Prediction," represents the y=x line. This line indicates a perfect prediction, where the estimated purity exactly matches the simulated purity. The closer a method's line is to this dashed line, the more accurate its prediction.
+
+**Figure Legend:** Comparison of tumor purity prediction accuracy for four methods across eight different cancer cell line datasets. Each plot shows the estimated purity (y-axis) versus the simulated ground-truth purity (x-axis). The performance of four methods is shown: `Ascat(Tumor-Normal pair)` (red), `LongPhase-TO(ClairS-TO-ssrs)` (blue), `LongPhase-TO(ClairS-TO-ss)` (green), and `LongPhase-TO(DeepSomatic-TO)` (purple). The dashed grey line indicates an ideal, perfectly accurate prediction.
+
+**Key Message of the Visualization:**
+1.  **Superior Performance of `LongPhase-TO` Methods:** The three methods based on `LongPhase-TO` (blue, green, and purple lines) consistently provide accurate purity estimations. Their predictions closely follow the "Ideal Prediction" line across most datasets and purity levels.
+2.  **Poor Performance of `Ascat`:** The `Ascat` method (red line) performs erratically and is often highly inaccurate. For several datasets (e.g., `COLO829_NYGC`, `H1437_UCSC`, `HCC1395_HKU`, `HCC1395_NYGC`, `HCC1937_UCSC`), `Ascat` significantly overestimates purity, especially at low simulated purity values. For instance, it predicts a purity of 1.0 when the true value is 0.2 or 0.4.
+3.  **Consistency Among `LongPhase-TO` Variants:** The three variations of the `LongPhase-TO` pipeline (using `ClairS-TO-ssrs`, `ClairS-TO-ss`, or `DeepSomatic-TO` as the underlying somatic caller) yield very similar and robust results. The choice of the base caller appears to have a minimal effect on the final purity estimation.
+4.  **Low Purity is Challenging:** While the `LongPhase-TO` methods are generally robust, there is some minor deviation from the ideal line at the lowest simulated purity (0.2), where they tend to slightly underestimate or overestimate the purity. However, their performance is still vastly superior to `Ascat`.
+
+### **Tables**
+
+A legend at the bottom of the slide identifies the different methods and the ideal prediction line.
+
+**Table Legend:** This key defines the markers and colors for the four computational methods benchmarked and the ideal prediction reference.
+
+| Marker and Color                                  | Method Name                    |
+|:--------------------------------------------------|:-------------------------------|
+| <span style="color:red;">—△—</span>               | Ascat(Tumor-Normal pair)       |
+| <span style="color:blue;">—●—</span>               | LongPhase-TO(ClairS-TO-ssrs)   |
+| <span style="color:green;">—●—</span>              | LongPhase-TO(ClairS-TO-ss)     |
+| <span style="color:purple;">—●—</span>             | LongPhase-TO(DeepSomatic-TO)   |
+| <span style="color:grey;">---</span>             | Ideal Prediction               |
+
+### **Summary of Key Messages**
+
+Following the evaluation of somatic calling performance on the previous slide, this slide assesses a related capability: the accurate prediction of tumor purity. The key findings are:
+
+*   **`LongPhase-TO` Provides Accurate Purity Estimates:** The pipelines incorporating `LongPhase-TO` are highly effective at predicting tumor purity, with results that closely match the ground truth across a range of datasets and purity levels.
+*   **`Ascat` is Unreliable for Purity Estimation in this Context:** The standard `Ascat` method demonstrates poor and inconsistent performance, making it an unreliable choice for purity estimation on these datasets.
+*   **Robustness Across Base Callers:** The accuracy of purity estimation by `LongPhase-TO` is not heavily dependent on the specific underlying somatic variant caller (`ClairS-TO-ssrs`, `ClairS-TO-ss`, or `DeepSomatic-TO`), indicating the robustness of the `LongPhase-TO` estimation algorithm itself. This suggests that the tool can reliably estimate a crucial sample characteristic in addition to improving variant calls.
+
+
+
+
+Page 34:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Result : Haplotagging somatic variant
+
+### **Visualizations**
+
+This slide presents a visualization, likely from a genome browser like IGV (Integrative Genomics Viewer), to illustrate the process and result of haplotagging a somatic variant using long-read sequencing data. The image is divided into several horizontal tracks, each providing a different layer of information about a specific genomic region.
+
+*   **Top Track ("Somatic"):** This track at the very top indicates the positions of genetic variants detected in the sample. The vertical lines represent variant calls. The tall, dark blue line in the center likely highlights the specific somatic variant of interest for this demonstration. Other, fainter lines (light blue/cyan) may represent other variants, possibly germline ones.
+
+*   **Coverage Track:** The gray histogram-like track directly below the "Somatic" track shows the read coverage across this genomic region. The label `[0 - 41]` on the left indicates that the coverage depth in this area ranges up to 41x.
+
+*   **Haplotype Tracks:** The main body of the visualization consists of three tracks that show sequencing reads segregated by haplotype. This segregation is the result of a process called "phasing."
+    *   **HP1 (Haplotype 1):** This track, with a pink background, contains all the long sequencing reads (shown as horizontal white bars) that have been computationally assigned to the first parental chromosome (Haplotype 1).
+    *   **HP2 (Haplotype 2):** This track, with a light blue background, displays reads assigned to the second parental chromosome (Haplotype 2).
+    *   **HP2-1 (Sub-haplotype):** This track, with a light green background, appears to be a subset of Haplotype 2. It groups reads that not only belong to Haplotype 2 but also share a specific characteristic, which in this case is the somatic mutation.
+
+*   **Read-level Details:** Within each haplotype track, the long horizontal bars represent individual sequencing reads. Small, colored vertical ticks on these reads indicate positions where the read's sequence differs from the reference genome. By inspecting the alignment of these ticks with the variant calls in the top track, one can see which reads support which variant.
+
+**Figure Legend:** A genome browser view demonstrating the successful haplotagging of a somatic variant. The visualization shows long sequencing reads partitioned into three groups: Haplotype 1 (HP1, pink), Haplotype 2 (HP2, blue), and a sub-haplotype (HP2-1, green). The top track marks the locations of called variants, with the central dark blue line indicating the somatic variant of interest. The reads in the HP2-1 track all contain this somatic mutation (visible as aligned vertical ticks), demonstrating that the mutation has been successfully assigned to a specific sub-clone on Haplotype 2.
+
+**Key Message of the Visualization:**
+1.  **Successful Phasing:** The method has effectively separated the long reads into distinct groups corresponding to the two parental haplotypes (HP1 and HP2).
+2.  **Precise Haplotagging of a Somatic Variant:** The key result is that the somatic variant (central dark blue line) is shown to exist exclusively on reads within the "HP2-1" track. This means the analysis has not only identified the mutation but also determined its chromosome of origin (Haplotype 2).
+3.  **Identification of a Sub-clone:** The creation of the "HP2-1" track suggests the identification of a tumor sub-clone. The somatic mutation is not present on all Haplotype 2 reads, but only on a specific subset, which has been isolated here. This demonstrates the method's ability to resolve intra-tumor heterogeneity.
+
+### **Summary of Key Messages**
+
+Building on the previous slide which validated the performance of the `LongPhase-TO` pipeline, this slide provides a concrete visual example of one of its key capabilities. The main takeaway is the successful haplotagging of a somatic variant. The visualization clearly demonstrates that the analysis pipeline can:
+
+*   Use long-read data to phase a genomic region, separating reads by their parental chromosome of origin (Haplotype 1 vs. Haplotype 2).
+*   Pinpoint the specific haplotype on which a somatic mutation has occurred. In this case, the mutation is on Haplotype 2.
+*   Potentially identify and resolve tumor sub-clones by showing that the somatic mutation is carried by only a subset of reads from that haplotype. This ability to link a mutation to its specific chromosomal background is critical for understanding the evolution and genetic makeup of a tumor.
+
+
+
+
+Page 35:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Result : Haplotagging somatic and LOH
+
+### **Visualizations**
+
+This slide presents a complex result in a genome browser view, demonstrating the pipeline's ability to simultaneously identify and phase a somatic point mutation and a large-scale Loss of Heterozygosity (LOH) event using long-read sequencing data. The visualization is annotated to highlight these two distinct genomic alterations.
+
+*   **Overall Layout:** The image displays several horizontal tracks representing a specific region of the genome. The top track shows read coverage, while the three main tracks below show long sequencing reads that have been separated (phased) based on their haplotype of origin.
+*   **Coverage and Variant Track:** The topmost gray histogram shows the read coverage across the displayed region, with the scale `[0 - 64]` on the far left indicating a maximum depth of 64x. Small vertical colored lines within this track represent nucleotide differences from the reference genome.
+*   **Haplotype Tracks:** The core of the visualization consists of three tracks showing phased reads:
+    *   **HP1 (Haplotype 1):** This track, with a light purple background, groups all long reads assigned to the first parental chromosome.
+    *   **HP2 (Haplotype 2):** This track, with a light red/pink background, contains reads assigned to the second parental chromosome.
+    *   **HP2-1 (Sub-haplotype):** This track, with a light green background, isolates a specific subset of reads from Haplotype 2. These reads represent a sub-clonal population that carries a unique mutation.
+*   **Annotations:**
+    *   **"Somatic Variant":** An arrow points to a specific genomic coordinate. At this location, a distinct vertical blue line is visible on the reads within the **HP2-1** track, indicating that this mutation is present only in this sub-clonal population and is linked to Haplotype 2.
+    *   **"LOH":** A long horizontal arrow spans the entire left portion of the view. In this region, the **HP1** track is completely devoid of reads, while the **HP2** track shows normal read coverage. This stark absence of one haplotype is the definitive signature of a Loss of Heterozygosity event, where the tumor cells have lost the chromosomal segment corresponding to Haplotype 1.
+
+**Figure Legend:** A genome browser visualization from a cancer sample analysis, illustrating the simultaneous detection of a Loss of Heterozygosity (LOH) event and a phased somatic point variant. The long sequencing reads are partitioned into Haplotype 1 (HP1, purple), Haplotype 2 (HP2, red), and a sub-clonal group from Haplotype 2 (HP2-1, green). The region marked "LOH" shows a complete absence of reads from HP1, indicating the physical loss of this chromosomal region. In a separate, heterozygous region to the right, a "Somatic Variant" is identified exclusively on the HP2-1 reads, demonstrating that it is a sub-clonal mutation that occurred on the retained Haplotype 2.
+
+**Key Message of the Visualization:**
+1.  **Clear Detection of LOH:** The method successfully identifies a large LOH event by demonstrating the complete absence of reads belonging to Haplotype 1 across a significant genomic region.
+2.  **Phasing of a Somatic Variant:** The pipeline precisely assigns a somatic point mutation to its parental chromosome of origin (Haplotype 2) and further resolves it to a specific sub-clone (HP2-1).
+3.  **Resolving Complex Tumor Genetics:** The visualization powerfully illustrates how different types of tumor-driving events (a large structural loss and a specific point mutation) can be resolved and correctly phased. It reveals that the LOH affected Haplotype 1, while a subsequent somatic mutation occurred on the remaining Haplotype 2, providing crucial insights into the evolutionary history of the tumor.
+
+### **Summary of Key Messages**
+
+This slide presents a key result, advancing from the previous example by tackling a more complex genomic scenario found in cancer. The primary message is that the analysis pipeline is capable of not only haplotagging individual somatic variants but also identifying large-scale structural events like Loss of Heterozygosity (LOH) and understanding their relationship.
+
+The visualization provides compelling evidence that:
+*   The method can detect and phase different classes of mutations simultaneously.
+*   It can reveal the specific parental chromosome affected by LOH (in this case, Haplotype 1 was lost).
+*   It can concurrently pinpoint that a separate somatic mutation arose on the other, retained chromosome (Haplotype 2).
+*   By isolating the somatic variant into a sub-haplotype (HP2-1), the method demonstrates its power in resolving tumor heterogeneity and reconstructing the sequence of mutational events.
+
+

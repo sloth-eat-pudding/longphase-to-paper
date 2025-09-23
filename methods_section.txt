@@ -1,0 +1,918 @@
+Page 10:
+### Title
+Objective
+
+### Figure Description
+
+This slide presents a flowchart that outlines the objective of the master thesis: to develop and utilize a bioinformatics pipeline named **LongPhase-TO**. This pipeline is designed for the comprehensive analysis of "Tumor-Only" samples using data from long-read sequencing technologies.
+
+The flowchart is organized from left to right, illustrating the entire workflow from the biological sample to the final computational outputs.
+
+1.  **Input Sample and Sequencing:**
+    *   The process starts with a **"Tumor-Only sample"**, which is depicted as a heterogeneous collection of cells. The different colors of the cells (yellow, orange, green) represent different tumor subclones or a mixture of tumor and normal cells. The chromosomes within these cells show different combinations of alleles (represented by blue and orange blocks), indicating genetic diversity.
+    *   This sample undergoes **"Long-read Sequencing"**, which generates long DNA fragments (reads). Example reads are shown as sequences of nucleotides (A, T, C, G), with colored letters highlighting variant positions that differ between haplotypes.
+
+2.  **The LongPhase-TO Pipeline:**
+    The core of the slide is the "LongPhase-TO" pipeline, which processes the long-read data to perform three main tasks:
+
+    *   **LOH Detection (Chromosomal-Scale):** This module is designed to identify large-scale Loss of Heterozygosity (LOH) events. LOH is a genetic event common in cancer where a cell loses one of its two parental copies of a chromosome or a chromosomal region. The icon shows a pair of homologous chromosomes where a segment of one chromosome is lost, resulting in the presence of only one allele in that region.
+
+    *   **Somatic Phasing:** This is a central function of the pipeline. Phasing is the process of assigning alleles to their specific parental chromosome of origin (haplotype).
+        *   **Germline Haplotypes:** The pipeline first reconstructs the two fundamental **Germline Haplotypes** (labeled HP1 and HP2 and associated with male and female icons, representing the paternal and maternal inheritance). These represent the baseline genetic makeup of the individual before tumor development.
+        *   **Somatic Haplotypes:** The pipeline then identifies **Somatic Haplotypes** (e.g., HP1-1, HP2-1, HP2-1-1), which have evolved from the germline haplotypes through the accumulation of somatic mutations during tumor progression. The arrows in the diagram illustrate this evolutionary lineage: a mutation on HP1 gives rise to HP1-1, and successive mutations on HP2 give rise to HP2-1 and then HP2-1-1. This provides a detailed, haplotype-resolved view of the tumor's evolution. The LOH event is shown to influence the presence and combination of these haplotypes in the tumor.
+
+    *   **Purity Prediction:** This module aims to estimate the purity of the tumor sample (i.e., the proportion of cancer cells). The diagram shows the initial mixed cell population with one cell type crossed out, leading to a calculated **"Purity = 1"**. This suggests the pipeline can either work ideally with pure samples or can computationally determine that the sample consists entirely of tumor cells (even if clonally heterogeneous), effectively addressing the purity challenge mentioned in the previous context.
+
+### Summary of Key Messages
+
+*   **Main Goal:** The research objective is to develop "LongPhase-TO," an integrated pipeline for analyzing tumor-only samples using long-read sequencing.
+*   **Comprehensive Cancer Genome Analysis:** LongPhase-TO combines three critical analyses in one workflow: chromosomal-scale LOH detection, high-resolution somatic phasing, and tumor purity prediction.
+*   **Evolutionary Insight through Phasing:** A key focus is on somatic phasing to reconstruct the evolutionary history of tumor haplotypes, tracing the accumulation of mutations from the original germline state.
+*   **Clinical Relevance:** The pipeline is designed for a "Tumor-Only" workflow, which is advantageous in clinical settings where a matched normal sample is often unavailable.
+*   **Addressing Tumor Complexity:** The tool aims to tackle the complexities of tumor samples, such as clonal heterogeneity and purity, to provide a more accurate and detailed genomic characterization.
+
+
+
+
+Page 11:
+### Title
+Method: Overview
+
+### Figure Description
+
+This slide provides a detailed, six-step overview of the bioinformatics method used in the thesis. The method is designed to analyze tumor-only samples using long-read sequencing data, starting from raw reads and culminating in a comprehensive genomic characterization including LOH, somatic haplotypes, and tumor purity.
+
+**1. CNV/BFB Interval Calling**
+This initial step involves analyzing the alignment of long sequencing reads to a reference genome. The diagram shows long reads (grey bars) with colored vertical lines indicating genetic variants. Dotted lines demarcate specific genomic intervals. Some reads are depicted with arrows, suggesting structural rearrangements like those found in Breakage-Fusion-Bridge (BFB) cycles. The key message is that the pipeline first screens the genome to identify regions potentially affected by large-scale Copy Number Variations (CNV) or complex rearrangements.
+
+**2. Chromosomal-Scale LOH Detection**
+This step focuses on identifying large regions of Loss of Heterozygosity (LOH). The visualization is a line graph where the y-axis represents the "Heterozygosity ratio" (from 0 to 1) and the x-axis represents a chromosomal region. The graph shows the ratio dropping from a high value (around 0.8) to a very low value (around 0.2) in a specific segment labeled "LOH." This illustrates how the method detects the loss of one parental chromosome copy by identifying a significant decrease in heterozygous variants across a large genomic scale.
+
+**3. Somatic Variant Candidate Selection**
+This is a critical filtering step to enrich for true somatic mutations. The diagram shows an initial pool of variants from the tumor sample (a circle containing blue, green, and orange dots). These variants are filtered by subtracting common germline variants found in a "Panel of Normals" (PON) database and applying other quality filters. The result is a refined set of high-confidence somatic variant candidates (two orange dots). This step is essential for reducing false positives in a tumor-only analysis where a matched normal sample is unavailable.
+
+**4. Somatic Variant Calling**
+This step identifies somatic mutations from the candidate list. The diagram displays aligned sequencing reads with a color code: grey for the reference allele, blue for the germline variant, orange for the somatic variant, and yellow for a sequencing error. It shows how the method distinguishes a true somatic variant, which is consistently present on multiple reads forming a new haplotype, from a random sequencing artifact. The small graph at the bottom illustrates this by showing the somatic variant (orange) creating a new, consistent path, while the sequencing artifact (yellow) is an isolated event.
+
+**5. Phasing**
+This is a central part of the methodology, where the pipeline reconstructs haplotypes. The diagram illustrates:
+*   **Germline Haplotypes:** Two initial haplotypes, HP1 (A-G-T-C) and HP2 (G-G-T-G), are established.
+*   **Somatic Haplotype Evolution:** A somatic mutation (T to G) occurs on HP1, giving rise to a new tumor-specific haplotype, HP1-1 (A-G-G-C).
+*   **Read Assignment:** Sequenced reads are then assigned to their most likely haplotype of origin (HP1, HP2, or the somatic HP1-1).
+*   **Integration with LOH:** The diagram differentiates between a "Non-LOH" region, where both germline haplotypes are present, and an "LOH" region, where one haplotype (HP1) is lost (indicated by the faded 'T'). This shows that the phasing process incorporates the LOH information from Step 2.
+
+**6. Tumor Purity Prediction Equation**
+The final step uses the phased haplotype information to estimate tumor purity. The visualization consists of:
+*   **Cell Populations:** Icons at the top show cell mixtures with increasing proportions of tumor cells (orange) corresponding to increasing purity.
+*   **Stacked Bar Chart:** The chart plots the relative abundance of the different haplotypes (HP1 - light blue, HP2 - dark blue, somatic HP1-1 - orange) against tumor purity values from 0.2 to 1. As purity increases, the proportion of the somatic haplotype (HP1-1) increases, while the proportion of the germline haplotype presumed to come from contaminating normal cells (HP2) decreases. The model (referred to as an "Equation") leverages these changing haplotype frequencies to calculate the purity of the tumor sample.
+
+### Summary of Key Messages
+
+*   **Integrated Workflow:** The slide presents a comprehensive, multi-step pipeline that integrates LOH detection, somatic variant calling, haplotype phasing, and tumor purity estimation into a single, cohesive method.
+*   **Haplotype-Resolved Analysis:** A core strength of the method is its ability to perform phasing with long reads, allowing it to reconstruct not only the germline haplotypes but also the evolutionary new somatic haplotypes that drive cancer.
+*   **Tumor-Only Design:** The methodology is specifically designed for tumor-only samples, using a Panel of Normals (PON) to effectively filter germline variants in the absence of a matched normal control.
+*   **Leveraging Long Reads:** The entire process is built upon the strengths of long-read sequencing, which is crucial for accurate phasing of variants and detection of complex structural events.
+*   **Quantitative Output:** The pipeline produces quantitative results, such as the location of LOH regions and a precise tumor purity estimate, which are derived from the relative frequencies of the phased haplotypes.
+
+
+
+
+Page 12:
+### Title
+Method: Chromosomal-Scale LOH Detection
+
+### Figure Description
+
+This slide provides a detailed visual explanation of the method used for detecting Chromosomal-Scale Loss of Heterozygosity (LOH) and associated structural variants. It expands on the LOH detection step introduced in the previous overview slide. The diagram is divided into three main conceptual parts: visualizing LOH using haplotype-specific reads, identifying structural variant signatures from read clipping patterns, and defining clipped reads using CIGAR strings.
+
+**1. Haplotype-Based LOH Visualization**
+The top half of the diagram illustrates the core concept of LOH detection.
+*   **Initial State:** The uppermost panel shows a collection of aligned long sequencing reads (grey bars) with various colored vertical lines indicating heterozygous variants. In the middle, there is an increased pile-up of reads, hinting at a copy number change.
+*   **Haplotype Separation and LOH:** The middle panel clarifies this by separating the reads into two putative haplotypes, represented by dark blue and light blue reads, respectively, and associated with two different individual icons (representing the two parental chromosome copies). A long horizontal arrow labeled "LOH (Chromosomal-Scale)" delineates a specific genomic region. Within this LOH region, the light blue reads (and their corresponding haplotype) are absent, while the dark blue reads continue. This visually represents the loss of one parental allele/haplotype, which is the definition of LOH.
+
+**2. Clipping Pattern Analysis for Structural Variants**
+The central graph plots the "Clipping count" (y-axis) against genomic position or "Loci" (x-axis). This graph analyzes the patterns of soft-clipped reads to infer the presence of specific structural variants (SVs) that are often mechanistically linked to LOH. A grey line represents the overall read "Coverage".
+*   **Legend:** A blue upward arrow represents "Up clipping" (soft-clipping at the start of a read), and an orange downward arrow represents "Down clipping" (soft-clipping at the end of a read).
+*   **CNV Signature:** The region labeled "CNV" (Copy Number Variation) shows a distinct pattern: a sharp peak of up-clipped reads followed immediately by a sharp peak of down-clipped reads. This signature is characteristic of a tandem duplication, where reads spanning the duplication breakpoint are clipped. The coverage is also shown to be elevated in this region.
+*   **BFB Signature:** The region labeled "BFB" (Breakage-Fusion-Bridge) displays a more complex pattern of alternating and overlapping up- and down-clipping signals. This pattern suggests a fold-back inversion, a type of complex rearrangement that is a hallmark of BFB cycles.
+
+**3. Definition of Clipped Reads and CIGAR Strings**
+The bottom part of the slide provides a technical explanation of the clipping patterns shown in the graph above. It illustrates how read alignments are represented by CIGAR strings.
+*   **Up-clipped read:** An example read is shown where the beginning of the read (sequence `GCT...`) does not align to the reference genome. Its CIGAR string is `10S 5M 2D 1M`, where `10S` signifies 10 soft-clipped bases at the start.
+*   **Down-clipped read:** Another example shows a read where the end of the read (sequence `AGC...`) is soft-clipped. Its CIGAR string is `8M 10S`, with `10S` indicating 10 soft-clipped bases at the end.
+
+This section connects the abstract clipping patterns in the graph to the concrete way sequence alignments are reported, demonstrating how these signatures are extracted from raw alignment data.
+
+### Summary of Key Messages
+
+*   **Multi-faceted LOH Detection:** The method detects LOH not just by observing the loss of heterozygous variants but by visualizing the complete loss of reads corresponding to one entire haplotype over a large chromosomal scale.
+*   **SV Signatures from Clipping Patterns:** The analysis of soft-clipped read patterns provides powerful evidence for identifying the underlying structural variants (SVs) causing LOH, such as tandem duplications (CNV) and fold-back inversions (BFB).
+*   **Leveraging Long-Read Data:** The entire approach relies on long sequencing reads, which are essential for both phasing haplotypes over long distances and for reliably spanning the breakpoints of structural variants to generate informative clipping signatures.
+*   **Integrated Genomic Characterization:** The slide demonstrates an integrated approach where LOH detection is combined with SV analysis, allowing for a more comprehensive characterization of large-scale genomic aberrations in the tumor.
+
+
+
+
+Page 13:
+This slide provides a detailed, step-by-step illustration of the method used for "CNV/BFB Interval Calling." Following the previous slide's introduction to clipping patterns, this slide demonstrates the algorithm for formally identifying the genomic boundaries of these structural variants based on soft-clipping signatures in sequencing data.
+
+### Title
+Method : CNV/BFB Interval Calling
+
+### Figure Description
+
+The figure is a multi-panel diagram that visualizes the process of identifying genomic intervals containing Copy Number Variations (CNV) or Breakage-Fusion-Bridge (BFB) events by analyzing read clipping patterns.
+
+1.  **Parsing Clipping (Top Panel):** This panel shows a schematic of long sequencing reads (grey arrow-shaped bars) aligned to a reference genome. The red segments at the ends of many reads represent soft-clipped portions—sequences that are present in the read but do not align to the reference at that location. The clipping is not random; the reads are organized into distinct pileups where clipping occurs at specific boundaries, forming patterns indicative of structural rearrangements.
+
+2.  **Clipping Count (Middle Panel):** This panel quantifies the clipping data from the top panel into a scatter plot.
+    *   The horizontal axis represents the genomic position.
+    *   The vertical axis, labeled "Clipping Count," represents the number of clipped reads at each position. By convention, up-clipping (soft-clipping at the start of a read) is plotted as a positive count, while down-clipping (soft-clipping at the end of a read) is plotted as a negative count.
+    *   Most of the plot shows low-level, scattered clipping events, likely representing alignment noise.
+    *   However, two distinct regions show sharp, significant peaks. The first highlighted region (with an orange upward arrow) shows a strong peak of positive counts (up-clipping). The second highlighted region (with an orange downward arrow) shows a strong peak of negative counts (down-clipping). This signature of an up-clipping peak followed by a down-clipping peak is characteristic of a tandem duplication (a type of CNV), as shown in the previous slide.
+
+3.  **Expected Interval / Small Region (Bottom Panel):** This panel illustrates the final output of the interval calling method. Based on the significant clipping signatures identified in the middle panel, the algorithm defines specific genomic regions.
+    *   The thick black bars labeled "Interval" represent the regions that have been successfully "called" as likely containing a CNV or BFB event. The boundaries of these intervals correspond directly to the locations of the significant, opposing clipping peaks in the plot above.
+    *   The slide also mentions "Small Region," suggesting a classification or filtering step might be applied, possibly based on the size of the interval or the strength of the clipping signal.
+
+### Summary of Key Messages
+
+*   **Algorithmic Interval Calling:** The slide details the computational method for moving from raw read alignment data (with clipping) to formally defined genomic intervals that contain structural variants like CNVs and BFBs.
+*   **Quantitative Clipping Signatures:** The method works by quantifying soft-clipping patterns. It converts visual pileups of clipped reads into a numerical plot, allowing for the systematic detection of significant signatures (e.g., opposing peaks of up- and down-clipping).
+*   **Defining SV Boundaries:** The core purpose of this method is to precisely identify the start and end points (the "interval") of a structural variant by locating the breakpoints where clipping signals accumulate.
+*   **Operationalizing the Concept:** This slide provides the practical "how-to" for the conceptual framework introduced in the previous slide, showing how the theoretical clipping patterns of CNVs and BFBs are detected and delineated in practice.
+
+
+
+
+Page 14:
+### Title
+Method : CNV/BFB Interval Calling (cont.)
+
+### Figure Description
+
+This slide presents a four-step flowchart detailing the computational method for identifying candidate locations for Copy Number Variation (CNV) or Breakage-Fusion-Bridge (BFB) events. Building on the previously introduced concept of clipping patterns, this slide illustrates the algorithm for processing raw clipping data to find significant signal peaks.
+
+1.  **Parsing Clipping (Top Panel):** This panel visually represents sequencing reads (grey arrow-shaped bars) aligned to a reference genome. The red-colored ends of the reads signify "soft-clipped" portions—sequences present in the read but not aligning to the reference at that specific location. The visualization shows how these clipped reads can form distinct pileups at certain genomic positions, creating a pattern that suggests a potential structural rearrangement.
+
+2.  **Clipping Count (Second Panel):** This panel translates the visual clipping information from the top panel into a quantitative scatter plot.
+    *   The horizontal axis represents the genomic position.
+    *   The vertical axis plots the "Clipping Count." By convention, one type of clipping (e.g., at the start of reads, or "up-clipping") is assigned a positive value (e.g., +1), while the opposite type (e.g., at the end of reads, or "down-clipping") is assigned a negative value (e.g., -1).
+    *   Each point on the plot represents a specific genomic location where one or more reads are clipped. The y-value of the point indicates the net count and type of clipping at that position. This step converts the raw alignment data into a discrete numerical signal.
+
+3.  **Forward Pileup (Third Panel):** This panel demonstrates a data smoothing technique applied to the "Clipping Count" signal.
+    *   A line graph is generated by calculating a sliding window sum across the clipping counts. The slide provides an example where the window size `w` is 6.
+    *   For each position, the algorithm sums the "Clipping Count" values of the `w` nearest points. This process, termed "Forward Pileup," transforms the sparse, spiky signal from the previous step into a continuous, smoothed profile. This smoothing helps to reduce noise and amplify regions with a consistent and strong clipping signal.
+
+4.  **Find Peak (Bottom Panel):** In the final step, the algorithm analyzes the "Forward Pileup" profile to identify local maxima, or peaks.
+    *   As indicated by the orange arrows and dotted circles, the peaks in the smoothed graph correspond to the locations with the most significant accumulation of a specific type of clipping.
+    *   These peaks are identified as "Gentle Clipping Candidates," representing the most probable locations for the breakpoints of a CNV or BFB event.
+
+### Equations
+
+The slide provides two examples of the "Forward Pileup" calculation, which is a summation of clipping counts within a defined window `W` (here, with size `w=6`).
+
+The first example shows a window with mixed positive and negative counts, resulting in a moderate pileup value. The second example shows a window where all counts are positive, leading to a strong peak in the pileup signal. *(Note: There appears to be a minor typo in the first calculation shown on the slide, as the sum `(-1)+(-1)+(-1)+1+(-1)+5` equals 0, not 2. However, the principle of summing values in a window remains clear).*
+
+```markdown
+(-1)+(-1)+(-1)+1+(-1)+5 = 2
+```
+```markdown
+1+1+1+1+1+1=6
+```
+
+The key message of these equations is to demonstrate the mechanism of the sliding window sum. This mathematical operation is used to smooth the raw clipping count data, making it easier to programmatically identify significant signal peaks that might otherwise be obscured by noise.
+
+### Summary of Key Messages
+
+*   **Algorithmic Signal Processing:** The slide outlines a systematic, multi-step algorithm for processing raw soft-clipping data from DNA sequencing.
+*   **From Raw Data to Candidate Sites:** The method follows a clear progression: 1) parsing visual clipping patterns, 2) quantifying them into a numerical signal, 3) smoothing the signal to enhance significant features using a sliding window sum ("Forward Pileup"), and 4) identifying peaks in the smoothed data as candidate breakpoints.
+*   **Noise Reduction and Signal Enhancement:** A core component of the method is the "Forward Pileup" step, which effectively filters out random noise and amplifies consistent, localized clipping signals that are characteristic of structural variants.
+*   **Automated Breakpoint Detection:** The ultimate goal of this method is to automate the detection of precise genomic locations ("Gentle Clipping Candidates") that are highly likely to be the boundaries of CNV or BFB events.
+
+
+
+
+Page 15:
+This slide continues the explanation of the "Method" for "CNV/BFB Interval Calling," building upon the signal processing steps detailed in the previous slide. It introduces two more sophisticated criteria for identifying significant clipping patterns: "Calling Gentle Clipping" and "Amplify Gentle Clipping."
+
+### Visualizations
+
+The slide presents two main sections, each containing one or more graphs to illustrate a specific signal processing step. The window size for these operations is specified as `w=6`.
+
+**1. Calling Gentle Clipping**
+
+This section describes a method for identifying regions with a consistent, albeit low-level, clipping signal.
+
+*   **Figure Legend:** The top graph is a scatter plot where the y-axis represents the "Clipping Count" (positive for one clipping direction, negative for the other) and the x-axis represents the genomic position. Each point is a raw clipping count at a specific location. The graph highlights two scenarios:
+    *   An 'X' marks a point that is likely rejected as it is an isolated signal.
+    *   A checkmark ('✓') highlights a successful "call" where a dense cluster of points with the same sign (in this case, +1) are found within a window `w`. This indicates a sustained, or "gentle," clipping pattern rather than a single sharp peak.
+*   **Key Message:** This step filters for candidate locations that are not necessarily high-amplitude peaks, but rather regions characterized by a high *density* of consistent, low-level clipping events. This is useful for identifying breakpoints that might not produce a strong, sharp peak but still have a clear, localized signal.
+
+**2. Amplify Gentle Clipping**
+
+This section describes a method for identifying breakpoints characterized by a rapid switch in the direction of clipping.
+
+*   **Figure Legend:** This part consists of two linked graphs plotted against the same genomic position on the x-axis.
+    *   The **top graph ("Clipping Pileup")** is a line chart showing the smoothed signal, which is the result of the "Forward Pileup" sliding window sum from the previous slide. It highlights a local minimum (valley) with a value of -8 and a subsequent local maximum (peak) with a value of -2.
+    *   The **bottom graph ("Clipping Count")** is a scatter plot of the raw clipping counts that generated the pileup signal above. Arrows connect the dense clusters of raw counts to their corresponding smoothed values in the pileup graph: a cluster of negative counts corresponds to the -8 valley, and a subsequent cluster of positive counts corresponds to the -2 peak.
+    *   The core concept is the rapid transition from a strong negative pileup to a positive one. The difference in their amplitudes is calculated to quantify this switch.
+*   **Key Message:** This method is designed to detect a specific, powerful signature of a structural breakpoint: a sharp, localized transition from one type of clipping pileup (e.g., predominantly negative) to the opposite type (predominantly positive). The magnitude of this change, or "amplification," serves as a strong indicator of a high-confidence event.
+
+### Equations
+
+The slide presents a single equation to explain the "Amplify Gentle Clipping" concept.
+
+This equation calculates the difference in amplitude between a local minimum (valley) and a subsequent local maximum (peak) in the "Clipping Pileup" graph. In the example provided, the calculation subtracts the pileup value of the valley (-8) from the value of the peak (-2) to find the total amplitude of the signal swing.
+
+```markdown
+-2 - (-8) = 6
+```
+
+The key message of the equation is to provide a quantitative score for the strength of a breakpoint signal that is characterized by a rapid switch in clipping patterns. A larger resulting value (in this case, 6) signifies a more pronounced and therefore more confident transition, effectively "amplifying" the signal of the gentle clipping events.
+
+### Summary of Key Messages
+
+*   **Advanced Signal Feature Detection:** The method moves beyond simple peak detection to employ more sophisticated criteria for identifying candidate CNV/BFB breakpoints.
+*   **Two Types of Signatures:** The slide details two distinct signatures: "Gentle Clipping," which identifies regions with a high density of consistent clipping, and "Amplify Gentle Clipping," which identifies sharp transitions from one clipping direction to another.
+*   **Quantifying Breakpoint Confidence:** The "Amplify" step introduces a quantitative metric (the amplitude of the pileup signal swing) to score the confidence of a candidate breakpoint. A larger amplitude indicates a stronger signal.
+*   **Connecting Raw Data to Complex Signals:** The visualizations clearly link patterns in the raw, discrete clipping count data to more complex features (like valleys and peaks in close proximity) in the smoothed pileup signal, providing a clear rationale for the algorithm's logic.
+
+
+
+
+Page 16:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : CNV/BFB Interval Calling (cont.)
+
+### **Visualizations**
+
+The slide contains three main visual components that illustrate the final steps of the interval calling method.
+
+**1. Amplify Gentle Clipping Graph**
+
+*   **Figure Legend:** This graph plots a processed signal against genomic position (implied x-axis). The y-axis represents the signal strength, ranging from -6 to 6. The plot shows a series of discrete signal points (grey dots) connected by lines. Two specific events are highlighted with dotted circles: a local maximum (peak) with a value of +4 and a local minimum (valley) with a value of -4. Arrows indicate that these prominent peaks and valleys are derived from clusters of smaller, raw signal events (small filled circles), effectively "amplifying" the signal from regions with dense, consistent clipping.
+*   **Key Message:** This visualization illustrates how the method processes the raw clipping signal to identify significant local peaks and valleys. These amplified signal points serve as the primary candidates for defining the boundaries of structural variations.
+
+**2. Interval Calling Graph**
+
+*   **Figure Legend:** This is a simplified version of the signal plot above, designed to illustrate the "Signal Swing" concept. The y-axis ranges from -6 to 6. Two examples of signal swings are shown with orange arrows. The first swing connects a peak at +5 to a subsequent valley at -5 over a genomic distance of 7,000 base pairs (bp). The second swing connects a peak at +6 to a valley at -5 over a distance of 9,000 bp.
+*   **Key Message:** This graph provides concrete examples of what the algorithm identifies as a "Signal Swing"—a pair of nearby, opposing peaks and valleys that meet specific criteria for amplitude and distance. These swings are considered strong evidence for a breakpoint.
+
+**3. Result Schematic**
+
+*   **Figure Legend:** This diagram shows the final output of the method in a format resembling a genome browser view. It consists of three layers:
+    *   The top layer displays grey, arrow-shaped rectangles representing sequencing reads aligned to a reference genome. Reads with red, jagged ends likely represent soft-clipped reads, which are the source of the clipping signal.
+    *   The middle layer, labeled "Interval," shows thick black vertical bars placed at the locations of the identified breakpoints.
+    *   The bottom layer, labeled "Small Region," shows thick black horizontal bars that span the genomic regions between pairs of breakpoints, representing the final called intervals.
+*   **Key Message:** This schematic demonstrates how the abstract signal processing and interval calling logic translate into a tangible genomic result. The identified signal swings are used to pinpoint precise breakpoint locations ("Interval") and define the boundaries of the affected genomic segments ("Small Region").
+
+### **Equations**
+
+The slide presents the formal criteria for "Interval Calling" using two conditions.
+
+These equations define the rules for identifying significant genomic events. The first rule, "Event Burst," is a simple thresholding to identify any point of interest. The second, "Signal Swing," defines the core logic for pairing a peak and a valley to call a high-confidence event. It requires that the ratio of the signals at two points, `i` and `j`, exceeds a threshold `α`, and that the genomic distance between them is less than a threshold `β`. This formalizes the search for sharp, localized inversions in the clipping signal.
+
+```markdown
+Event Burst: c > λ
+
+Signal Swing (i,j) ⇔ (c_j / c_i ≥ α) ∧ (|j - i| ≤ β)
+```
+
+The key message of these equations is to provide a quantitative and reproducible framework for identifying breakpoints. By defining a "Signal Swing" with both an amplitude condition (the ratio `α`) and a proximity condition (the distance `β`), the method can systematically filter for high-confidence events while ignoring random noise or distant, unrelated signals.
+
+### **Summary of Key Messages**
+
+This slide concludes the description of the CNV/BFB interval calling method by detailing the final decision-making steps.
+
+*   **Formal Criteria for Breakpoints:** The method uses a set of formal rules, defined by mathematical equations, to identify significant events called "Signal Swings."
+*   **Signal Swings as Key Evidence:** A "Signal Swing," characterized by a rapid and localized transition between a signal peak and a signal valley, is the primary evidence used to call a breakpoint.
+*   **Defining Genomic Intervals:** The identified breakpoints are used to define the start and end coordinates of the final CNV/BFB intervals.
+*   **From Signal to Result:** The slide effectively connects the abstract signal processing concepts (peaks, valleys, swings) to the final, interpretable output: specific genomic regions identified as having structural variations, visualized in the context of the underlying sequencing read data.
+
+
+
+
+Page 17:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Chromosomal-Scale LOH Detection (cont.)
+
+### **Visualizations**
+
+The slide presents a multi-stage workflow for detecting large, chromosomal-scale Loss of Heterozygosity (LOH) events, illustrating how smaller, localized events are handled to define the final region.
+
+**1. Genomic Data and Initial Event Interpretation**
+
+*   **Figure Legend:** This multi-layered diagram illustrates the process from raw data to event calling.
+    *   **Top Layer (Sequencing Reads):** A schematic resembling a genome browser view shows sequencing reads (blue and light blue rectangles) aligned to a reference genome. Vertical colored lines within the reads likely represent single nucleotide variants (SNVs).
+    *   **Annotation Layers ("Interval", "Small Region"):** Above the reads, annotations from a previous step (as per the context) mark out "Intervals" and smaller "Small Regions," which correspond to specific genomic events.
+    *   **Middle Plot (Heterozygosity Ratio):** This plot shows the calculated heterozygosity ratio across the genomic region. The y-axis ranges from 0 to 1. The ratio is high (around 0.8) in some segments and drops to nearly zero in others. The high-ratio segments are marked with an orange 'X', suggesting they are distinct from the primary LOH regions.
+    *   **Bottom Layer (Genomic Event):** This track provides an initial interpretation of the heterozygosity ratio plot. Regions where the ratio is near zero are labeled "LOH". The segments with a restored high heterozygosity ratio are labeled as "CNV" (Copy Number Variation) and "BFB" (Breakpoint-Fusion-Bridge), corresponding to the "Small Region" calls from the prior analysis step.
+*   **Key Message:** This part of the diagram demonstrates how the heterozygosity ratio is used to make initial event calls. A low ratio is a clear signal for LOH. However, this initial pass reveals that large LOH regions can be interrupted by small, complex events like CNVs or BFBs, which temporarily restore or elevate the heterozygosity signal.
+
+**2. Filtering and Merging Step**
+
+*   **Figure Legend:** This lower part of the diagram, introduced by a large grey arrow, illustrates the final processing step, explicitly labeled "Skipping small CNV/BFB events".
+    *   The initial `LOH - CNV - BFB - LOH` event sequence is shown. Dashed arrows indicate that the algorithm "skips" over the intervening CNV and BFB events, effectively merging the flanking LOH segments.
+    *   The final resulting plot shows a single, continuous block of low heterozygosity ratio, which is now classified as one large "LOH" event.
+*   **Key Message:** The core logic of chromosomal-scale detection is to merge adjacent LOH segments by filtering out small, intervening events (CNV, BFB). This allows the method to identify the true, large-scale LOH that might be characteristic of major chromosomal alterations, rather than a collection of smaller, fragmented events.
+
+### **Equations**
+
+The slide includes two mathematical expressions that define the core metrics for LOH detection.
+
+The first equation defines how the heterozygosity ratio is calculated from sequencing read counts. It is the proportion of reads that support a heterozygous allele out of all reads covering a variant site. The second expression is the decision rule for calling an LOH event: it occurs when this calculated ratio falls below a predefined threshold, `σ`.
+
+```markdown
+Heterozygosity ratio = Het Count / (Het Count + Hom Count)
+```
+
+```markdown
+Heterozygosity ratio < σ
+```
+
+The key message of these equations is to formalize the LOH calling process. The ratio provides a quantitative measure of allelic balance, and the threshold `σ` provides a clear, reproducible criterion for distinguishing LOH regions from normal heterozygous regions.
+
+### **Summary of Key Messages**
+
+This slide details the final stage of a genomic analysis pipeline focused on identifying large-scale Loss of Heterozygosity (LOH).
+
+*   **LOH is Detected via Heterozygosity Ratio:** The primary signal for LOH is a significant drop in the heterozygosity ratio, calculated from SNV data in sequencing reads, to a value near zero.
+*   **Small Events Can Interrupt LOH Regions:** The method recognizes that complex events like Copy Number Variations (CNV) and Breakpoint-Fusion-Bridge (BFB) cycles can occur within larger LOH regions, causing localized spikes in the heterozygosity signal.
+*   **Merging for Chromosomal-Scale Detection:** To identify the full extent of chromosomal-scale events, the algorithm includes a crucial filtering step that "skips" or ignores these small intervening CNV/BFB events, merging the flanking LOH segments into a single, contiguous call.
+*   **From Complex Signals to a Coherent Result:** The overall workflow refines a complex signal pattern (dips and spikes in heterozygosity) into a simple, biologically meaningful interpretation: the presence of a large, chromosomal-scale LOH event.
+
+
+
+
+Page 18:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Somatic Variant Candidate Selection
+
+### **Visualizations**
+
+This slide outlines a three-step method for genomic analysis, with a primary focus on the third step: selecting somatic variant candidates. Steps 1 and 2, which identify large-scale structural changes, provide the context for the fine-grained variant selection in step 3.
+
+**1. Overall Methodological Flow (Left Panel)**
+
+*   **Figure Legend:** The panel on the left illustrates a three-stage bioinformatics pipeline.
+    1.  **CNV/BFB Interval Calling:** The first step involves identifying intervals of Copy Number Variation (CNV) or Breakpoint-Fusion-Bridge (BFB) events from sequencing read data.
+    2.  **Chromosomal-Scale LOH Detection:** The second step, building on the previous analysis, detects large regions of Loss of Heterozygosity (LOH) by analyzing the heterozygosity ratio across the genome. A low ratio indicates LOH.
+    3.  **Somatic Variant Candidate Selection:** The third and main step detailed on this slide is the selection and filtering of somatic (tumor-specific) single nucleotide variants.
+*   **Key Message:** The overall method first characterizes the large-scale genomic landscape (CNVs, LOH) and then zooms in to perform a detailed and rigorous selection of small-scale somatic mutations.
+
+**2. Somatic Variant Filtering Workflow (Right Panel)**
+
+*   **Figure Legend:** This diagram provides a detailed walkthrough of the variant filtering process. It uses a color-coded legend for different allele types: Reference (grey), Germline (blue), Somatic (brown), and Non-Somatic (yellow).
+    *   **Somatic Variant Candidate:** The top line represents the initial list of variants called by tools like ClairS-TO or DeepSomatic from sequencing reads. This raw list is a mixture of true somatic mutations (brown), germline variants (blue), and other non-somatic or ambiguous calls (yellow).
+    *   **Panel of Normals Variant:** The middle step shows the filtering process. The initial candidates are compared against a "Panel of Normals" (PON), a database of variants commonly found in a population of healthy individuals (e.g., from 1000g, gnomAD) and recurrent artifacts. The diagram shows that the germline variants (blue) from the initial list are found in this panel.
+    *   **Filtered Somatic Candidate:** The bottom line shows the result of the filtering. By removing variants present in the PON, the list is refined to primarily contain high-confidence somatic candidates (brown) and other rare variants not found in the normal population.
+*   **Key Message:** Raw variant calls from sequencing data are noisy and contain many non-somatic variants. To obtain a reliable list of true somatic mutations, it is essential to filter the initial candidates against a Panel of Normals to eliminate common germline polymorphisms and known sequencing artifacts.
+
+**3. Conceptual Filtering Model (Bottom Left)**
+
+*   **Figure Legend:** This is a simplified schematic that visually represents the logic of "Somatic Variant Candidate Selection" (Step 3). It begins with a circle containing a heterogeneous population of detected variants: somatic (brown), germline (blue), and clustered/artifact (green). The model shows that two components are subtracted: the "PON" (Panel of Normals) to remove germline variants, and "Clustered" variants to remove likely systematic errors. The final output is a circle containing only the filtered, high-confidence somatic variants (brown).
+*   **Key Message:** The strategy for identifying true somatic mutations is one of subtraction. By systematically removing known germline variants (using a PON) and technical artifacts (identified by their clustered patterns), one can isolate the true, biologically relevant somatic mutations.
+
+### **Summary of Key Messages**
+
+This slide describes the third step in a comprehensive genomic analysis pipeline, focusing on the rigorous filtering required to identify true somatic variants.
+
+*   **Contextual Analysis:** The selection of somatic variants occurs after the characterization of large-scale events like CNV, BFB, and LOH.
+*   **Filtering is Crucial:** The core of the method is a multi-stage filtering process designed to distinguish true somatic mutations from germline variants and technical artifacts.
+*   **Use of Panel of Normals (PON):** A key tool in this process is the Panel of Normals, a database of common variants and artifacts, which is used to subtract non-somatic calls from the initial candidate list.
+*   **Artifact Removal:** In addition to the PON, the method also filters out clustered variants, which are often a sign of systematic sequencing errors.
+*   **High-Confidence Output:** The goal of this meticulous process is to generate a high-confidence list of somatic variant candidates for downstream biological interpretation and research.
+
+
+
+
+Page 19:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Somatic Variant Candidate Selection (cont.)
+
+### **Visualizations**
+
+This slide continues the explanation of the somatic variant selection method, focusing on a specific filtering step designed to remove clustered variants, which are often technical artifacts from the sequencing process.
+
+**1. Allele Type Legend and Initial State (Top)**
+
+*   **Figure Legend:** A legend at the top left defines the color coding for different types of alleles observed in sequencing reads: Reference (grey), Germline (blue), Somatic (brown), and Non-Somatic/Artifact (yellow). To the right, a diagram illustrates a set of aligned sequencing reads (Read 1-6) at a specific genomic location `i` and its surrounding window `W`. These reads contain a mix of reference bases, a true somatic variant candidate (C), and a non-somatic variant (T), which is part of a cluster of potential errors. The line labeled "Somatic Variant Candidate" represents the initial output from a variant caller, which includes both the true somatic variant and the artifact that needs to be filtered.
+*   **Key Message:** Raw variant calls can contain true somatic mutations alongside artifacts. This slide details the method for distinguishing between them by identifying and removing variants that appear in suspicious clusters.
+
+**2. Allele Concordance Filtering Workflow (Main Diagram)**
+
+*   **Figure Legend:** The main diagram illustrates the core logic of the filtering process through four example scenarios. The goal is to evaluate a candidate variant at position `i` (the yellow 'T') by checking its "Allele Concordance" with other nearby variants at a position `j`. A high degree of concordance—meaning two variants consistently appear together on the same reads—suggests they may be part of a systematic sequencing error rather than independent biological events.
+    *   The workflow evaluates pairs of variants (`i`, `j`) using two concordance metrics (explained in the Equations section).
+    *   Each of the four panels represents a test between the candidate variant `i` and a different nearby variant `j`.
+    *   A test for a pair `(i,j)` is considered successful (passed, indicated by a circle) if the calculated ratios meet predefined thresholds (`μ` and `ν`).
+    *   **Panels 1 & 3** show pairs that pass the concordance test (indicated by circles and a final checkmark). In panel 3, the variants at `i` and `j` are perfectly concordant (ratio = 1), meaning every read with a variant at `i` also has a variant at `j`, and vice-versa.
+    *   **Panels 2 & 4** show pairs that fail the test (indicated by a cross). In panel 2, the concordance is low (0.33). In panel 4, the concordance is asymmetric (one ratio is 1, the other is 0.5), causing it to fail.
+    *   The final step aggregates these pairwise concordance results. If the overall "Allele Concordance" score for variant `i` exceeds a threshold `ρ`, it is classified as a "Filtered Clustered Variant" and removed.
+*   **Key Message:** Variants are not evaluated in isolation. By analyzing the co-occurrence patterns of nearby variants on the same sequencing reads, the method can identify and filter out artifacts that appear in clusters. High allele concordance between a candidate variant and its neighbors is a strong indicator of a false positive.
+
+### **Equations**
+
+The slide presents two equations that define the metrics for calculating "Allele Concordance" between a variant at position `i` and a variant at position `j` based on reads that span both locations.
+
+The equations are used to measure how often an alternate (non-reference) allele at position `i` co-occurs with an alternate allele at position `j` on the same sequencing read. A high value for both metrics indicates strong linkage, suggesting a potential systematic artifact.
+
+*   The first equation calculates the fraction of reads with an alternate allele at `i` that also have an alternate allele at `j`.
+*   The second equation calculates the fraction of reads with an alternate allele at `j` that also have an alternate allele at `i`.
+
+For a pair of variants to be considered concordant, both fractions must be above their respective thresholds, `μ` and `ν`.
+
+The final filtering rule checks if the overall "Allele Concordance" score, which is an aggregate of these pairwise checks for a variant `i`, exceeds a final threshold `ρ`.
+
+```markdown
+(AltAlt_ij) / (AltAlt_ij + AltRef_ij) ≥ μ
+```
+
+```markdown
+(AltAlt_ij) / (AltAlt_ij + RefAlt_ij) ≥ ν
+```
+
+Where:
+*   `AltAlt_ij`: Number of reads with an alternate allele at both `i` and `j`.
+*   `AltRef_ij`: Number of reads with an alternate allele at `i` and the reference allele at `j`.
+*   `RefAlt_ij`: Number of reads with the reference allele at `i` and an alternate allele at `j`.
+*   `μ`, `ν`: Pre-defined concordance thresholds.
+
+```markdown
+Filtered Clustered Variant(i) = Allele Concordance ≥ ρ
+```
+
+### **Summary of Key Messages**
+
+This slide details a crucial filtering step in the somatic variant calling pipeline, building upon the methods introduced in the previous slide.
+
+*   **Continuation of Method:** It explains the "Clustered Variant" filtering that was mentioned as part of the overall "Somatic Variant Candidate Selection" method.
+*   **Targeted Problem:** The focus is on eliminating false positive variants that arise from systematic sequencing artifacts, which often manifest as clusters of co-occurring errors.
+*   **Core Mechanism:** The method employs a quantitative measure called "Allele Concordance" to identify variants that are suspiciously linked on the same sequencing reads.
+*   **Quantitative Filtering:** By calculating concordance ratios and comparing them against set thresholds (`μ`, `ν`, and `ρ`), the process systematically identifies and removes candidate variants that are likely artifacts.
+*   **Increased Specificity:** The ultimate goal of this step is to increase the confidence and accuracy of the final somatic variant call set by removing a known class of false positives.
+
+
+
+
+Page 20:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Somatic Variant Calling
+
+### **Visualizations**
+
+This slide introduces a graph-based methodology for somatic variant calling, designed to accurately distinguish true somatic mutations from sequencing artifacts by analyzing local haplotype information.
+
+**1. Allele Legend (Top Left)**
+
+*   **Figure Legend:** A legend defines the color-coding used throughout the slide for different types of genetic alleles:
+    *   **Grey:** Reference Allele (the base present in the reference genome).
+    *   **Blue:** Germline Variant (an inherited variant present in all cells).
+    *   **Brown:** Somatic Variant (a mutation acquired by a subset of cells, e.g., in a tumor).
+    *   **Yellow:** Sequencing Error (an artifact introduced during the sequencing process).
+*   **Key Message:** This legend is crucial for interpreting the subsequent diagrams, which use these colors to differentiate the origin of each observed allele.
+
+**2. Tumor Evolution Diagram (Left)**
+
+*   **Figure Legend:** This diagram illustrates the biological basis of tumor heterogeneity and the origin of different variant types. It traces cellular lineage from a zygote (formed by an egg and sperm) to a complex organism with a tumor. The diagram shows:
+    1.  **Origin:** Initial cells inherit a germline variant (blue stripe on the chromosome).
+    2.  **Clonal Evolution:** As cells divide, new mutations arise. "Clonal 2" acquires a somatic variant (brown stripe). "Subclone 1.1" branches off, acquiring an additional somatic mutation (orange stripe).
+*   **Key Message:** This illustrates that a single tissue sample can contain a mixture of cells with different genetic profiles (germline, clonal somatic, and subclonal somatic variants), making it challenging to identify true somatic mutations.
+
+**3. Somatic Variant vs. Sequencing Artifact (Center)**
+
+*   **Figure Legend:** This central panel contrasts two scenarios using simplified sequencing read alignments and their corresponding graph representations.
+    *   **Read Alignments:** It shows how sequencing reads might look for a true "Somatic Variant" versus a "Sequencing Artifact". Both occur in the context of a pre-existing germline variant. In the "Somatic Variant" case, some reads contain a true somatic mutation (brown 'T'). In the "Sequencing Artifact" case, some reads contain a sequencing error (yellow 'T'). Visually, the raw data can appear similar.
+    *   **Simple Graphs:** Below the reads, a simple directed graph shows the linkage between adjacent bases on a read. For example, `A -> G -> T` might represent the reference haplotype, while `C -> T -> A` represents a haplotype containing a germline variant (`C`), a somatic variant (`T`), and another germline variant (`A`).
+*   **Key Message:** The primary challenge in somatic variant calling is distinguishing rare, true variants from sequencing errors, especially when they co-occur with other variants on the same reads. This section sets up the problem that the proposed graph method aims to solve.
+
+**4. Tri-nodal-edge Graph (Top Right)**
+
+*   **Figure Legend:** This diagram introduces the proposed "Tri-nodal-edge Graph". The graph models haplotypes across three adjacent genomic positions.
+    *   **Nodes:** The nodes represent the allele type at each of the three positions, either Reference (R) or Alternate (A).
+    *   **Edges:** The edges represent the observed combinations of alleles across the three positions (i.e., the 3-base haplotypes). The edges are labeled with codes like `rrr` (Reference-Reference-Reference), `rra` (Reference-Reference-Alternate), `aar` (Alternate-Alternate-Reference), etc. Different colors and line styles for the edges correspond to these different haplotype patterns.
+*   **Key Message:** This graph structure is proposed as a powerful way to model the local context of a variant. By considering the linkage information across three positions simultaneously, it captures more information than simpler models, which helps in disambiguating complex cases.
+
+**5. Bi-nodal-edge Graph (Bottom Right)**
+
+*   **Figure Legend:** This diagram shows a simpler, alternative graph structure labeled "noninformative".
+    *   **Nodes & Edges:** This graph models haplotypes across only two adjacent positions. The nodes are again Reference (R) or Alternate (A), and the edges represent the four possible two-base haplotypes: `rr`, `ra`, `ar`, and `aa`.
+*   **Key Message:** This graph is presented as an inferior alternative. By labeling it "noninformative," the slide argues that considering variants in pairs (bi-nodal) is insufficient to resolve the ambiguity between true somatic variants and artifacts. This highlights the necessity of the more complex "Tri-nodal-edge Graph" for accurate variant calling.
+
+### **Summary of Key Messages**
+
+This slide introduces a novel method for somatic variant calling that addresses the challenge of distinguishing true mutations from sequencing artifacts within a heterogeneous cell population.
+
+*   **Problem:** Somatic variants are often rare and can co-occur with germline variants and sequencing errors, making them difficult to identify reliably.
+*   **Proposed Solution:** A "Tri-nodal-edge Graph" is proposed to model the local haplotype context of a candidate variant by analyzing allele combinations across three adjacent positions.
+*   **Core Claim:** The method's strength lies in its ability to capture rich linkage information. The slide explicitly contrasts this approach with a simpler "Bi-nodal-edge Graph" (looking at pairs of variants), which it dismisses as "noninformative" for this task.
+*   **Overall Goal:** The proposed graph-based method aims to improve the accuracy of somatic variant calling by leveraging more comprehensive local sequence context than conventional approaches.
+
+
+
+
+Page 21:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Somatic Variant Calling (cont.)
+
+### **Visualizations**
+
+This slide continues the explanation of the tri-nodal-edge graph method for somatic variant calling, detailing how different combinations of observed haplotypes are classified. The visualization uses a color code where blue nodes represent a germline alternate allele and orange nodes represent a somatic alternate allele.
+
+**1. Haplotype Input Scenarios (Left)**
+
+*   **Figure Legend:** This section illustrates two hypothetical scenarios based on the number of distinct haplotypes present in a sample.
+    *   **"3 haplotype" scenario:** A sample contains reads from three distinct chromosome types: two with a germline variant (represented by two grey figures and chromosomes with a blue bar) and one with an additional somatic variant (represented by an orange figure and a chromosome with both a blue and an orange bar). This complex mixture provides rich information.
+    *   **"2 haplotype" scenario:** A simpler sample contains reads from only two distinct chromosome types.
+*   **Key Message:** The number of distinct haplotypes observed in the data determines the confidence of the variant call. A more complex mixture (3 haplotypes) allows for higher confidence classification.
+
+**2. Somatic Haplotype Pattern Catalog (Top Right)**
+
+*   **Figure Legend:** This large grid visualizes the specific local haplotype patterns that the model identifies as high-confidence somatic variants. It shows the possible paths through the tri-nodal graph (representing three adjacent variant positions). The nodes are either Reference (R) or Alternate (A), with alternate alleles colored blue for germline and orange for somatic. The grid is categorized by the position of the somatic mutation:
+    *   **Middle Somatic:** The somatic variant (orange 'A') is at the central position, flanked by other variants.
+    *   **Left Somatic:** The somatic variant is at the first position.
+    *   **Right Somatic:** The somatic variant is at the third position.
+    In total, 12 distinct patterns are shown that serve as the signature for a high-confidence somatic call.
+*   **Key Message:** The method relies on a predefined catalog of 12 specific tri-haplotype patterns. If the combination of haplotypes observed in the sequencing reads matches one of these 12 patterns, the variant is classified as a high-confidence somatic mutation.
+
+**3. Low-Confidence and Non-Somatic Patterns (Bottom Right)**
+
+*   **Figure Legend:** This section illustrates the classification for patterns that do not meet the high-confidence criteria.
+    *   A set of simpler graph patterns, derived from the "2 haplotype" scenario, is shown. These lead to a low-confidence call.
+    *   A concluding statement, "Not matching any somatic pattern → V_N(NonSomatic)", indicates that any combination of haplotypes not fitting the defined high- or low-confidence patterns is classified as non-somatic.
+*   **Key Message:** Haplotype combinations that provide less definitive evidence are classified as low-confidence. All other combinations are rejected as non-somatic, making the method specific.
+
+### **Equations**
+
+The slide presents two formulas that quantify the feature space for classifying variants based on combinations of observed haplotypes. The model appears to work by identifying which set of the 8 possible tri-nodal edge types (e.g., `rrr`, `rra`, etc., from the previous slide) are present in the data.
+
+1.  **High-Confidence Somatic Variant (V_H)**: This equation corresponds to the "3 haplotype" scenario. It represents the classification of a high-confidence somatic variant. The model is looking for combinations of 3 distinct haplotypes from the 8 possibilities. The denominator `C(8,3)` represents the total number of ways to choose 3 distinct haplotype patterns from a set of 8, which is 56. The numerator `12` represents the number of these specific combinations that are defined as high-confidence somatic patterns (as shown in the visual catalog).
+
+    ```markdown
+    V_H(High) ∈ (12 / C(8,3)) = 12 / 56
+    ```
+
+2.  **Low-Confidence Somatic Variant (V_L)**: This equation corresponds to the "2 haplotype" scenario. It represents a low-confidence call. The model is looking for combinations of 2 distinct haplotypes. The denominator `C(8,2)` is the total number of ways to choose 2 distinct haplotype patterns from 8, which is 28. The numerator `3` is the number of these combinations that are defined as low-confidence patterns.
+
+    ```markdown
+    V_L(Low) ∈ (3 / C(8,2)) = 3 / 28
+    ```
+
+*   **Key Message of Equations:** The classification is not based on a single haplotype but on identifying specific *combinations* of co-occurring haplotypes. The formulas define the size of the feature space for high- and low-confidence calls, showing that the method relies on combinatorial pattern matching.
+
+### **Summary of Key Messages**
+
+This slide elaborates on the classification logic of the tri-nodal-edge graph method, building on the concepts from the previous slide.
+
+*   **Core Mechanism:** The method classifies a variant by matching the set of observed local haplotypes against a predefined catalog of patterns.
+*   **Confidence Levels:** The confidence of a call depends on the complexity of the observed haplotype combination.
+    *   **High-Confidence (V_H):** A call is made when the data matches one of 12 specific patterns involving three distinct haplotypes, providing strong evidence for a somatic mutation.
+    *   **Low-Confidence (V_L):** A call is made for simpler patterns involving only two distinct haplotypes.
+    *   **Non-Somatic (V_N):** Any pattern not matching the high- or low-confidence criteria is rejected.
+*   **Combinatorial Approach:** The strength of the method lies in its use of combinatorial haplotype patterns, allowing it to distinguish true somatic variants from complex germline backgrounds and artifacts with high specificity.
+
+
+
+
+Page 22:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Somatic Variant Calling (cont.)
+
+### **Visualizations**
+
+This slide details the filtering and artifact removal steps of the somatic variant calling method, building upon the pattern-matching concepts from the previous slide. The method is divided into two distinct workflows for high-confidence (V_H) and low-confidence (V_L) variant calls. In the diagrams, blue nodes represent germline alternate alleles and orange nodes represent somatic alternate alleles.
+
+The slide illustrates a two-step process for each confidence level:
+1.  **Frequency Filtering:** Selecting the most frequent local haplotypes (patterns of alleles across adjacent variant sites) from the sequencing reads.
+2.  **Pattern Artifact Filtering:** Applying a ratio-based filter using read counts to eliminate patterns that are likely to be sequencing artifacts, thus increasing the specificity of the calls.
+
+---
+
+#### **V_H Pattern Mining and Filtering (Top Half)**
+
+*   **Figure Legend:** This section describes the workflow for identifying high-confidence somatic variants (V_H), which are derived from a "3 haplotype" scenario.
+    *   **Frequency Filtering (Select Top 3):** The process begins by analyzing the aligned sequencing reads covering the variant region. It identifies all unique local haplotypes and their corresponding read counts. In the example shown, the three most frequent haplotypes are `A-C-T` (3 reads), `G-C-G` (2 reads), and `G-T-G` (2 reads). These top 3 are selected for further analysis.
+    *   **Pattern Matching:** The selected set of three haplotypes is then matched against the predefined catalog of high-confidence `V_H` patterns. The example shows that the combination {`A-C-T`, `G-C-G`, `G-T-G`} corresponds to a valid `V_H` graph structure.
+    *   **Pattern Artifact Filtering:** This is a crucial step to improve accuracy. A candidate `V_H` pattern is tested to ensure it is not an artifact. The diagram illustrates a scenario where a pattern is rejected. It calculates an "Artifact path ratio." In the example, a path with low support (`A-C-T`, count 1) is compared to a path with higher support (`G-T-G`, count 2). The ratio of their read counts is calculated. If this ratio exceeds a predefined threshold `τ`, the pattern is considered an artifact and reclassified as non-somatic (`V_N`). The condition for a valid `V_H` call is that this ratio must be less than or equal to `τ`.
+*   **Key Message:** A high-confidence somatic variant is called only if the top three most frequent haplotypes match a specific `V_H` pattern *and* pass a stringent artifact filter. This filter ensures that minor, potentially erroneous, haplotypes do not have significant read support compared to the primary somatic haplotype.
+
+---
+
+#### **V_L Pattern Mining and Filtering (Bottom Half)**
+
+*   **Figure Legend:** This section describes the parallel workflow for identifying low-confidence somatic variants (V_L), which are derived from a simpler "2 haplotype" scenario.
+    *   **Frequency Filtering (Select Top 2):** In this case, only the top two most frequent haplotypes are selected. The example shows `G-C-G` (2 reads) and `G-T-G` (2 reads) being chosen.
+    *   **Pattern Matching:** This pair of haplotypes is matched against the predefined `V_L` patterns. The example pair {`G-C-G`, `G-T-G`} corresponds to a valid `V_L` graph structure.
+    *   **Pattern Artifact Filtering:** A different artifact filter is applied for `V_L` calls. It checks if a third, less frequent haplotype exists with significant support. The filter calculates the ratio of the read count of the 3rd most frequent path to the 2nd most frequent path. For a `V_L` call to be valid, this ratio must be below a threshold `δ`. If the ratio is too high (as in the example, where the 3rd path has a count of 1 and the 2nd has a count of 2, leading to a ratio of 1/2), it suggests the site might be more complex (e.g., a `V_H` pattern) or noisy, and the `V_L` call is rejected.
+*   **Key Message:** A low-confidence call is made when the top two haplotypes fit a `V_L` pattern, but only if there isn't a third haplotype with significant read support. This filter prevents misclassifying more complex variant sites as simple `V_L` cases.
+
+### **Equations**
+
+The slide presents the logic for the artifact filtering steps as inequalities involving read count ratios and predefined thresholds.
+
+1.  **V_H Artifact Filter Condition:** For a candidate pattern to be confirmed as high-confidence (`V_H`), its artifact path ratio must be less than or equal to a threshold `τ`. The example on the slide shows a case where the pattern is *rejected* because the ratio is too high. Note: There appears to be a typo in the slide's calculation `1/(1+2)`; a more standard ratio of the two path counts would be `1/2`.
+
+    ```markdown
+    Artifact path ratio <= τ
+    ```
+    *Example of rejection:*
+    ```markdown
+    Ratio = Count(Artifact Path) / Count(Somatic Path) = 1 / 2
+    If (1/2 > τ), then the pattern is rejected (classified as V_N).
+    ```
+
+2.  **V_L Artifact Filter Condition:** For a candidate pattern to be confirmed as low-confidence (`V_L`), the ratio of the read count of the 3rd most frequent haplotype path to that of the 2nd most frequent path must be less than a threshold `δ`. The example shows a rejection.
+
+    ```markdown
+    (Top 3 path / Top 2 path) < δ
+    ```
+    *Example of rejection:*
+    ```markdown
+    Ratio = Count(Top 3 path) / Count(Top 2 path) = 1 / 2
+    If (1/2 > δ), then the pattern is rejected (classified as V_N).
+    ```
+
+*   **Key Message of Equations:** The method's specificity relies on quantitative filters. These filters use ratios of read counts to distinguish true, well-supported haplotype patterns from those likely caused by sequencing artifacts or more complex underlying biology. Different thresholds (`τ` and `δ`) are used for high and low-confidence calls, reflecting their different evidentiary standards.
+
+### **Summary of Key Messages**
+
+This slide details the crucial filtering steps that refine the initial pattern-matching approach to somatic variant calling.
+
+*   **Hierarchical Filtering:** The method first identifies candidate variant patterns by selecting the most frequent haplotypes (`Top 3` for `V_H`, `Top 2` for `V_L`).
+*   **Ratio-Based Artifact Removal:** It then applies a second, more stringent filtering stage based on read count ratios to reject patterns that are likely artifacts.
+*   **Context-Specific Filters:** The artifact filtering logic is tailored to the confidence level:
+    *   For `V_H` calls, it ensures that sub-paths within the complex 3-haplotype pattern are well-balanced and not skewed by a single noisy path.
+    *   For `V_L` calls, it ensures that the site is truly simple (2-haplotype) and not a misidentified complex site by checking the prevalence of a potential third haplotype.
+*   **Increased Specificity:** This two-stage process of pattern mining followed by artifact filtering is designed to significantly increase the precision and reliability of the final somatic variant calls.
+
+
+
+
+Page 23:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Somatic Variant Calling (cont.)
+
+### **Visualizations**
+
+This slide illustrates the final decision-making stage of the somatic variant calling method, which follows the haplotype pattern mining and filtering described on the previous slide. The core idea is to classify identified local haplotype patterns into different evidence categories and then use a "voting" system to make a final call.
+
+The overall workflow shown is:
+1.  **Input Reads to Graph:** Sequencing reads covering a genomic region are used to construct a graph representing the different haplotypes (paths) present.
+2.  **Pattern Classification ("Somatic Decision Vote"):** Each unique local haplotype pattern derived from the graph is classified into one of three categories:
+    *   **3-path pattern ∈ V_H(High):** A high-confidence somatic pattern. This complex pattern likely represents the presence of a reference allele, a germline variant allele, and a somatic variant allele, forming three distinct paths. The orange node signifies the somatic allele.
+    *   **2-path pattern ∈ V_L(Low):** A low-confidence somatic pattern. This simpler pattern typically represents a reference allele and a single somatic variant allele.
+    *   **Neither 3-path nor 2-path pattern ∈ V_N(NonSomatic):** Any pattern not fitting the high or low confidence criteria is classified as non-somatic.
+3.  **Tally and Decision:** The counts of V_H, V_L, and V_N patterns are tallied for the site, and a final decision is made using a quantitative formula.
+
+---
+
+#### **Pattern Classification Examples**
+
+The slide presents two contrasting examples to demonstrate the classification process. In the diagrams, orange nodes represent somatic alternate alleles, and blue nodes represent germline alternate alleles.
+
+*   **Figure Legend (Middle Column - "Somatic Variant"):** This column depicts a scenario where a site is correctly identified as containing a somatic variant. It shows a catalog of different haplotype patterns found at this site. These patterns are individually classified, resulting in a final tally of **V_H = 1, V_L = 1, and V_N = 3**. The key feature is the presence of one high-confidence (`V_H`) pattern, which provides strong evidence for a somatic mutation.
+
+*   **Figure Legend (Right Column - "Germline Variant"):** This column illustrates a non-somatic site, likely containing only germline variants or sequencing noise. After classifying all observed patterns, the tally is **V_H = 0, V_L = 1, and V_N = 5**. The absence of any `V_H` patterns and the low proportion of `V_L` patterns suggest that this site does not harbor a somatic variant.
+
+*   **Key Message:** The method's strength lies in its ability to differentiate complex, high-confidence somatic patterns (`V_H`) from simpler or ambiguous ones. A final decision is not based on a single piece of evidence but on an aggregate vote from all patterns observed at a locus, with `V_H` patterns carrying the most weight.
+
+### **Equations**
+
+The slide provides the final "Somatic Variant Detection Formula," which formalizes the voting process into a clear decision rule.
+
+The formula states that a site is called a somatic variant if either of two conditions is met:
+1.  There is at least one high-confidence pattern (`V_H ≥ 1`).
+2.  The proportion of low-confidence patterns relative to all non-high-confidence patterns is greater than or equal to a predefined threshold `θ`.
+
+```markdown
+V_H ≥ 1  or  (V_L / (V_L + V_N)) ≥ θ
+```
+
+The slide includes calculations for the two examples:
+*   **Somatic Variant Example:** With `V_H = 1`, `V_L = 1`, and `V_N = 3`, the first condition `V_H ≥ 1` is met. The site is called somatic, regardless of the ratio calculation (`1 / (1+3) = 0.25`).
+*   **Germline Variant Example:** With `V_H = 0`, `V_L = 1`, and `V_N = 5`, the first condition is not met. The decision depends on the second condition. The ratio is calculated as `1 / (1+5) = 0.167`. The slide indicates `0.167 < θ`, meaning the ratio is below the required threshold, so the site is correctly classified as non-somatic.
+
+*   **Key Message of Equations:** This two-tiered formula provides a robust framework for variant calling. It ensures high sensitivity by immediately calling any site with strong (`V_H`) evidence. Simultaneously, it maintains specificity by requiring an accumulation of weaker (`V_L`) evidence to pass a statistical threshold `θ`, effectively filtering out noise.
+
+### **Summary of Key Messages**
+
+This slide describes the final classification and decision-making step of the somatic variant calling method.
+
+*   **Pattern-Based Voting:** The method classifies local haplotype patterns into high-confidence somatic (`V_H`), low-confidence somatic (`V_L`), and non-somatic (`V_N`) categories.
+*   **Hierarchical Decision Rule:** A final call is made using a two-part formula. A site is considered somatic if it contains at least one `V_H` pattern OR if the proportion of `V_L` patterns is statistically significant (i.e., above a threshold `θ`).
+*   **Robustness and Specificity:** This approach combines evidence from all observed patterns at a site, making the final call more robust than methods that consider variants in isolation. The distinction between `V_H` and `V_L` evidence and the use of the threshold `θ` allow for a tunable balance between sensitivity and specificity.
+
+
+
+
+Page 24:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Phasing
+
+### **Visualizations**
+
+This slide provides a detailed visual explanation of the "Phasing" step, which is a core component of the variant calling method. Phasing is the process of assigning alleles from different variant sites to their original chromosomes (haplotypes). This slide demonstrates how sequencing read data is used to construct haplotypes, including identifying a new somatic haplotype. The process flows from left to right, starting with input data and ending with the final phased haplotypes.
+
+The overall workflow consists of four main stages:
+
+1.  **Parsing Info (Input Data):** This section shows the input data as a set of aligned sequencing reads covering several variant positions. The region is divided into a "Non-LOH" (Non-Loss of Heterozygosity) part, where two distinct parental alleles are present, and an "LOH" part, where one of the parental alleles has been lost. The different colors (light blue, dark blue, orange) represent alleles belonging to different haplotypes.
+
+2.  **k-variant Graph (Data Structure):** The information from the reads is used to build a "k-variant Graph." In this example, `k=2`, meaning the graph models the linkage between adjacent pairs of variants.
+    *   **Nodes:** Each node in the graph represents a specific allele (e.g., 'A', 'G', 'T', 'C') at a variant position. The colors correspond to the likely haplotype of origin: black/light blue for Haplotype 1 (HP1), dark blue for Haplotype 2 (HP2), and orange for a somatic variant.
+    *   **Edges:** A directed edge between two nodes indicates that the two connected alleles were observed together on the same sequencing read.
+    *   **Edge Weights:** The number on each edge represents the number of reads supporting that specific connection (co-occurrence). For example, the edge from 'G' to 'C' has a weight of '3', indicating strong evidence for this linkage.
+
+3.  **Phasing (Algorithm):** This section illustrates the step-by-step process of traversing the k-variant graph to reconstruct the full haplotypes. The algorithm starts with the most common alleles at the first position to seed the main haplotypes (HP1 starting with 'A', HP2 with 'G'). It then extends these paths one variant at a time, following the edges with the strongest support (highest weight). When a split occurs, like from 'G' to 'C' (3 reads) and 'T' (1 read), the main haplotype (HP2) follows the stronger path to 'C', while the weaker path to 'T' suggests a lower-frequency variant, likely somatic. This process is repeated across all variant sites.
+
+4.  **Phasing Result and Final Result (Output):** The final output of the phasing process is a set of reconstructed haplotypes.
+    *   **HP1 (light blue/black):** A germline haplotype (`A-T-G-T...`).
+    *   **HP2 (dark blue):** A second germline haplotype (`G-C-G-A...`).
+    *   **HP2-1 (orange):** A somatic haplotype (`G-C-T-A...`). This haplotype is shown to be derived from HP2 but contains a somatic mutation ('T' instead of 'G' at the third position) and another mutation ('T' instead of 'A' at the last position in the LOH region).
+    *   The "Result" section provides a simplified, column-wise view of the phased alleles at each position, clearly distinguishing the alleles belonging to HP1, HP2, and the somatic HP2-1. The LOH region is handled by showing the lost alleles as faded nodes in the "Phasing Result."
+
+*   **Key Message of Visualizations:** The core message is that by representing allele co-occurrence in a weighted `k-variant Graph`, it is possible to algorithmically reconstruct the underlying haplotypes from sequencing data. This method is powerful enough to distinguish between two primary germline haplotypes (HP1, HP2) and simultaneously identify and phase a new, low-frequency somatic haplotype (HP2-1). This provides the detailed haplotype information needed for the subsequent pattern classification and variant calling steps.
+
+### **Summary of Key Messages**
+
+This slide explains the "Phasing" methodology, which is the foundational step for generating the haplotype patterns used in the subsequent variant calling decision process.
+
+*   **Graph-Based Reconstruction:** The method leverages a `k-variant graph` to model connections between alleles found on the same sequencing reads.
+*   **Haplotype Identification:** By finding the most supported paths through this graph, the algorithm reconstructs the two main germline haplotypes (HP1 and HP2).
+*   **Somatic Haplotype Discovery:** The method is sensitive enough to identify less frequent paths, allowing it to discover and reconstruct novel somatic haplotypes (HP2-1) that differ from the germline haplotypes.
+*   **Foundation for Variant Calling:** The output of this phasing process—a clear separation of alleles into distinct haplotypes—is the essential input for the pattern classification and "voting" system described on the following slide for making a final somatic call.
+
+
+
+
+Page 25:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Tumor Purity Prediction Equation
+
+### **Visualizations**
+
+This slide presents a comprehensive workflow for predicting tumor purity from sequencing data by analyzing Haplotype Imbalance (HI). The workflow progresses from the biological sample composition to the final machine learning-based prediction.
+
+1.  **Sample Composition and Haplotype Ratios (Top Row):**
+    *   The process starts by illustrating the cellular composition of a sample, which is a mixture of "Normal cells" and "Tumor cells."
+    *   Normal cells contain two germline haplotypes, HP1 (light blue) and HP2 (dark blue).
+    *   Tumor cells contain a somatic alteration, resulting in a new haplotype, HP1-1 (orange), which is derived from the original HP1.
+    *   A series of five scenarios is shown, representing increasing tumor purity (the fraction of tumor cells in the sample) from 0.2 to 1.0 (20% to 100%).
+    *   Stacked bar graphs next to each purity level depict the expected proportion of each haplotype in the mixed sample's sequencing data. As purity increases, the contribution from the normal HP1 decreases while the somatic HP1-1 increases, causing a measurable imbalance between the total counts of reads derived from the original HP1 and HP2 haplotypes.
+
+2.  **Haplotype Imbalance (HI) Distributions (Middle Row):**
+    *   For each purity level, a histogram shows the distribution of Haplotype Imbalance (HI) values calculated across many heterozygous variant sites in the genome.
+    *   The x-axis of the histograms represents the HI value (from 0.5 to 1), and the y-axis represents the "Variant Count."
+    *   At low purity (0.2), the HI distribution is concentrated near 0.5, indicating that the two germline haplotypes are relatively balanced.
+    *   As tumor purity increases, the distribution shifts to the right, with more variants showing higher HI values. In high-purity samples (e.g., 0.8, 1.0), a prominent peak appears at HI = 1, corresponding to regions with Loss of Heterozygosity (LOH) where one of the germline haplotypes is completely lost in the tumor cells.
+
+3.  **Box Plot Summaries of HI Distributions (Third Row):**
+    *   Directly below each histogram, a corresponding box plot summarizes its distribution. The box plot shows the median (orange line), interquartile range (Q1 to Q3, the box), and whiskers.
+    *   These plots clearly show that as tumor purity increases, the median HI and the entire distribution shift towards higher values.
+
+4.  **Polynomial Regression Model for Purity Prediction (Bottom Row):**
+    *   This section illustrates the machine learning approach. Statistical features, such as the first (Q1) and third (Q3) quartiles, are extracted from the box plots of the HI distribution.
+    *   These features are then used as input for a "Polynomial Regression" model, symbolized by a neural network icon.
+    *   The model is trained to learn the relationship between the HI distribution statistics and the known tumor purity.
+    *   The final output of the model is a predicted "purity" value, represented on a continuous scale from 0 to 1.
+
+*   **Key Message of Visualizations:** The central message is that tumor purity creates a quantifiable signature in the genome-wide distribution of Haplotype Imbalance. By summarizing this distribution with statistical features (like quartiles) and feeding them into a regression model, it is possible to accurately predict the purity of a given tumor sample.
+
+### **Equations**
+
+The slide defines the metric used to measure allelic imbalance at each variant site: Haplotype Imbalance (HI). The equation calculates the proportion of sequencing reads that support the more abundant of the two germline haplotypes (HP1 or HP2) at a given heterozygous locus. An HI value of 0.5 signifies a perfect 1:1 balance, while a value of 1.0 indicates that only one of the two haplotypes is present in the sequencing reads for that site, a sign of LOH.
+
+```markdown
+HI = max(HP1, HP2) / (HP1 + HP2)
+```
+
+### **Summary of Key Messages**
+
+This slide details a method for predicting tumor purity by leveraging the phased haplotype information described on the previous slide.
+
+*   **Haplotype Imbalance as a Biomarker:** The core idea is that the presence of tumor cells with somatic alterations (like LOH or other copy number changes) creates an imbalance in the observed germline haplotypes. This Haplotype Imbalance (HI) is a direct, measurable biomarker of tumor content.
+*   **Purity-Dependent Distribution:** The statistical distribution of HI values across all heterozygous sites in the genome changes predictably with tumor purity. Higher purity leads to a higher average HI.
+*   **Machine Learning for Prediction:** A polynomial regression model can be trained to learn the precise relationship between the statistical properties of the HI distribution (e.g., quartiles) and the actual tumor purity.
+*   **Automated Purity Estimation:** This method provides a data-driven, automated way to estimate tumor purity, a critical parameter for accurately interpreting somatic variants and understanding tumor biology.
+
+
+
+
+Page 26:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Method : Tumor Purity Prediction Equation (cont.)
+
+### **Visualizations**
+
+This slide presents a schematic workflow detailing how two genomic features, Loss of Heterozygosity (LOH) Ratio and Haplotype Imbalance, are used as inputs for a polynomial regression model to predict tumor purity.
+
+1.  **Sample Composition and Feature Variation (Top and Middle Rows):**
+    *   The workflow begins by illustrating samples with varying "purity" levels (0.2, 0.4, 0.6, 0.8, and 1.0), representing the fraction of tumor cells mixed with normal cells. Tumor cells are shown with a clear LOH event (one chromosome homolog is lost, represented by the orange color).
+    *   Below each purity level, two corresponding features are shown:
+        *   **LOH Ratio:** This is the fraction of the genome exhibiting LOH. For low-purity samples (0.2-0.8), this signal is weak and quantified as "<5%". For a pure tumor sample (purity=1.0), the signal is strong at "35%".
+        *   **Haplotype Imbalance:** A box plot summarizes the distribution of Haplotype Imbalance (HI) values across the genome. As purity increases from left to right, the median and interquartile range of the box plots shift to higher values, indicating a stronger and more widespread imbalance.
+
+2.  **Machine Learning Model for Purity Prediction (Right Side):**
+    *   The diagram illustrates that features are extracted from a given sample. Specifically, the calculated "LOH Ratio" and statistical summaries of the "Haplotype Imbalance" distribution (represented by the box plot, with the first and third quartiles, Q1 and Q3, highlighted) are used as inputs.
+    *   These features are fed into a "Polynomial Regression" model, which is visually represented by a multi-layer neural network icon.
+    *   The model processes these input features to produce a single output: a predicted "purity" value on a continuous scale from 0 to 1. This output is visualized with a color gradient bar, where blue corresponds to low purity and orange corresponds to high purity.
+
+*   **Key Message of Visualizations:** The central message is that tumor purity can be predicted by a machine learning model. The model learns the relationship between tumor purity and two key genomic features: the proportion of the genome affected by LOH and the statistical distribution of Haplotype Imbalance. As purity increases, both features change in a predictable manner, allowing for accurate regression-based prediction.
+
+### **Equations**
+
+The slide defines the LOH Ratio, which quantifies the extent of Loss of Heterozygosity across the entire genome. The equation states that the LOH Ratio is the total length of genomic regions with LOH (`L_LOH`) divided by the total analyzable length of the genome (`L_Genome`). This ratio serves as one of the primary input features for the purity prediction model.
+
+```markdown
+LOH Ratio = L_LOH / L_Genome
+```
+
+### **Summary of Key Messages**
+
+This slide continues the description of the tumor purity prediction method, moving from the conceptual basis of Haplotype Imbalance (from the previous slide) to its application in a quantitative model.
+
+*   **Feature Engineering:** The method relies on extracting two key features from genomic data: the LOH Ratio (the fraction of the genome with LOH) and statistics from the Haplotype Imbalance distribution (such as quartiles Q1 and Q3).
+*   **Predictive Modeling:** A polynomial regression model is employed to map the values of these features to a precise, continuous prediction of tumor purity.
+*   **Feature-Purity Correlation:** The slide visually demonstrates the core principle that both the LOH Ratio and the Haplotype Imbalance distribution are strongly correlated with tumor purity, making them effective predictors.
+*   **Integrated Approach:** The method integrates information about large-scale copy number changes (LOH Ratio) and more subtle allelic imbalances (Haplotype Imbalance) to create a robust and accurate purity estimation tool.
+
+
+
+
+Page 27:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+Data : Sources and Tools Used in This Study
+
+### **Tables**
+
+The slide features two tables that list the data sources and software tools used in the research.
+
+The first table, on the left, details the cell lines and their corresponding data sources. It has three columns: "Cell Line," "Material Source," and "Benchmark Source." This table specifies six different cancer cell lines used in the study (COLO829, H1437, H2009, HCC1395, HCC1937, HCC1954). For each cell line, it lists the institution that provided the raw sequencing data (Material Source), such as ONT, NYGC, and UCSF. It also identifies the source of the ground-truth or benchmark variant calls (Benchmark Source), which include NYGC, Google, and SEQC2.
+
+*   **Key Message of the Table:** The study is built upon a foundation of well-established and publicly available cancer cell line data from multiple reputable consortia and institutions. This ensures the data is of high quality and that the results can be independently verified.
+
+```markdown
+| Cell Line | Material Source | Benchmark Source |
+|-----------|-----------------|------------------|
+| COLO829   | ONT, NYGC       | NYGC             |
+| H1437     | UCSC            | Google           |
+| H2009     | UCSC            | Google           |
+| HCC1395   | HKU, NYGC       | SEQC2            |
+| HCC1937   | UCSC            | Google           |
+| HCC1954   | UCSC            | Google           |
+```
+
+The second table, on the top right, lists the specific somatic variant calling tools employed in the analysis. It includes three distinct software configurations: ClairS-TO v0.3.0 (ssrs), ClairS-TO v0.3.0 (ss), and DeepSomatic v1.8.0 (tumor-only).
+
+*   **Key Message of the Table:** The study utilizes and likely compares multiple state-of-the-art bioinformatics tools for identifying somatic mutations, including different modes of ClairS-TO and the tumor-only mode of DeepSomatic.
+
+```markdown
+| Somatic Variant Callers           |
+|-----------------------------------|
+| ClairS-TO v0.3.0 (ssrs)             |
+| ClairS-TO v0.3.0 (ss)               |
+| DeepSomatic v1.8.0 (tumor-only)   |
+```
+
+### **Visualizations**
+
+The diagram at the bottom right illustrates the methodology for creating synthetic, or *in-silico*, tumor-normal mixture samples. This process is often called *in-silico* titration.
+
+*   **Workflow:** The diagram shows that sequencing reads from a pure "Tumor" sample and a pure "Normal" sample are combined in varying proportions to simulate different levels of tumor purity.
+*   **Purity Levels and Coverage:** Five specific mixture examples are provided, corresponding to purity levels of 1.0, 0.8, 0.6, 0.4, and 0.2. The diagram explicitly shows the sequencing coverage contributed by the tumor (orange boxes) and normal (blue boxes) components for each mixture. For example, to create a sample with 0.8 purity, 40x coverage from the tumor sample is mixed with 10x coverage from the normal sample, resulting in a total coverage of 50x. At 1.0 purity, the sample is composed entirely of 50x tumor data with 0x normal data.
+*   **Purpose:** This method creates a benchmark dataset where the tumor purity of each sample is precisely known. This is essential for training and validating the accuracy of the purity prediction model described in the previous slide.
+
+*   **Key Message of the Visualization:** The study employs a controlled, synthetic approach to generate benchmark data. By mixing pure tumor and normal sequencing data at predefined ratios, the researchers can create a reliable dataset with known ground-truth purity values, which is critical for evaluating the performance of their method and other tools.
+
+### **Summary of Key Messages**
+
+This slide provides a comprehensive overview of the data and computational framework for the thesis, establishing the foundation for the methods and results that follow.
+
+*   **Data Foundation:** The research utilizes multiple, well-characterized public cancer cell line datasets, enhancing the reproducibility and reliability of the findings.
+*   **Tooling:** A selection of modern somatic variant calling tools is used, suggesting a comparative analysis or a multi-tool approach to ensure robust variant detection.
+*   **Benchmark Generation:** The core methodological contribution highlighted is the use of *in-silico* titration to create synthetic datasets with precisely controlled tumor purity levels. This provides an essential ground truth for training and validating the tumor purity prediction model that was the focus of the preceding slide.
+
+

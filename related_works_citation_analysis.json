@@ -1,0 +1,104 @@
+{
+  "sentences": [
+    {
+      "sentence": "The advent of long-read sequencing technologies, developed by Pacific Biosciences (PacBio) and Oxford Nanopore Technologies (ONT), has substantially advanced the field.",
+      "reason": "States a factual claim about specific technologies and the companies that developed them.",
+      "key_terms": [
+        "long-read sequencing",
+        "Pacific Biosciences",
+        "PacBio",
+        "Oxford Nanopore Technologies",
+        "ONT"
+      ]
+    },
+    {
+      "sentence": "While historically challenged by higher per-base error rates compared to short-read platforms, long reads offer the distinct advantage of spanning large, repetitive, or complex genomic regions, with the crucial capability of linking multiple variant sites on a single molecule.",
+      "reason": "Makes a factual claim comparing the technical challenges and advantages of long-read versus short-read sequencing.",
+      "key_terms": [
+        "per-base error rates",
+        "long reads",
+        "short-read platforms",
+        "repetitive regions"
+      ]
+    },
+    {
+      "sentence": "Leading tools such as `DeepVariant` and `Clair3` employ deep learning, typically using convolutional or recurrent neural networks, to analyze raw read pileups.",
+      "reason": "Makes a specific claim about named software tools and the machine learning methods they use.",
+      "key_terms": [
+        "DeepVariant",
+        "Clair3",
+        "deep learning",
+        "convolutional neural networks"
+      ]
+    },
+    {
+      "sentence": "Building on these foundations, the field has addressed the more complex problem of identifying somatic mutations: genetic alterations acquired by cells during an organism's lifetime that are primary drivers of cancer.",
+      "reason": "Makes a strong factual claim about the biological role of somatic mutations as 'primary drivers of cancer'.",
+      "key_terms": [
+        "somatic mutations",
+        "cancer",
+        "drivers of cancer"
+      ]
+    },
+    {
+      "sentence": "The gold-standard approach for somatic variant calling involves a paired analysis of a tumor sample and a matched normal sample from the same individual.",
+      "reason": "Describes an established concept or methodology referred to as a 'gold-standard'.",
+      "key_terms": [
+        "gold-standard",
+        "somatic variant calling",
+        "paired analysis",
+        "tumor-normal"
+      ]
+    },
+    {
+      "sentence": "A somatic mutation often arises on only one of the two parental chromosomes and may be present in just a fraction of the cells within a heterogeneous tumor.",
+      "reason": "States a specific biological fact about the nature of somatic mutations and tumor heterogeneity.",
+      "key_terms": [
+        "somatic mutation",
+        "heterogeneous tumor",
+        "fraction of cells"
+      ]
+    },
+    {
+      "sentence": "This principle is leveraged by state-of-the-art somatic callers like `DeepSomatic`, `ClairS`, and `Severus`, which integrate information from the tumor-normal comparison with phased read data to achieve superior sensitivity and precision, especially for variants with low allele frequencies.",
+      "reason": "Makes specific claims about named software tools, their methods, and their performance characteristics.",
+      "key_terms": [
+        "DeepSomatic",
+        "ClairS",
+        "Severus",
+        "somatic callers",
+        "sensitivity and precision"
+      ]
+    },
+    {
+      "sentence": "To address this, current workflows often substitute the matched normal with a Panel of Normals (PON).",
+      "reason": "Describes a specific and established technical approach (Panel of Normals) used in practice.",
+      "key_terms": [
+        "Panel of Normals",
+        "PON",
+        "tumor-only",
+        "workflows"
+      ]
+    },
+    {
+      "sentence": "Specialized tools and modes, such as `DeepSomatic(TO)`, `ClairS-TO`, and `Severus(TO)`, have been developed specifically for this purpose.",
+      "reason": "Names specific software tools and their specialized modes for a particular application.",
+      "key_terms": [
+        "DeepSomatic(TO)",
+        "ClairS-TO",
+        "Severus(TO)",
+        "specialized tools"
+      ]
+    },
+    {
+      "sentence": "This progression from germline to paired-somatic and, finally, to tumor-only workflows underscores a pivotal trend in the field: the strategic integration of long-range phasing information with advanced machine learning models is essential for overcoming the inherent challenges of long-read data and achieving high-confidence variant discovery.",
+      "reason": "Makes a concluding assertion about a 'pivotal trend' in the field that should be supported by a review or perspective article.",
+      "key_terms": [
+        "pivotal trend",
+        "long-range phasing",
+        "machine learning models",
+        "variant discovery"
+      ]
+    }
+  ]
+}

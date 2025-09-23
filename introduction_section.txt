@@ -1,0 +1,187 @@
+Page 1:
+This is the title slide of a master's thesis presentation.
+
+*   **Title**: Joint Somatic Phasing and Purity Estimation Incorporating Loss of Heterozygosity in Tumor-Only Long-Read Sequencing
+*   **Advisor**: Yao-Ting Huang
+*   **Speaker**: Zhen-Yu Chen
+
+### Summary of Key Messages
+
+This slide introduces the topic of the master's thesis. The research focuses on developing a computational method for analyzing cancer genomics data. The key aspects of the work, as indicated by the title, are:
+
+*   **Joint Somatic Phasing and Purity Estimation**: The method aims to simultaneously solve two problems:
+    1.  **Somatic Phasing**: Determining which parental chromosome (haplotype) a somatic mutation occurs on.
+    2.  **Purity Estimation**: Estimating the proportion of tumor cells within the sequenced sample, which is often a mix of tumor and normal cells.
+*   **Incorporating Loss of Heterozygosity (LOH)**: The method specifically uses information from LOH events—a common occurrence in cancer where a region of a chromosome loses one of its two alleles—to improve its estimations.
+*   **Tumor-Only Long-Read Sequencing**: The methodology is designed for a specific and challenging data type: long-read sequencing data obtained only from a tumor sample, without a matched normal sample from the same patient. Long reads are particularly useful for phasing because they can span multiple variant sites.
+
+
+
+
+Page 2:
+This slide presents the outline for the master's thesis presentation, setting the agenda for the topics that will be discussed. It follows a standard and logical structure for a scientific presentation, guiding the audience through the research from its conception to its conclusion.
+
+The outline consists of a bulleted list of six sections:
+
+*   **Introduction**: This section will likely provide the necessary background on cancer genomics, long-read sequencing, somatic mutations, phasing, and tumor purity, setting the stage for the research problem.
+*   **Related work**: Here, the speaker will probably review existing computational methods and studies relevant to the thesis topic, highlighting their strengths and limitations.
+*   **Motivation**: This part will explain the specific research gap or challenge that the thesis aims to address, justifying the need for a new method for joint somatic phasing and purity estimation.
+*   **Methods**: This section is expected to detail the novel algorithm and computational framework developed in the thesis. It will describe how the method incorporates information from Loss of Heterozygosity (LOH) and is tailored for tumor-only long-read sequencing data.
+*   **Result**: The speaker will present the findings from applying their method, likely including performance evaluations on simulated or real cancer data, and comparisons with existing tools.
+*   **Conclusion**: The presentation will end with a summary of the key contributions, a discussion of the results' implications, and potential directions for future research.
+
+### Summary of Key Messages
+
+This slide functions as a roadmap for the presentation. It informs the audience about the structure and flow of the talk, ensuring they can follow the logical progression from the background and motivation for the research to the methods, results, and final conclusions. The structure is comprehensive, covering all essential components of a thesis defense.
+
+
+
+
+Page 3:
+### Introduction: Germline and Somatic Variants
+
+This slide provides a foundational visual explanation of the distinction between germline and somatic genetic variants.
+
+### Figure Description
+
+The slide contains a central diagram that illustrates the origin, distribution, and inheritability of germline and somatic variants.
+
+*   **Left Side (Inheritance):** The process begins with fertilization. A paternal sperm cell and a maternal egg cell, each containing their respective genetic material (chromosomes), are shown. A blue bar on a paternal chromosome represents a pre-existing genetic variant. These gametes combine to form an embryo, which inherits a complete set of chromosomes, including the paternal variant. This embryo develops into an adult human, with every cell containing this inherited (germline) variant.
+
+*   **Right Side (Variant Types):** The diagram then branches to show two distinct types of variants present in the adult:
+    *   **Germline variants:** These are the "Inherited mutations" that were present from conception. The diagram shows that these variants are present in the normal cells (represented by blue circles) of the individual. Because they are also present in the germ cells (e.g., sperm), they are labeled as "Inheritable" and can be passed on to the next generation.
+    *   **Somatic variants:** These are "Novel mutations" that arise in specific body cells (somatic cells) during an individual's lifetime, often associated with factors like environmental exposure or errors in DNA replication. In the diagram, a new mutation (represented by an orange bar) appears in a subset of cells (orange circles), which could represent a tumor developing in a specific organ (indicated by a red dot on the person's torso). These variants are confined to the affected somatic cells and are not present in germ cells, making them "Uninheritable."
+
+### Key Messages of the Visualization
+
+*   **Germline variants** are inherited from parents, are present in virtually every cell of an individual's body from birth, and can be passed down to offspring.
+*   **Somatic variants** are acquired after conception, are present only in a specific subset of cells (e.g., a tumor), and are not passed on to offspring.
+*   This distinction is fundamental to cancer genetics, as cancer is driven by the accumulation of somatic mutations within a population of cells.
+
+### Summary of Key Messages
+
+This slide serves as an introduction to the core concepts of the thesis. By visually contrasting germline and somatic variants, it establishes the biological context necessary for the audience to understand the subsequent discussion on cancer genomics. The key takeaway is the different origin and fate of these two types of genetic alterations, which is a critical concept for methods that aim to distinguish them using sequencing data.
+
+
+
+
+Page 7:
+### Title
+Motivation: Lack of Somatic Phasing
+
+### Figure Description
+
+This slide presents the motivation for developing methods for somatic phasing by illustrating the concept of tumor evolution and its clinical implications. It is composed of two main visual sections.
+
+**Figure 1: Clonal Evolution and the Phasing Challenge**
+
+This figure, occupying the top half of the slide, explains the complexity of tumor genetics and the limitations of current phasing technologies.
+
+*   **Clonal Evolution Diagram (Left):** This part illustrates how a tumor develops and becomes a heterogeneous mixture of different cell populations (subclones).
+    *   The process starts with a **Founder mutation** (blue), which is a germline variant inherited from the parents and present in all of the individual's cells.
+    *   A **Driver mutation** (yellow) then occurs somatically, initiating the cancer and creating the primary tumor clone (clonal).
+    *   As the tumor grows, additional mutations occur, leading to the emergence of distinct **Subclones** (green and orange).
+    *   The final tumor is depicted as a mass containing a mix of these cell populations, each with a unique combination of mutations.
+
+*   **Haplotype Phasing Diagram (Right):** This part contrasts the established process of germline phasing with the challenge of somatic phasing.
+    *   **Germline Haplotypes:** Current standard tools (e.g., WhatsHap, LongPhase, HapCut2) can successfully perform germline phasing. They analyze sequencing reads to separate them into two groups corresponding to the two parental chromosomes, or haplotypes (HP1 and HP2). An example DNA sequence shows HP1 and HP2 differing by a single germline variant (T vs. G, highlighted in blue).
+    *   **Somatic Haplotypes:** This section, marked with a question mark, highlights the central problem. In a tumor, somatic mutations create new, cancer-specific haplotypes within each subclone. The diagram shows how the original germline haplotypes (HP1, HP2) can evolve into distinct somatic haplotypes like HP1-1, HP2-1, and HP2-1-1, each defined by the acquisition of new somatic mutations (highlighted in orange). The goal of somatic phasing is to reconstruct these specific subclonal haplotypes, a task that current tools cannot perform.
+
+**Figure 2: Clinical Importance of Somatic Phasing in NSCLC**
+
+This figure, in the bottom half of the slide, provides a concrete clinical example from Non-Small Cell Lung Cancer (NSCLC) to demonstrate why somatic phasing is critical.
+
+*   **Context:** The example focuses on mutations in the Epidermal Growth Factor Receptor (EGFR) gene, specifically in Exons 20 and 21. A legend identifies two key mutations: L858R and T790M.
+*   **Haplotype Configurations and Treatment:** The diagram shows two possible scenarios for a patient with both the L858R and T790M mutations:
+    1.  **Trans Configuration:** The L858R mutation is on one haplotype (HP1-1), and the T790M mutation is on the other haplotype (HP2-1). In this case, the cancer is sensitive to either 1st or 3rd generation Tyrosine Kinase Inhibitors (TKIs) like Gefitinib or Osimertinib.
+    2.  **Cis Configuration:** Both the L858R and T790M mutations are on the same haplotype (HP2-1). This configuration confers resistance to 1st generation TKIs, and the patient must be treated with a 3rd generation TKI like Osimertinib.
+
+### Key Messages of the Visualizations
+
+*   **Tumors are Genetically Heterogeneous:** Cancers are not uniform masses but are composed of multiple subclones, each with a unique set of somatic mutations acquired during tumor evolution.
+*   **Somatic Phasing is an Unsolved Problem:** While tools exist to determine an individual's two inherited (germline) haplotypes, there is a lack of methods capable of reconstructing the specific, newly-evolved somatic haplotypes present in different cancer subclones.
+*   **Somatic Phase has Direct Clinical Consequences:** The arrangement of multiple somatic mutations on chromosomes (*cis* vs. *trans*) is not just an academic detail. As the EGFR example shows, it can determine a patient's sensitivity or resistance to specific targeted therapies, directly impacting treatment strategy and outcome.
+
+### Summary of Key Messages
+
+This slide argues that the lack of methods for "somatic phasing" is a significant gap in cancer genomics. It establishes that tumors are complex mixtures of subclones, each with unique genetic fingerprints. The central message is that determining the phase of somatic mutations—whether they occur on the same or different parental chromosomes—is clinically critical. Using NSCLC as a powerful example, the slide demonstrates that knowing the somatic haplotype configuration can directly guide the selection of the most effective targeted therapy, providing a strong motivation for developing new computational tools to solve this challenge.
+
+
+
+
+Page 8:
+### Title
+Challenge 1: Chromosome-scale Loss of Heterozygosity
+
+### Figure Description
+
+This slide illustrates the first major challenge in somatic phasing: accurately identifying and phasing through large, chromosome-scale Loss of Heterozygosity (LOH) events. It contrasts the output of existing bioinformatics tools with the desired, biologically correct result. The slide is divided into two main sections comparing phasing approaches and Copy Number Variation (CNV) detection.
+
+**Figure 1: Comparison of Phasing Approaches in the Presence of LOH**
+
+This figure, located in the upper half of the slide, visualizes how current phasing methods fall short when dealing with large-scale LOH and what the ideal output should look like.
+
+*   **Source of the Problem (Left):** A diagram labeled "Tumor cells" shows a cell containing two parental chromosome homologs (one light blue, one dark blue). A large portion of the light blue chromosome is shown as lost, which represents a major LOH event where the tumor cell loses one of the two inherited copies of a chromosomal region.
+*   **Existing Phasing Approaches (Top Right):** This diagram represents the output of current phasing tools. It shows sequencing reads aligned to a reference genome. Reads are colored to indicate their assigned haplotype (light blue for haplotype 1, dark blue for haplotype 2) or are left grey if unphased. The result is a set of fragmented haplotype "blocks." There are several distinct light blue and dark blue blocks, separated by large grey regions of unphased reads. This illustrates that existing methods fail to connect these blocks across the LOH region, breaking the chromosome into multiple, small, incorrectly phased segments.
+*   **Expected Phasing (Bottom Right):** This diagram shows the ideal, correct phasing result. The dark blue haplotype is reconstructed as a single, continuous block spanning the entire region. The light blue haplotype is present only at the beginning and then disappears, correctly reflecting the large LOH event shown in the "Tumor cells" diagram. This demonstrates a contiguous, chromosome-scale phased haplotype.
+
+**Figure 2: Comparison of LOH Detection by CNV Callers**
+
+This figure, in the lower half of the slide, compares how existing CNV detection tools interpret LOH versus the actual underlying event.
+
+*   **Existing Tool Output (Top Graph):** Associated with a list of standard CNV/SV callers (`CNVkit`, `ExomeDepth`, `Sniffles`, `Delly`), this graph plots copy number state against genomic loci. It shows both haplotypes (light and dark blue). The output depicts several separate, smaller regions labeled "LOH" where the light blue haplotype is lost. These are interspersed with regions where both haplotypes appear present. This output incorrectly suggests multiple independent LOH events.
+*   **Expected Output (Bottom Graph):** This graph shows the true biological state. It depicts a single, continuous "LOH (Chromosomal-Scale)" event where the entire light blue haplotype is lost across a vast chromosomal region. This contrasts with the fragmented interpretation from existing tools.
+
+### Summary of Key Messages
+
+*   **Chromosome-scale LOH is a Major Challenge:** Large genomic deletions, common in cancer, lead to the loss of one parental chromosome copy over a wide area.
+*   **Existing Tools Provide a Fragmented View:** Current phasing and CNV detection tools are not optimized for such large-scale events. They tend to break the analysis into smaller segments, misinterpreting a single, large LOH event as multiple, disconnected events or failing to phase across the region entirely.
+*   **The Goal is Contiguous, Biologically Accurate Phasing:** The desired outcome is a method that can reconstruct complete, chromosome-scale haplotypes, correctly identifying the precise boundaries of large LOH events and maintaining phase consistency across the entire chromosome. This is a critical step for accurately understanding the genomic landscape of a tumor.
+
+
+
+
+Page 9:
+### Title
+Challenge 2: Tumor Purity
+
+### Figure Description
+
+This slide addresses the second major challenge in somatic phasing: the impact of tumor purity. It illustrates how the proportion of tumor cells versus normal cells in a sequenced sample affects the accuracy of phasing and outlines a computational approach to estimate and correct for this mixture. The slide is divided into two main diagrams.
+
+**Figure 1: The Effect of Tumor Purity on Haplotype Phasing**
+
+This diagram, located in the upper half of the slide, contrasts the outcome of phasing in high-purity and low-purity tumor samples.
+
+*   **High Purity Scenario:**
+    *   **Input:** Shows a collection of sequencing reads. The majority of reads (indicated by an orange background and a male icon) originate from the tumor genome, while a smaller fraction (blue background, female icon) come from the contaminating normal genome. This represents a high-purity sample where the tumor signal is dominant.
+    *   **Output (Phasing):** The phasing algorithm successfully separates the reads into two distinct and correct haplotypes. One haplotype (`A-T-C`) corresponds to the normal cells, and the other (`G-C-A`) corresponds to the tumor cells. The result is clean and accurate.
+
+*   **Low Purity Scenario:**
+    *   **Input:** Shows sequencing reads where the number of reads from the tumor genome (orange) and the normal genome (blue) are nearly equal. This represents a low-purity sample with significant normal cell contamination.
+    *   **Output (Phasing):** The mixed signals from the tumor and normal cells confuse the phasing algorithm. It incorrectly links alleles from different haplotypes, resulting in a "switch error." For example, it incorrectly connects the `A` from the normal haplotype to the `A` from the tumor haplotype, and the `G` from the tumor to the `C` from the normal. This leads to an erroneous phased output.
+
+**Figure 2: Workflow for Estimating Tumor Purity and Ploidy**
+
+This diagram, in the lower half of the slide, illustrates a complete workflow for analyzing a mixed sample to determine its composition.
+
+*   **Step 1: Initial Cell Populations:** The process begins with a conceptual mixture of "Tumor cells" and "Normal cells."
+    *   **Tumor cells:** Depicted as being triploid (three copies of each chromosome shown), indicating a copy number aberration common in cancer.
+    *   **Normal cells:** Depicted as being diploid (two copies of each chromosome), representing the healthy state.
+
+*   **Step 2: Sample Sequencing:** The mixed cell population is sequenced (e.g., using "illumina" technology), generating a pool of short DNA reads. These reads originate from both the tumor and normal genomes.
+
+*   **Step 3: Purity and Ploidy Estimation:** A bioinformatics tool, exemplified by "Ascat," analyzes the mixed sequencing reads to computationally separate the signals.
+    *   The tool estimates key sample characteristics: **Purity = 0.5** (the sample is 50% tumor cells), **Tumor Ploidy = 3** (the average tumor cell is triploid), and **Normal Ploidy = 2** (the normal cells are diploid).
+    *   Based on these estimations, the reads are computationally assigned to either the tumor component (orange box) or the normal component (blue box).
+
+*   **Step 4: Reconstructed Genomes:** Using the estimated parameters, the tool reconstructs the distinct genomic profiles of the tumor and normal cell populations present in the original sample, reflecting the initial state. The value "0.5" is shown again, emphasizing the estimated purity.
+
+### Summary of Key Messages
+
+*   **Tumor Purity Critically Affects Phasing:** The accuracy of haplotype phasing is highly dependent on tumor purity. Low-purity samples, where normal cell DNA contamination is high, can introduce conflicting evidence that leads to significant phasing errors.
+*   **Contamination Causes Phasing Errors:** When signals from normal and tumor haplotypes are present in similar proportions, phasing algorithms may incorrectly connect segments from different origins, creating biologically incorrect haplotypes.
+*   **Purity and Ploidy Estimation is Essential:** To overcome this challenge, it is necessary to computationally estimate the tumor purity and ploidy from the mixed sequencing data. Tools like Ascat can perform this analysis.
+*   **Computational Separation Enables Accurate Analysis:** By estimating purity and ploidy, it becomes possible to computationally deconvolute the mixed signals, allowing for a more accurate reconstruction of the separate tumor and normal haplotypes, which is a prerequisite for reliable downstream analyses.
+
+

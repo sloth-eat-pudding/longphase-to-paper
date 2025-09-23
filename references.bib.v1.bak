@@ -1,0 +1,256 @@
+@article{vogelstein2013,
+  author = {Vogelstein, B and Papadopoulos, N and Velculescu, VE and Zhou, S and Diaz, LA Jr and Kinzler, KW},
+  title = {Cancer genome landscapes.},
+  journal = {Science},
+  year = {2013},
+  volume = {339},
+  number = {6127},
+  doi = {10.1126/science.1235122},
+  pmid = {23539594}
+}
+
+@article{stratton2009,
+  author = {Stratton, MR and Campbell, PJ and Futreal, PA},
+  title = {The cancer genome.},
+  journal = {Nature},
+  year = {2009},
+  volume = {458},
+  number = {7239},
+  doi = {10.1038/nature07943},
+  pmid = {19360079}
+}
+
+@article{vogelstein2004,
+  author = {Vogelstein, B and Kinzler, KW},
+  title = {Cancer genes and the pathways they control.},
+  journal = {Nat Med},
+  year = {2004},
+  volume = {10},
+  number = {8},
+  doi = {10.1038/nm1087},
+  pmid = {15286780}
+}
+
+@article{gamundi2008,
+  author = {Gamundi, MJ and Hernan, I and Muntanyola, M and Maseras, M and Lopez-Romero, P and Alvarez, R and Dopazo, A and Borrego, S and Carballo, M},
+  title = {Transcriptional expression of cis-acting and trans-acting splicing mutations cause autosomal dominant retinitis pigmentosa.},
+  journal = {Hum Mutat},
+  year = {2008},
+  volume = {29},
+  number = {6},
+  doi = {10.1002/humu.20747},
+  pmid = {18412284}
+}
+
+@article{ambrodji2024,
+  author = {Ambrodji, A and Sadlon, A and Amstutz, U and Hoch, D and Berger, MD and Bastian, S and Offer, SM and Largiader, CR},
+  title = {Approach for Phased Sequence-Based Genotyping of the Critical Pharmacogene Dihydropyrimidine Dehydrogenase (DPYD).},
+  journal = {Int J Mol Sci},
+  year = {2024},
+  volume = {25},
+  number = {14},
+  doi = {10.3390/ijms25147599},
+  pmid = {39062841}
+}
+
+@article{warburton2023,
+  author = {Warburton, PE and Sebra, RP},
+  title = {Long-Read DNA Sequencing: Recent Advances and Remaining Challenges.},
+  journal = {Annu Rev Genomics Hum Genet},
+  year = {2023},
+  volume = {24},
+  doi = {10.1146/annurev-genom-101722-103045},
+  pmid = {37075062}
+}
+
+@article{maestri2020,
+  author = {Maestri, S and Maturo, MG and Cosentino, E and Marcolungo, L and Iadarola, B and Fortunati, E and Rossato, M and Delledonne, M},
+  title = {A Long-Read Sequencing Approach for Direct Haplotype Phasing in Clinical Settings.},
+  journal = {Int J Mol Sci},
+  year = {2020},
+  volume = {21},
+  number = {23},
+  doi = {10.3390/ijms21239177},
+  pmid = {33271988}
+}
+
+@article{gupta2024,
+  author = {Gupta, P and O'Neill, H and Wolvetang, EJ and Chatterjee, A and Gupta, I},
+  title = {Advances in single-cell long-read sequencing technologies.},
+  journal = {NAR Genom Bioinform},
+  year = {2024},
+  volume = {6},
+  number = {2},
+  doi = {10.1093/nargab/lqae047},
+  pmid = {38774511}
+}
+
+@article{poplin2018,
+  author = {Poplin, R and Chang, PC and Alexander, D and Schwartz, S and Colthurst, T and others},
+  title = {A universal SNP and small-indel variant caller using deep neural networks.},
+  journal = {Nat Biotechnol},
+  year = {2018},
+  volume = {36},
+  number = {10},
+  doi = {10.1038/nbt.4235},
+  pmid = {30247488}
+}
+
+@article{zheng2022,
+  author = {Zheng, Z and Li, S and Su, J and Leung, AW and Lam, TW and Luo, R},
+  title = {Symphonizing pileup and full-alignment for deep learning-based long-read variant calling.},
+  journal = {Nat Comput Sci},
+  year = {2022},
+  volume = {2},
+  number = {12},
+  doi = {10.1038/s43588-022-00387-x},
+  pmid = {38177392}
+}
+
+@article{simpson2024,
+  author = {Simpson, JT},
+  title = {Detecting Somatic Mutations Without Matched Normal Samples Using Long Reads.},
+  journal = {bioRxiv},
+  year = {2024},
+  doi = {2024.02.26.582089 [pii] 10.1101/2024.02.26.582089},
+  pmid = {38464143}
+}
+
+@article{li2024,
+  author = {Li, H and Meng, L and Wang, H and Cui, L and Sheng, H and others},
+  title = {Precise identification of somatic and germline variants in the absence of matched normal samples.},
+  journal = {Brief Bioinform},
+  year = {2024},
+  volume = {26},
+  number = {1},
+  doi = {10.1093/bib/bbae677},
+  pmid = {39737564}
+}
+
+@article{park2024,
+  author = {Park, J and Cook, DE and Chang, PC and Kolesnikov, A and Brambrink, L and others},
+  title = {DeepSomatic: Accurate somatic small variant discovery for multiple sequencing technologies.},
+  journal = {bioRxiv},
+  year = {2024},
+  doi = {2024.08.16.608331 [pii] 10.1101/2024.08.16.608331},
+  pmid = {39229187}
+}
+
+@article{keskus2025,
+  author = {Keskus, AG and Bryant, A and Ahmad, T and Yoo, B and Aganezov, S and others},
+  title = {Severus detects somatic structural variation and complex rearrangements in cancer genomes using long-read sequencing.},
+  journal = {Nat Biotechnol},
+  year = {2025},
+  doi = {10.1038/s41587-025-02618-8},
+  pmid = {40185952}
+}
+
+@article{nowell1976,
+  author = {Nowell, PC},
+  title = {The clonal evolution of tumor cell populations.},
+  journal = {Science},
+  year = {1976},
+  volume = {194},
+  number = {4260},
+  doi = {10.1126/science.959840},
+  pmid = {959840}
+}
+
+@article{zheng2005,
+  author = {Zheng, HT and Peng, ZH and Li, S and He, L},
+  title = {Loss of heterozygosity analyzed by single nucleotide polymorphism array in cancer.},
+  journal = {World J Gastroenterol},
+  year = {2005},
+  volume = {11},
+  number = {43},
+  doi = {10.3748/wjg.v11.i43.6740},
+  pmid = {16425377}
+}
+
+@article{zhang2021,
+  author = {Zhang, X and Sjoblom, T},
+  title = {Targeting Loss of Heterozygosity: A Novel Paradigm for Cancer Therapy.},
+  journal = {Pharmaceuticals (Basel)},
+  year = {2021},
+  volume = {14},
+  number = {1},
+  doi = {10.3390/ph14010057},
+  pmid = {33450833}
+}
+
+@article{hwang2021,
+  author = {Hwang, MS and Mog, BJ and Douglass, J and Pearlman, AH and Hsiue, EH and others},
+  title = {Targeting loss of heterozygosity for cancer-specific immunotherapy.},
+  journal = {Proc Natl Acad Sci U S A},
+  year = {2021},
+  volume = {118},
+  number = {12},
+  doi = {10.1073/pnas.2022410118},
+  pmid = {33731480}
+}
+
+@article{yadav2015,
+  author = {Yadav, VK and De, S},
+  title = {An assessment of computational methods for estimating purity and clonality using genomic data derived from heterogeneous tumor tissue samples.},
+  journal = {Brief Bioinform},
+  year = {2015},
+  volume = {16},
+  number = {2},
+  doi = {10.1093/bib/bbu002},
+  pmid = {24562872}
+}
+
+@article{zheng2017,
+  author = {Zheng, X and Zhang, N and Wu, HJ and Wu, H},
+  title = {Estimating and accounting for tumor purity in the analysis of DNA methylation data from cancer studies.},
+  journal = {Genome Biol},
+  year = {2017},
+  volume = {18},
+  number = {1},
+  doi = {10.1186/s13059-016-1143-5},
+  pmid = {28122605}
+}
+
+@article{rhee2018,
+  author = {Rhee, JK and Jung, YC and Kim, KR and Yoo, J and Kim, J and Lee, YJ and Ko, YH and Lee, HH and Cho, BC and Kim, TM},
+  title = {Impact of Tumor Purity on Immune Gene Expression and Clustering Analyses across Multiple Cancer Types.},
+  journal = {Cancer Immunol Res},
+  year = {2018},
+  volume = {6},
+  number = {1},
+  doi = {10.1158/2326-6066.CIR-17-0201},
+  pmid = {29141981}
+}
+
+@article{satas2018,
+  author = {Satas, G and Raphael, BJ},
+  title = {Haplotype phasing in single-cell DNA-sequencing data.},
+  journal = {Bioinformatics},
+  year = {2018},
+  volume = {34},
+  number = {13},
+  doi = {10.1093/bioinformatics/bty286},
+  pmid = {29950014}
+}
+
+@article{garg2021,
+  author = {Garg, S},
+  title = {Computational methods for chromosome-scale haplotype reconstruction.},
+  journal = {Genome Biol},
+  year = {2021},
+  volume = {22},
+  number = {1},
+  doi = {10.1186/s13059-021-02328-9},
+  pmid = {33845884}
+}
+
+@article{watkins2023,
+  author = {Watkins, TBK and Colliver, EC and Huska, MR and Kaufmann, TL and Lim, EL and others},
+  title = {Refphase: Multi-sample phasing reveals haplotype-specific copy number heterogeneity.},
+  journal = {PLoS Comput Biol},
+  year = {2023},
+  volume = {19},
+  number = {10},
+  doi = {10.1371/journal.pcbi.1011379},
+  pmid = {37871126}
+}

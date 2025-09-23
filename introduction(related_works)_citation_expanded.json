@@ -1,0 +1,264 @@
+{
+  "sentences": [
+    {
+      "sentence": "Cancer is fundamentally a disease of the genome, initiated and propelled by the accumulation of somatic mutations.",
+      "reason": "This is a foundational concept in cancer biology and should be attributed to seminal or review literature.",
+      "key_terms": [
+        "cancer",
+        "genome",
+        "somatic mutations"
+      ],
+      "papers": [
+        {
+          "Title": "Cancer genome landscapes",
+          "Passage": "Over the past decade, comprehensive sequencing efforts have revealed the genomic landscapes of common forms of human cancer. ... To date, these studies have revealed ~140 genes that, when altered by intragenic mutations, can promote or “drive” tumorigenesis. A typical tumor contains two to eight of these “driver gene” mutations; the remaining mutations are passengers that confer no selective growth advantage."
+        },
+        {
+          "Title": "The cancer genome",
+          "Passage": "All cancers arise as a result of changes that have occurred in the DNA sequence of the genomes of cancer cells. ... All cancers arise as a result of somatically acquired changes in the DNA of cancer cells."
+        },
+        {
+          "Title": "Cancer genes and the pathways they control",
+          "Passage": "The revolution in cancer research can be summed up in a single sentence: cancer is, in essence, a genetic disease. ... Cancer is a genetic disease fueled by accumulation of driver mutations which confer a selective growth advantage to tumor cells (Vogelstein and Kinzler 2004) ."
+        }
+      ]
+    },
+    {
+      "sentence": "This resolution is critical because the functional consequence of multiple mutations is contingent upon whether they occur on the same chromosome copy (in *cis*) or on different copies (in *trans*).",
+      "reason": "This describes the established genetic principles of cis and trans effects, which is a specific, factual claim.",
+      "key_terms": [
+        "haplotype phasing",
+        "cis-trans effect",
+        "functional consequence"
+      ],
+      "papers": [
+        {
+          "Title": "cis-acting sites and trans-acting molecules - GENES IV",
+          "Passage": "cis configuration describes two sites on the same molecule of DNA. trans configuration of two sites refers to their presence on two different molecules of DNA (chromosomes). There is a crucial difference in the effects of two mutations in the same gene that depends on whether they are in cis or trans configuration."
+        },
+        {
+          "Title": "Cis, trans configurations - Oxford Reference",
+          "Passage": "In the cis configuration both mutant recons are on one homolog and both wild-type recons are on the other (a1 a2/++). The phenotype observed is wild type. In the trans configuration each homolog has a mutant and a nonmutant recon (a1+/+a2), and the mutant phenotype is observed."
+        },
+        {
+          "Title": "Complementation and allelism: the cis-trans test - Genetics - EBSCO",
+          "Passage": "Alleles can be in two configurations: cis (on the same chromosome) or trans (on opposite homologs), affecting their ability to produce normal phenotypes."
+        }
+      ]
+    },
+    {
+      "sentence": "The emergence of long-read sequencing technologies has significantly advanced phasing capabilities.",
+      "reason": "This is a factual claim about the impact of a specific technology on a scientific field.",
+      "key_terms": [
+        "long-read sequencing",
+        "haplotype phasing",
+        "phasing capabilities"
+      ],
+      "papers": [
+        {
+          "Title": "Long-Read DNA Sequencing: Recent Advances and Remaining Challenges",
+          "Passage": "Long-read sequencing (LRS) permits routine sequencing of human DNA fragments tens to hundreds of kilobase pairs in size, using both real-time sequencing by synthesis and nanopore-based direct electronic sequencing. LRS permits analysis of large structural variation and haplotypic phasing in human genomes and has enabled the discovery and characterization of rare pathogenic structural variants and repeat expansions."
+        },
+        {
+          "Title": "Long-read Sequencing for Haplotype Phasing",
+          "Passage": "Highly accurate long reads (called HiFi reads) are particularly well suited for phasing haplotypes because they provide the high precision needed to detect single nucleotide variants (SNVs) and the length of reads that link these variants over a long range."
+        },
+        {
+          "Title": "Advances in single-cell long-read sequencing technologies | NAR Genomics and Bioinformatics | Oxford Academic",
+          "Passage": "Additionally, single-cell long-read DNA sequencing enables high-quality assemblies, structural variant detection, haplotype phasing, resolving high-complexity regions, and characterization of epigenetic modifications."
+        }
+      ]
+    },
+    {
+      "sentence": "State-of-the-art tools, such as DeepVariant and Clair3, employ deep learning models that analyze patterns in aligned sequencing reads to render highly accurate predictions, effectively separating the biological signal from technological artifacts.",
+      "reason": "This sentence names specific software tools (DeepVariant, Clair3) and describes their methodology, requiring citation to the original papers.",
+      "key_terms": [
+        "DeepVariant",
+        "Clair3",
+        "deep learning",
+        "variant calling"
+      ],
+      "papers": [
+        {
+          "Title": "A universal SNP and small-indel variant caller using deep neural networks",
+          "Passage": "Here we show that a deep convolutional neural network can call genetic variation in aligned next-generation sequencing read data by learning statistical relationships between images of read pileups around putative variant and true genotype calls. The approach, called DeepVariant, outperforms existing state-of-the-art tools."
+        },
+        {
+          "Title": "Symphonizing pileup and full-alignment for deep learning-based long-read variant calling",
+          "Passage": "In this paper, we present Clair3, which leveraged the best of two major method categories: pile-up calling handles most variant candidates with speed, and full-alignment tackles complicated candidates to maximize precision and recall. Long-read variant calling, using Oxford Nanopore (ONT) data, on the other hand, has been dominated by DL-methods since the beginning, primarily owing to the difficulty caused by its higher base error rate in general."
+        }
+      ]
+    },
+    {
+      "sentence": "The gold standard for identifying somatic mutations has historically been the comparative analysis of paired tumor and normal samples from the same patient.",
+      "reason": "This sentence asserts a 'gold standard' practice in the field, which requires a citation to establish it as such.",
+      "key_terms": [
+        "gold standard",
+        "somatic mutations",
+        "tumor-normal pairing"
+      ],
+      "papers": [
+        {
+          "Title": "Detecting Somatic Mutations Without Matched Normal Samples Using Long Reads",
+          "Passage": "The gold standard method of detecting somatic mutations is to compare sequencing data from the tumour to a matched “normal” sample that is assumed to be representative of the individual's inherited genome. This method, referred to to tumour-normal calling, is highly accurate and widely used."
+        },
+        {
+          "Title": "Matched tumor-normal sequencing: The preferred method for identifying somatic mutations driving tumorigenesis",
+          "Passage": "Matched tumor-normal sequencing that pairs analysis of a tumor sample with that of a comparable, normal sample – most often from the same individual – has been shown to be a more effective strategy, yielding more reliable identification of the somatic changes specific to a tumor. When used as a filter against the tumor sample, somatic variants relevant to the cancer at hand can be identified with a high degree of confidence."
+        },
+        {
+          "Title": "Precise identification of somatic and germline variants in the absence of matched normal samples",
+          "Passage": "Detecting somatic mutations can be challenging due to heterogeneity and genomic instability in cancer specimens. This is typically solved by sequencing the tumor specimen with the matched normal tissue from the same patient and followed by comparison: variants present in both of the paired samples are determined to be germline variants shared across all cells within an individual, while those detected in tumor specimen only are classified as somatic variants."
+        }
+      ]
+    },
+    {
+      "sentence": "Modern somatic variant callers designed for long-read data, including DeepSomatic, ClairS, and Severus, have adopted a phase-centric strategy.",
+      "reason": "This sentence names specific software tools (DeepSomatic, ClairS, Severus) and should cite their respective publications.",
+      "key_terms": [
+        "DeepSomatic",
+        "ClairS",
+        "Severus",
+        "somatic variant callers"
+      ],
+      "papers": [
+        {
+          "Title": "ClairS: a deep-learning method for long-read somatic small variant calling",
+          "Passage": "Our findings suggest that improved read phasing enabled by long-read sequencing is key to accurate long-read SNV calling, especially for variants with low VAF."
+        },
+        {
+          "Title": "DeepSomatic: Accurate somatic small variant discovery for multiple sequencing technologies",
+          "Passage": "While most methods have focused on short-read sequencing, long-read technologies now offer potential advantages in terms of repeat mapping and variant phasing."
+        },
+        {
+          "Title": "Severus detects somatic structural variation and complex rearrangements in cancer genomes using long-read sequencing",
+          "Passage": "Severus works with tumour-only and matched normal samples, produces haplotype-specific SV calling, characterises complex SV patterns, and supports unbalanced cancer karyotypes."
+        }
+      ]
+    },
+    {
+      "sentence": "The standard mitigation strategy involves filtering candidate variants against a Panel of Normals (PON), a database of common germline variants and recurrent technical artifacts compiled from a large cohort of healthy individuals.",
+      "reason": "This sentence describes a specific, standard technical method (Panel of Normals) used in genomics.",
+      "key_terms": [
+        "Panel of Normals",
+        "PON",
+        "tumor-only workflow",
+        "variant filtering"
+      ],
+      "papers": [
+        {
+          "Title": "Panel of Normals (PON) – GATK",
+          "Passage": "A Panel of Normal or PON is a type of resource used in somatic variant analysis. What all PONs have in common is that (1) they are made from normal samples (in this context, \"normal\" means derived from healthy tissue that is believed to not have any somatic alterations) and (2) their main purpose is to capture recurrent technical artifacts in order to improve the results of the variant calling analysis."
+        },
+        {
+          "Title": "CreateSomaticPanelOfNormals (BETA) – GATK",
+          "Passage": "Create a panel of normals (PoN) containing germline and artifactual sites for use with Mutect2. The tool takes multiple normal sample callsets produced by {@link Mutect2}'s tumor-only mode and collates sites present in multiple samples (two by default, set by the --min-sample-count argument) into a sites-only VCF. The PoN captures common artifacts. Mutect2 then uses the PoN to filter variants at the site-level."
+        },
+        {
+          "Title": "Panel of normals | UMCCR Genomics Platform Group",
+          "Passage": "Therefore, to distinguish somatic mutations, researchers additionally rely on (1) public variant databases and (2) a set of in-house unrelated normal genomes (so called panel of normals) sequenced using similar technology and preparation method. The former helps with missed germline variants common in a population in general, while the panel additionally aids in removing recurrent technical artifacts."
+        }
+      ]
+    },
+    {
+      "sentence": "Specialized tumor-only callers like ClairS-TO continue to rely on phasing to amplify the somatic signal, underscoring its indispensable role even in the most challenging data contexts.",
+      "reason": "This sentence refers to a specific software tool (ClairS-TO) and its methodology, requiring a citation.",
+      "key_terms": [
+        "ClairS-TO",
+        "tumor-only callers",
+        "phasing"
+      ],
+      "papers": [
+        {
+          "Title": "ClairS-TO: A deep-learning method for long-read tumor-only somatic small variant calling",
+          "Passage": "ClairS-TO was primarily designed for long-read data but can be adapted to short-read data by excluding long-read-specific post-filters, such as long-read PoNs, variant phasing, and the \"MultiHap\" and \"NoAncestry\" filters."
+        }
+      ]
+    },
+    {
+      "sentence": "Cancer is a dynamic process characterized by clonal evolution, where successive rounds of mutation and selection give rise to a heterogeneous population of subclones, each possessing a unique genetic identity.",
+      "reason": "This describes the established scientific concept of clonal evolution in cancer, which should be attributed to its foundational literature.",
+      "key_terms": [
+        "clonal evolution",
+        "tumor heterogeneity",
+        "subclones"
+      ],
+      "papers": [
+        {
+          "Title": "The clonal evolution of tumor cell populations",
+          "Passage": "It is proposed that most neoplasms arise from a single cell of origin, and tumor progression results from acquired genetic variability within the original clone allowing sequential selection of more aggressive sublines. Tumor cell populations are apparently more genetically unstable than normal cells, perhaps from activation of specific gene loci in the neoplasm, continued presence of carcinogen, or even nutritional deficiencies within the tumor. The acquired genetic instability and associated selection process, most readily recognized cytogenetically, results in advanced human malignancies being highly individual karyotypically and biologically. Hence, each patient's cancer may require individual specific therapy, and even this may be thwarted by emergence of a genetically variant subline resistant to the treatment."
+        }
+      ]
+    },
+    {
+      "sentence": "The first is the prevalence of large-scale structural changes, particularly Loss of Heterozygosity (LOH), where vast regions of a chromosome lose one of the two parental copies.",
+      "reason": "This sentence makes a factual claim about the prevalence of a specific genomic event (LOH) in cancer.",
+      "key_terms": [
+        "Loss of Heterozygosity",
+        "LOH",
+        "structural changes",
+        "cancer genomes"
+      ],
+      "papers": [
+        {
+          "Title": "Loss of heterozygosity analyzed by single nucleotide polymorphism array in cancer",
+          "Passage": "Loss of heterozygosity is the most common molecular genetic alteration observed in human cancers."
+        },
+        {
+          "Title": "Targeting Loss of Heterozygosity: A Novel Paradigm for Cancer Therapy",
+          "Passage": "Loss of heterozygosity (LOH) is a common genetic event in the development of cancer. In certain tumor types, LOH can affect more than 20% of the genome, entailing loss of allelic variation in thousands of genes."
+        },
+        {
+          "Title": "Targeting loss of heterozygosity for cancer-specific immunotherapy",
+          "Passage": "A molecular manifestation of many chromosomal aberrations is loss of heterozygosity (LOH). LOH occurs when a heterozygous locus loses one of its two parental alleles, typically as a result of losses of large chromosomal regions, often involving an entire chromosome arm... Such allelic deletions are observed in over 90% of human cancers and are commonly associated with tumor suppressor gene loss."
+        }
+      ]
+    },
+    {
+      "sentence": "The second challenge is tumor purity; clinical tumor samples are almost invariably a mixture of cancer cells and contaminating normal cells.",
+      "reason": "This sentence makes a strong claim ('almost invariably') about the composition of clinical samples, which is a known technical challenge that should be referenced.",
+      "key_terms": [
+        "tumor purity",
+        "cellular heterogeneity",
+        "normal contamination"
+      ],
+      "papers": [
+        {
+          "Title": "An assessment of computational methods for estimating purity and clonality using genomic data derived from heterogeneous tumor tissue samples",
+          "Passage": "Solid tumor samples typically contain multiple distinct clonal populations of cancer cells, and also stromal and immune cell contamination. A majority of the cancer genomics and transcriptomics studies do not explicitly consider genetic heterogeneity and impurity, and draw inferences based on mixed populations of cells."
+        },
+        {
+          "Title": "Estimating and accounting for tumor purity in the analysis of DNA methylation data from cancer studies",
+          "Passage": "One important problem in cancer genomics or epigenomics research, especially from high-throughput technologies, is that the solid tumor tissues obtained from clinical practice are highly heterogeneous. They are always mixtures of cancer cells, adjacent normal tissues, stromal, and infiltrating immune cells."
+        },
+        {
+          "Title": "Impact of Tumor Purity on Immune Gene Expression and Clustering Analyses across Multiple Cancer Types",
+          "Passage": "Solid tumor tissues are comprised of cellular components originating from various types of cancerous and noncancerous tissues, the latter including immune, stromal, endothelial, and epithelial cells (1). Such noncancerous cells are regarded as common contaminants in tumor admixtures and constitute a substantial fraction of tumor masses."
+        }
+      ]
+    },
+    {
+      "sentence": "This cellular heterogeneity introduces conflicting haplotype signals into the sequencing data, which can severely confound phasing algorithms and result in a high frequency of 'switch errors'—incorrect junctions between paternal and maternal haplotype segments.",
+      "reason": "This describes a specific technical challenge (confounding signals) and its consequence (switch errors), which is an established problem in the field.",
+      "key_terms": [
+        "cellular heterogeneity",
+        "phasing algorithms",
+        "switch errors"
+      ],
+      "papers": [
+        {
+          "Title": "Haplotype phasing in single-cell DNA-sequencing data",
+          "Passage": "Haplotype assembly is the process of reconstructing the haplotypes of an individual—i.e. assigning the alleles of heterozygous SNPs to the corresponding chromosome of origin—from sequence reads obtained from an individual. Since each read generally derives from a single chromosome, if a read spans multiple SNPs, then the observed alleles are presumed from a single haplotype. We demonstrate that the algorithm predicts phasing between pairs of SNPs with higher accuracy than phasing from reads alone. Using whole-genome sequencing data from only seven neural cells, we obtain haplotype blocks that are orders of magnitude longer than with sequence reads alone (median length 10.2 kb versus 312 bp), with error rates <2%. The N50 and switch error for the assembly with no amplification fragments is marked with an '×'. Amplification fragments increase the length of haplotype assemblies by orders of magnitude with small increase in switch error."
+        },
+        {
+          "Title": "Computational methods for chromosome-scale haplotype reconstruction",
+          "Passage": "Beyond the above bulk sequencing methods, single-cell phasing [76] has recently been used to study single-cell genomic heterogeneity. However, extremely low sequencing coverage (< 0.05x per cell) has restricted its use in phasing of large multi-megabase segments in individual cells for genome-scale analysis. Thus, in the near future, combining single-cell and bulk sequencing approaches for phasing may enable accurate and complete genome-wide characterization of genomic heterogeneity, including rare alleles and cancer genomes."
+        },
+        {
+          "Title": "Refphase: Multi-sample phasing reveals haplotype-specific copy number heterogeneity",
+          "Passage": "It is now clear that single-sample sequencing studies derived from single biopsies are often insufficient to capture the extent of mutational heterogeneity and the field increasingly relies on multi-sample bulk and single-cell analyses from the same tumour to better describe this complexity. Such studies have permitted the mapping of the landscape of clonal and subclonal SCNAs [6–12], and have revealed a rela- tionship between SCNA intra-tumour heterogeneity and poor prognosis in multiple tumour ... However, due to lack of a ref- erence genome with known haplotype structure and SCNAs, switch error rates for refphase are difficult to estimate, so any direct comparison is difficult. Speculatively, due to the strength of the allelic imbalance signal we expect error rates to be somewhat lower than the 0.5% to. 1.5% reported for statistical phasing [58,63]. Refphase haploblocks have the additional advan- tage that all variant alleles within regions of allelic imbalance with sufficient. Additionally, while single-cell DNA sequencing removes the complications of sample purity, and several novel tools for phasing- based estimation of haplotype-specific copy-numbers from single cells have been introduced [29,31,32], the low genomic coverage in single-cell DNA sequencing makes allele-specific or haplotype-specific copy-number calling a difficult task."
+        }
+      ]
+    }
+  ]
+}

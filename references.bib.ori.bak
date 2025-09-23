@@ -1,0 +1,495 @@
+@article{ng2018,
+  author = {Ng, PK and Li, J and Jeong, KJ and Shao, S and Chen, H and others},
+  title = {Systematic Functional Annotation of Somatic Mutations in Cancer.},
+  journal = {Cancer Cell},
+  year = {2018},
+  volume={33},
+  number={3},
+  pages={450--462},
+  doi = {S1535-6108(18)30021-7 [pii] 10.1016/j.ccell.2018.01.021},
+  pmid = {29533785}
+}
+
+@article{nikzainal2016,
+  author = {Nik-Zainal, S and Davies, H and Staaf, J and Ramakrishna, M and Glodzik, D and others},
+  title = {Landscape of somatic mutations in 560 breast cancer whole-genome sequences.},
+  journal = {Nature},
+  year = {2016},
+  volume={534},
+  number={7605},
+  pages={47--54},
+  doi = {10.1038/nature17676},
+  pmid = {27135926}
+}
+
+@article{pmid320250072020,
+  author = {Unknown Author},
+  title = {Pan-cancer analysis of whole genomes.},
+  journal = {Nature},
+  year = {2020},
+  volume={578},
+  number={7793},
+  pages={82--93},
+  doi = {10.1038/s41586-020-1969-6},
+  pmid = {32025007}
+}
+
+@article{zhou2019,
+  title={Haplotype-resolved and integrated genome analysis of the cancer cell line HepG2},
+  author={Zhou, Bo and Ho, Steve S and Greer, Stephanie U and Spies, Noah and Bell, John M and Zhang, Xianglong and Zhu, Xiaowei and Arthur, Joseph G and Byeon, Seunggyu and Pattni, Reenal and others},
+  journal={Nucleic acids research},
+  volume={47},
+  number={8},
+  pages={3846--3861},
+  year={2019},
+  doi = {10.1093/nar/gkz169},
+  pmid = {30864654}
+}
+
+@article{gao2023,
+  title={Haplotype-aware analysis of somatic copy number variations from single-cell transcriptomes},
+  author={Gao, Teng and Soldatov, Ruslan and Sarkar, Hirak and Kurkiewicz, Adam and Biederstedt, Evan and Loh, Po-Ru and Kharchenko, Peter V},
+  journal={Nature Biotechnology},
+  volume={41},
+  number={3},
+  pages={417--426},
+  year={2023},
+  doi = {10.1038/s41587-022-01468-y},
+  pmid = {36163550}
+}
+
+@article{machlowska2020,
+  author = {Machlowska, J and Baj, J and Sitarz, M and Maciejewski, R and Sitarz, R},
+  title = {Gastric Cancer: Epidemiology, Risk Factors, Classification, Genomic Characteristics and Treatment Strategies.},
+  journal = {Int J Mol Sci},
+  year = {2020},
+  volume = {21},
+  number = {11},
+  pages = {4012},
+  doi = {10.3390/ijms21114012},
+  pmid = {32512697}
+}
+
+@article{sun2022,
+  author = {Sun, L and Zhang, H and Gao, P},
+  title = {Metabolic reprogramming and epigenetic modifications on the path to cancer.},
+  journal = {Protein Cell},
+  year = {2022},
+  volume = {13},
+  number = {12},
+  pages = {877--919},
+  doi = {10.1007/s13238-021-00846-7},
+  pmid = {34050894}
+}
+
+@article{recillastarga2022,
+  author = {Recillas-Targa, F},
+  title = {Cancer Epigenetics: An Overview.},
+  journal = {Arch Med Res},
+  year = {2022},
+  volume = {53},
+  number = {8},
+  pages = {732--740},
+  doi = {S0188-4409(22)00142-4 [pii] 10.1016/j.arcmed.2022.11.003},
+  pmid = {36411173}
+}
+
+@article{hanahan2011,
+  author = {Hanahan, Douglas and Weinberg, Robert A},
+  title = {Hallmarks of cancer: the next generation},
+  journal = {Cell},
+  year = {2011},
+  volume = {144},
+  number = {5},
+  pages = {646--674},
+  doi = {10.1016/j.cell.2011.02.013},
+  pmid = {21376230}
+}
+
+@article{slatkin2008,
+  title={Linkage disequilibrium—understanding the evolutionary past and mapping the medical future},
+  author={Slatkin, Montgomery},
+  journal={Nature Reviews Genetics},
+  volume={9},
+  number={6},
+  pages={477--485},
+  year={2008},
+  doi = {10.1038/nrg2361},
+  pmid = {18427557}
+}
+
+@article{gabriel2002,
+  title={The structure of haplotype blocks in the human genome},
+  author={Gabriel, Stacey B and Schaffner, Stephen F and Nguyen, Huy and Moore, Jamie M and Roy, Jessica and Blumenstiel, Brendan and Higgins, John and DeFelice, Matthew and Lochner, Amy and Faggart, Maura and others},
+  journal={science},
+  volume={296},
+  number={5576},
+  pages={2225--2229},
+  year={2002},
+  doi = {10.1126/science.1069424},
+  pmid = {12029063}
+}
+
+@article{international2005,
+  title={A haplotype map of the human genome},
+  author={International HapMap Consortium Altshuler David altshuler@ molbio. mgh. harvard. edu Donnelly Peter donnelly@ stats. ox. ac. uk},
+  journal={Nature},
+  volume={437},
+  number={7063},
+  pages={1299--1320},
+  year={2005},
+  doi = {10.1038/nature04226},
+  pmid = {16255080}
+}
+
+@article{pawara2021,
+  author = {Pawara, R and Ahmad, I and Nayak, D and Wagh, S and Wadkar, A and others},
+  title = {Novel, selective acrylamide linked quinazolines for the treatment of double mutant EGFR-L858R/T790M Non-Small-Cell lung cancer (NSCLC).},
+  journal = {Bioorg Chem},
+  year = {2021},
+  volume={115},
+  pages={105234},
+  doi = {S0045-2068(21)00611-8 [pii] 10.1016/j.bioorg.2021.105234},
+  pmid = {34399322}
+}
+
+@article{li2023,
+  author = {Li, MC and Coumar, MS and Lin, SY and Lin, YS and Huang, GL and others},
+  title = {Development of Furanopyrimidine-Based Orally Active Third-Generation EGFR Inhibitors for the Treatment of Non-Small Cell Lung Cancer.},
+  journal = {J Med Chem},
+  year = {2023},
+  volume={66},
+  number={4},
+  pages={2566--2588},
+  doi = {10.1021/acs.jmedchem.2c01434},
+  pmid = {36749735}
+}
+
+@article{mori2023,
+  author = {Mori, E and Hyuga, S and Hanawa, T and Naoki, K and Odaguchi, H},
+  title = {Effects of Ephedra Herb extract on the expression of EGFR-activating mutations and c-Met in non-small-cell lung cancer cell line, H1975, and its combined effects with osimertinib.},
+  journal = {J Nat Med},
+  year = {2023},
+  volume={77},
+  number={3},
+  pages={523--534},
+  doi = {10.1007/s11418-023-01695-w},
+  pmid = {37043119}
+}
+
+@article{hofman2019,
+  author = {Hofman, V and Hofman, P},
+  title = {Resistances to EGFR tyrosine kinase inhibitors in lung cancer-how to routinely track them in a molecular pathology laboratory?},
+  journal = {J Thorac Dis},
+  year = {2019},
+  volume={11},
+  number={Suppl 1},
+  pages={S65},
+  doi = {10.21037/jtd.2018.11.76},
+  pmid = {30775029}
+}
+
+@article{yang2024,
+  author = {Yang, X and Li, X and Yan, J and Liu, Y and Yin, J and Shao, W and Lu, Y and Xue, J},
+  title = {Response to EGFR/NTRK/MET Co-Inhibition Guided by Paired NGS in Advanced NSCLC With Acquired EGFR L858R/T790M/C797S Mutations.},
+  journal = {J Natl Compr Canc Netw},
+  year = {2024},
+  volume={23},
+  number={2},
+  doi = {e247070 [pii] 10.6004/jnccn.2024.7070},
+  pmid = {39729710}
+}
+
+@article{goldberg2018,
+  author = {Goldberg, ME and Montesion, M and Young, L and Suh, J and Greenbowe, J and others},
+  title = {Multiple configurations of EGFR exon 20 resistance mutations after first- and third-generation EGFR TKI treatment affect treatment options in NSCLC.},
+  journal = {PLoS One},
+  year = {2018},
+  volume={13},
+  number={11},
+  pages={e0208097},
+  doi = {10.1371/journal.pone.0208097},
+  pmid = {30481207}
+}
+
+@article{pucker2022,
+  author = {Pucker, B and Irisarri, I and de, Vries J and Xu, B},
+  title = {Plant genome sequence assembly in the era of long reads: Progress, challenges and future directions.},
+  journal = {Quant Plant Biol},
+  year = {2022},
+  volume={3},
+  pages={e5},
+  doi = {10.1017/qpb.2021.18},
+  pmid = {37077982}
+}
+
+@article{ebbert2019,
+  author = {Ebbert, MTW and Jensen, TD and Jansen-West, K and Sens, JP and Reddy, JS and others},
+  title = {Systematic analysis of dark and camouflaged genes reveals disease-relevant genes hiding in plain sight.},
+  journal = {Genome Biol},
+  year = {2019},
+  volume={20},
+  number={1},
+  pages={97},
+  doi = {10.1186/s13059-019-1707-2},
+  pmid = {31104630}
+}
+
+@article{ebert2021,
+  author = {Ebert, P and Audano, PA and Zhu, Q and Rodriguez-Martin, B and Porubsky, D and others},
+  title = {Haplotype-resolved diverse human genomes and integrated analysis of structural variation.},
+  journal = {Science},
+  year = {2021},
+  volume={372},
+  number={6537},
+  pages={eabf7117},
+  doi = {10.1126/science.abf7117},
+  pmid = {33632895}
+}
+
+@article{hamim2022,
+  author = {Hamim, I and Sekine, KT and Komatsu, K},
+  title = {How do emerging long-read sequencing technologies function in transforming the plant pathology research landscape?},
+  journal = {Plant Mol Biol},
+  year = {2022},
+  volume={110},
+  number={6},
+  pages={469--484},
+  doi = {10.1007/s11103-022-01305-5},
+  pmid = {35962900}
+}
+
+@article{sierra2024,
+  author = {Sierra, R and Roch, M and Moraz, M and Prados, J and Vuilleumier, N and Emonet, S and Andrey, DO},
+  title = {Contributions of Long-Read Sequencing for the Detection of Antimicrobial Resistance.},
+  journal = {Pathogens},
+  year = {2024},
+  volume={13},
+  number={9},
+  pages={730},
+  doi = {10.3390/pathogens13090730},
+  pmid = {39338921}
+}
+
+@article{sempere2010,
+  author = {Sempere, LF and Preis, M and Yezefski, T and Ouyang, H and Suriawinata, AA and Silahtaroglu, A and Conejo-Garcia, JR and Kauppinen, S and Wells, W and Korc, M},
+  title = {Fluorescence-based codetection with protein markers reveals distinct cellular compartments for altered MicroRNA expression in solid tumors.},
+  journal = {Clin Cancer Res},
+  year = {2010},
+  volume={16},
+  number={16},
+  pages={4246--4255},
+  doi = {10.1158/1078-0432.CCR-10-1152},
+  pmid = {20682703}
+}
+
+@article{ryland2015,
+  title={Loss of heterozygosity: what is it good for?},
+  author={Ryland, Georgina L and Doyle, Maria A and Goode, David and Boyle, Samantha E and Choong, David YH and Rowley, Simone M and Li, Jason and Australian Ovarian Cancer Study Group and Bowtell, David DL and Tothill, Richard W and others},
+  journal={BMC medical genomics},
+  volume={8},
+  number={1},
+  pages={45},
+  year={2015},
+  doi = {10.1186/s12920-015-0123-z},
+  pmid = {26231170}
+}
+
+@article{nichols2020,
+  title={Loss of heterozygosity of essential genes represents a widespread class of potential cancer vulnerabilities. Nat. Commun. 11, 2517},
+  author={Nichols, CA and Gibson, WJ and Brown, MS and Kosmicki, JA and Busanovich, JP and Wei, H and Urbanski, LM and Curimjee, N and Berger, AC and Gao, GF and others},
+  journal   = {Nature Communications},
+  year      = {2020},
+  volume    = {11},
+  number    = {1},
+  pages     = {2517},
+  doi       = {10.1038/s41467-020-16399-y},
+  pmid      = {32433464}
+}
+
+@article{garciadiez2019,
+  author = {Garcia-Diez, I and Hernandez-Munoz, I and Hernandez-Ruiz, E and Nonell, L and Puigdecanet, E and Bodalo-Torruella, M and Andrades, E and Pujol, RM and Toll, A},
+  title = {Transcriptome and cytogenetic profiling analysis of matched in situ/invasive cutaneous squamous cell carcinomas from immunocompetent patients.},
+  journal = {Genes Chromosomes Cancer},
+  year = {2019},
+  volume={58},
+  number={3},
+  pages={164--174},
+  doi = {10.1002/gcc.22712},
+  pmid = {30474248}
+}
+
+@article{fang2021,
+  title={Establishing community reference samples, data and call sets for benchmarking cancer mutation detection using whole-genome sequencing},
+  author={Fang, Li Tai and Zhu, Bin and Zhao, Yongmei and Chen, Wanqiu and Yang, Zhaowei and Kerrigan, Liz and Langenbach, Kurt and de Mars, Maryellen and Lu, Charles and Idler, Kenneth and others},
+  journal={Nature biotechnology},
+  volume={39},
+  number={9},
+  pages={1151--1160},
+  year={2021},
+  doi = {10.1038/s41587-021-00993-6},
+  pmid = {34504347}
+}
+
+@article{zhou2024,
+  author = {Zhou, W and Mumm, C and Gan, Y and Switzenberg, JA and Wang, J and others},
+  title = {A personalized multi-platform assessment of somatic mosaicism in the human frontal cortex.},
+  journal = {bioRxiv},
+  year = {2024},
+  doi = {2024.12.18.629274 [pii] 10.1101/2024.12.18.629274},
+  pmid = {39763954}
+}
+
+
+@article{koo2021,
+  author = {Koo, B and Rhee, JK},
+  title = {Prediction of tumor purity from gene expression data using machine learning.},
+  journal = {Brief Bioinform},
+  year = {2021},
+  volume={22},
+  number={6},
+  pages={bbab163},
+  doi = {bbab163 [pii] 10.1093/bib/bbab163},
+  pmid = {33954576}
+}
+
+@article{zhang2015,
+  author = {Zhang, N and Wu, HJ and Zhang, W and Wang, J and Wu, H and Zheng, X},
+  title = {Predicting tumor purity from methylation microarray data.},
+  journal = {Bioinformatics},
+  year = {2015},
+  volume={31},
+  number={21},
+  pages={3401--3405},
+  doi = {10.1093/bioinformatics/btv370},
+  pmid = {26112293}
+}
+
+@article{sanchezvega2018,
+  author = {Sanchez-Vega, F and Mina, M and Armenia, J and Chatila, WK and Luna, A and others},
+  title = {Oncogenic Signaling Pathways in The Cancer Genome Atlas.},
+  journal = {Cell},
+  year = {2018},
+  volume={173},
+  number={2},
+  pages={321--337},
+  doi = {S0092-8674(18)30359-3 [pii] 10.1016/j.cell.2018.03.035},
+  pmid = {29625050}
+}
+
+@article{saiki2021,
+  author = {Saiki, R and Momozawa, Y and Nannya, Y and Nakagawa, MM and Ochi, Y and others},
+  title = {Combined landscape of single-nucleotide variants and copy number alterations in clonal hematopoiesis.},
+  journal = {Nat Med},
+  year = {2021},
+  volume={27},
+  number={7},
+  pages={1239--1249},
+  doi = {10.1038/s41591-021-01411-9},
+  pmid = {34239136}
+}
+
+
+@article{martin2016,
+  title={WhatsHap: fast and accurate read-based phasing},
+  author={Martin, Marcel and Patterson, Murray and Garg, Shilpa and O Fischer, Sarah and Pisanti, Nadia and Klau, Gunnar W and Sch{\"o}enhuth, Alexander and Marschall, Tobias},
+  journal={BioRxiv},
+  pages={085050},
+  year={2016},
+  doi = {10.1101/085050}
+}
+
+@article{lin2022,
+  title={LongPhase: an ultra-fast chromosome-scale phasing algorithm for small and large variants},
+  author={Lin, Jyun-Hong and Chen, Liang-Chi and Yu, Shu-Chi and Huang, Yao-Ting},
+  journal={Bioinformatics},
+  volume={38},
+  number={7},
+  pages={1816--1822},
+  year={2022},
+  doi = {10.1093/bioinformatics/btac058},
+  pmid = {35104333}
+}
+
+@article{edge2017,
+  title={HapCUT2: robust and accurate haplotype assembly for diverse sequencing technologies},
+  author={Edge, Peter and Bafna, Vineet and Bansal, Vikas},
+  journal={Genome research},
+  volume={27},
+  number={5},
+  pages={801--812},
+  year={2017},
+  doi = {10.1101/gr.213462.116},
+  pmid = {27940952}
+}
+
+@article{zheng2022,
+  title={Symphonizing pileup and full-alignment for deep learning-based long-read variant calling},
+  author={Zheng, Zhenxian and Li, Shumin and Su, Junhao and Leung, Amy Wing-Sze and Lam, Tak-Wah and Luo, Ruibang},
+  journal={Nature Computational Science},
+  volume={2},
+  number={12},
+  pages={797--803},
+  year={2022},
+  doi = {10.1038/s43588-022-00387-x},
+  pmid = {38177392}
+}
+
+@article{poplin2018,
+  title={A universal SNP and small-indel variant caller using deep neural networks},
+  author={Poplin, Ryan and Chang, Pi-Chuan and Alexander, David and Schwartz, Scott and Colthurst, Thomas and Ku, Alexander and Newburger, Dan and Dijamco, Jojo and Nguyen, Nam and Afshar, Pegah T and others},
+  journal={Nature biotechnology},
+  volume={36},
+  number={10},
+  pages={983--987},
+  year={2018},
+  doi = {10.1038/nbt.4235},
+  pmid = {30247488}
+}
+
+@article{zheng2023,
+  title={ClairS: a deep-learning method for long-read somatic small variant calling},
+  author={Zheng, Zhenxian and Su, Junhao and Chen, Lei and Lee, Yan-Lam and Lam, Tak-Wah and Luo, Ruibang},
+  journal={bioRxiv},
+  pages={2023--08},
+  year={2023}
+}
+
+@article{park2024,
+  title={DeepSomatic: Accurate somatic small variant discovery for multiple sequencing technologies},
+  author={Park, Jimin and Cook, Daniel E and Chang, Pi-Chuan and Kolesnikov, Alexey and Brambrink, Lucas and Mier, Juan Carlos and Gardner, Joshua and McNulty, Brandy and Sacco, Samuel and Keskus, Ayse and others},
+  journal={bioRxiv},
+  year={2024},
+  doi = {10.1101/2024.08.16.608331},
+  pmid = {39229187}
+}
+
+@article{keskus2024,
+  title={Severus: accurate detection and characterization of somatic structural variation in tumor genomes using long reads},
+  author={Keskus, Ayse and Bryant, Asher and Ahmad, Tanveer and Yoo, Byunggil and Aganezov, Sergey and Goretsky, Anton and Donmez, Ataberk and Lansdon, Lisa A and Rodriguez, Isabel and Park, Jimin and others},
+  journal={medRxiv},
+  year={2024},
+  pmid = {38585974},
+  doi = {10.1101/2024.03.22.24304756}
+}
+
+@article{chen2025,
+  title={ClairS-TO: A deep-learning method for long-read tumor-only somatic small variant calling},
+  author={Chen, Lei and Zheng, Zhenxian and Su, Junhao and Yu, Xian and Wong, Angel On Ki and Zhang, Jingcheng and Lee, Yan-Lam and Luo, Ruibang},
+  journal={bioRxiv},
+  pages={2025--03},
+  year={2025},
+  doi = {10.1101/2025.03.10.642523}
+}
+
+@article{dou2020,
+  title={Accurate detection of mosaic variants in sequencing data without matched controls},
+  author={Dou, Yanmei and Kwon, Minseok and Rodin, Rachel E and Cort{\'e}s-Ciriano, Isidro and Doan, Ryan and Luquette, Lovelace J and Galor, Alon and Bohrson, Craig and Walsh, Christopher A and Park, Peter J},
+  journal={Nature biotechnology},
+  volume={38},
+  number={3},
+  pages={314--319},
+  year={2020},
+  doi = {10.1038/s41587-019-0368-8},
+  pmid = {31907404}
+}

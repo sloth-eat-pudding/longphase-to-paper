@@ -1,0 +1,116 @@
+{
+  "sentences": [
+    {
+      "sentence": "Cancer is fundamentally a disease of the genome, initiated and propelled by the accumulation of somatic mutations.",
+      "reason": "This is a foundational concept in cancer biology and should be attributed to seminal or review literature.",
+      "key_terms": [
+        "cancer",
+        "genome",
+        "somatic mutations"
+      ]
+    },
+    {
+      "sentence": "This resolution is critical because the functional consequence of multiple mutations is contingent upon whether they occur on the same chromosome copy (in *cis*) or on different copies (in *trans*).",
+      "reason": "This describes the established genetic principles of cis and trans effects, which is a specific, factual claim.",
+      "key_terms": [
+        "haplotype phasing",
+        "cis-trans effect",
+        "functional consequence"
+      ]
+    },
+    {
+      "sentence": "The emergence of long-read sequencing technologies has significantly advanced phasing capabilities.",
+      "reason": "This is a factual claim about the impact of a specific technology on a scientific field.",
+      "key_terms": [
+        "long-read sequencing",
+        "haplotype phasing",
+        "phasing capabilities"
+      ]
+    },
+    {
+      "sentence": "State-of-the-art tools, such as DeepVariant and Clair3, employ deep learning models that analyze patterns in aligned sequencing reads to render highly accurate predictions, effectively separating the biological signal from technological artifacts.",
+      "reason": "This sentence names specific software tools (DeepVariant, Clair3) and describes their methodology, requiring citation to the original papers.",
+      "key_terms": [
+        "DeepVariant",
+        "Clair3",
+        "deep learning",
+        "variant calling"
+      ]
+    },
+    {
+      "sentence": "The gold standard for identifying somatic mutations has historically been the comparative analysis of paired tumor and normal samples from the same patient.",
+      "reason": "This sentence asserts a 'gold standard' practice in the field, which requires a citation to establish it as such.",
+      "key_terms": [
+        "gold standard",
+        "somatic mutations",
+        "tumor-normal pairing"
+      ]
+    },
+    {
+      "sentence": "Modern somatic variant callers designed for long-read data, including DeepSomatic, ClairS, and Severus, have adopted a phase-centric strategy.",
+      "reason": "This sentence names specific software tools (DeepSomatic, ClairS, Severus) and should cite their respective publications.",
+      "key_terms": [
+        "DeepSomatic",
+        "ClairS",
+        "Severus",
+        "somatic variant callers"
+      ]
+    },
+    {
+      "sentence": "The standard mitigation strategy involves filtering candidate variants against a Panel of Normals (PON), a database of common germline variants and recurrent technical artifacts compiled from a large cohort of healthy individuals.",
+      "reason": "This sentence describes a specific, standard technical method (Panel of Normals) used in genomics.",
+      "key_terms": [
+        "Panel of Normals",
+        "PON",
+        "tumor-only workflow",
+        "variant filtering"
+      ]
+    },
+    {
+      "sentence": "Specialized tumor-only callers like ClairS-TO continue to rely on phasing to amplify the somatic signal, underscoring its indispensable role even in the most challenging data contexts.",
+      "reason": "This sentence refers to a specific software tool (ClairS-TO) and its methodology, requiring a citation.",
+      "key_terms": [
+        "ClairS-TO",
+        "tumor-only callers",
+        "phasing"
+      ]
+    },
+    {
+      "sentence": "Cancer is a dynamic process characterized by clonal evolution, where successive rounds of mutation and selection give rise to a heterogeneous population of subclones, each possessing a unique genetic identity.",
+      "reason": "This describes the established scientific concept of clonal evolution in cancer, which should be attributed to its foundational literature.",
+      "key_terms": [
+        "clonal evolution",
+        "tumor heterogeneity",
+        "subclones"
+      ]
+    },
+    {
+      "sentence": "The first is the prevalence of large-scale structural changes, particularly Loss of Heterozygosity (LOH), where vast regions of a chromosome lose one of the two parental copies.",
+      "reason": "This sentence makes a factual claim about the prevalence of a specific genomic event (LOH) in cancer.",
+      "key_terms": [
+        "Loss of Heterozygosity",
+        "LOH",
+        "structural changes",
+        "cancer genomes"
+      ]
+    },
+    {
+      "sentence": "The second challenge is tumor purity; clinical tumor samples are almost invariably a mixture of cancer cells and contaminating normal cells.",
+      "reason": "This sentence makes a strong claim ('almost invariably') about the composition of clinical samples, which is a known technical challenge that should be referenced.",
+      "key_terms": [
+        "tumor purity",
+        "cellular heterogeneity",
+        "normal contamination"
+      ]
+    },
+    {
+      "sentence": "This cellular heterogeneity introduces conflicting haplotype signals into the sequencing data, which can severely confound phasing algorithms and result in a high frequency of 'switch errors'—incorrect junctions between paternal and maternal haplotype segments.",
+      "reason": "This describes a specific technical challenge (confounding signals) and its consequence (switch errors), which is an established problem in the field.",
+      "key_terms": [
+        "cellular heterogeneity",
+        "phasing algorithms",
+        "switch errors"
+      ]
+    }
+  ]
+}

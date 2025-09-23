@@ -1,0 +1,355 @@
+Page 37:
+Here is a detailed analysis of the slide's content.
+
+### **Title**
+LOH Detection : Genotype Assignment and Heterozygosity Ratio-Based Classification
+
+This slide presents the methodology for detecting Loss of Heterozygosity (LOH) events. It explains a two-step approach: first, assigning a genotype (homozygous or heterozygous) to variants based on their allele frequency, and second, using a heterozygosity ratio to classify entire genomic regions as either LOH or Non-LOH.
+
+### **Visualizations**
+
+The slide features two plots that visually justify the LOH detection strategy.
+
+**Figure 1: Variant Genotype Distribution**
+
+This violin plot compares the distribution of Variant Allele Frequencies (VAF) for genetic variants found in "Non-LOH" regions (blue) versus "LOH" regions (green).
+*   In **Non-LOH** regions, the distribution is bimodal, with a large, wide peak centered at a VAF of 0.5. This signifies a high prevalence of heterozygous variants, where both parental alleles are present in roughly equal measure. A smaller peak is visible near a VAF of 1.0, representing homozygous variants.
+*   In **LOH** regions, the distribution is starkly different. The peak at 0.5 has almost completely disappeared, and the distribution is strongly skewed towards a VAF of 1.0 (or, implicitly, 0.0). This indicates that one of the two parental alleles has been lost, causing most variants to appear homozygous.
+*   A dashed line at VAF = 0.8 is shown, which corresponds to the threshold used in the equations to classify variants as either homozygous (Hom) or heterozygous (Het).
+
+**Figure 2: LOH Classification by Heterozygosity Ratio**
+
+This box plot displays the distribution of the "Heterozygosity ratio" for Non-LOH and LOH regions. This ratio quantifies the proportion of heterozygous variants in a region.
+*   For **Non-LOH** regions, the heterozygosity ratio is high, with a median value around 0.55. This confirms that these regions contain a substantial fraction of heterozygous sites.
+*   For **LOH** regions, the heterozygosity ratio is consistently close to zero. This demonstrates a near-complete loss of heterozygosity.
+*   The two distributions are clearly distinct and separable. A dashed line labeled **H<sub>r</sub>** is drawn at a ratio of 0.09, representing the classification threshold. Regions with a ratio below this line are classified as LOH.
+
+**Key Messages of the Visualizations:**
+The plots provide strong visual evidence for the proposed LOH detection method. They show that LOH regions are characterized by a dramatic loss of heterozygous variants (VAF ≈ 0.5) and a corresponding increase in homozygous variants (VAF ≈ 1.0). The "Heterozygosity ratio" emerges as a highly effective metric for distinguishing between LOH and Non-LOH regions, as there is a clear separation between the two classes.
+
+### **Equations**
+
+The slide formalizes the classification logic with a set of rules and formulas.
+
+The first rule explains how individual variants are counted as either homozygous or heterozygous based on their Variant Allele Frequency (VAF) and pre-existing genotype information. A variant is considered homozygous if its VAF is 0.8 or greater, or if it was already genotyped as homozygous. Otherwise, it is counted as heterozygous.
+
+The second equation defines the **Heterozygosity ratio (H<sub>r</sub>)**. It is calculated as the total count of heterozygous variants divided by the sum of heterozygous and homozygous variants in a given genomic window.
+
+The third rule defines the final classification step. A region is classified as **LOH** if its Heterozygosity ratio (H<sub>r</sub>) is less than 0.09. Otherwise, it is classified as **Non-LOH**.
+
+```markdown
+For each Variant Allele Frequency (VAF)
+$$
+\begin{cases}
+  \text{Hom count ++,} & \text{if (VAF} \ge \text{0.8) or (Genotype == Hom)} \\
+  \text{Het count ++,} & \text{otherwise}
+\end{cases}
+$$
+
+$$
+H_r (\text{Heterozygosity ratio}) = \frac{\text{Het Count}}{\text{Het Count} + \text{Hom Count}}
+$$
+
+$$
+\text{LOH type} = \begin{cases}
+  \text{LOH,} & \text{if } H_r < 0.09 \\
+  \text{Non-LOH,} & \text{otherwise}
+\end{cases}
+$$
+```
+
+**Key Messages of the Equations:**
+The equations provide a clear and simple algorithm for LOH detection. By counting variants based on VAF, calculating a simple ratio, and applying a single threshold (H<sub>r</sub> < 0.09), the method can systematically and automatically classify genomic regions. This formalized approach is robust and directly supported by the data distributions shown in the plots.
+
+### **Summary of Key Messages**
+
+This slide details a robust, data-driven methodology for the detection of Loss of Heterozygosity (LOH). The core message is that LOH can be reliably identified by quantifying the depletion of heterozygous variants.
+
+The key takeaways are:
+*   **Biomarker for LOH:** The absence of heterozygous variants (with allele frequencies around 0.5) is a strong signal of an LOH event.
+*   **Quantitative Metric:** The "Heterozygosity ratio" is introduced as a powerful metric that effectively summarizes this signal for a given genomic region.
+*   **Simple and Effective Algorithm:** A straightforward classification algorithm is presented: count variants, calculate the heterozygosity ratio, and apply a threshold (H<sub>r</sub> < 0.09) to make a definitive call of LOH or Non-LOH. This method is shown to be highly effective, as the two classes are well-separated.
+
+
+
+
+Page 38:
+This is a detailed analysis of the slide's content.
+
+### **Title**
+Somatic Variant Calling : Rationale for Pattern Selection
+
+This slide presents a rationale for selecting specific data patterns to improve the accuracy of somatic variant calling. It evaluates different patterns based on their contribution to True Positive and False Positive variant calls, aiming to identify the most reliable signatures of true somatic mutations. This follows the previous discussion on LOH detection by moving to the broader topic of identifying all types of somatic variants.
+
+### **Visualizations**
+
+**Figure 1: True Positive vs. False Positive Rates for Different Variant Patterns**
+
+This bar chart compares the performance of various predefined patterns used in somatic variant calling. The y-axis represents the "Vote Percentage," which indicates the proportion of all True Positive or False Positive calls that fall into a specific pattern category. The x-axis lists these different patterns, which appear to be defined by characteristics of sequencing reads (e.g., `MID_HIGH_SA_PAR`).
+
+*   **Legend:** The blue bars represent **TP (True Positives)**, which are correctly identified somatic variants. The red bars represent **FP (False Positives)**, which are variants that were incorrectly called as somatic.
+
+The chart is annotated to group the patterns into three distinct categories based on their performance:
+
+1.  **V<sub>H</sub>(High):** This group includes patterns (e.g., `MID_HIGH_SA_PAR`, `LEFT_HIGH_SA_PAR`) that show a relatively high rate of True Positives (up to ~5%) while having a very low rate of False Positives. These are considered high-confidence patterns, as they are strong indicators of a true somatic variant.
+
+2.  **V<sub>L</sub>(Low):** This group includes patterns that contribute a smaller percentage of True Positives (~1-2%) but also maintain a very low False Positive rate. While less frequent, these patterns are still reliable.
+
+3.  **V<sub>N</sub>(NonSomatic):** This section is dominated by the **"DISAGREE"** category. This category has by far the highest False Positive rate (over 30%) and also a very high True Positive rate (~15%). This suggests that when different variant calling methods or evidence types disagree, it leads to a large number of both correct and incorrect calls, making this a highly unreliable and ambiguous category.
+
+**Key Messages of the Visualization:**
+The primary message is that not all evidence for a somatic variant is equal. By breaking down variant calls into specific patterns, one can identify which patterns are reliable (high TP, low FP) and which are not. The `V_H` patterns are clearly the most desirable for high-confidence somatic variant calling. The "DISAGREE" category is a major source of error (high FPs) and requires special handling, likely filtering or careful re-evaluation, to improve the overall accuracy of the variant calling process.
+
+### **Summary of Key Messages**
+
+This slide provides a data-driven justification for a pattern-based approach to somatic variant calling. The key messages are:
+
+*   **Pattern-Based Filtering is Crucial:** The accuracy of somatic variant calling can be significantly improved by evaluating the specific patterns of evidence supporting each variant.
+*   **Identification of High-Confidence Patterns:** The analysis identifies a set of "High" confidence patterns (`V_H`) that are highly enriched for True Positives and have minimal False Positives. Prioritizing variants with these patterns would increase the precision of the final call set.
+*   **Ambiguity of "Disagree" Calls:** The "DISAGREE" category is highlighted as a major challenge, contributing the largest proportion of False Positives. This indicates that disagreement between callers or evidence types is a strong signal of unreliability.
+*   **Overall Strategy:** The slide argues for a strategy that selects for variants supported by high-confidence patterns (`V_H` and `V_L`) while likely filtering out or down-weighting those falling into the ambiguous "DISAGREE" category.
+
+
+
+
+Page 39:
+This is a detailed analysis of the slide's content.
+
+### **Title**
+Somatic Variant Calling : Pattern Artifact Filtering
+
+### **Context**
+Following the previous slide's identification of high-confidence (`V_H`) and non-somatic (`V_N`) patterns, this slide presents a quantitative method called "Pattern Artifact Filtering" to leverage this classification. It introduces a specific metric, the "Somatic path ratio," and a threshold (`τ`) to systematically filter out artifacts and improve the precision of somatic variant calls.
+
+### **Visualizations**
+
+**Figure 1: Conceptual Diagram of Pattern Artifact Filtering**
+
+Located in the top-left and center, this series of diagrams illustrates the core concept of the filtering method.
+*   The left-most part shows an alignment of sequencing reads, with a C->T somatic mutation present in some reads (haplotype 1) against a background of the reference base G (haplotype 2).
+*   The central graph model represents this genomic region as a graph, where nodes are bases (A, C, T, G) and edges represent observed sequences. It explicitly defines two types of paths:
+    *   **V<sub>H</sub>**: The high-confidence somatic path (G -> T -> G), representing the true mutation.
+    *   **V<sub>N</sub>**: A non-somatic path (A -> C -> T), likely representing the reference or germline sequence.
+*   This model is used to calculate a ratio of evidence supporting the somatic path versus all other paths.
+
+**Figure 2: Distribution of VOTE_RATIO for True and False Positives**
+
+Located at the bottom-left, these two histograms compare the distribution of a metric called "VOTE_RATIO" (equivalent to the "Somatic path ratio") for True Positives (TP) and False Positives (FP).
+*   **Legend:** Blue bars represent TPs, and red bars represent FPs.
+*   **True Positives (TP) Histogram (Left):** This plot shows that the vast majority of true somatic variants have a very high VOTE_RATIO, with a strong peak near 1.0. This indicates that for true variants, the evidence overwhelmingly supports the somatic path.
+*   **False Positives (FP) Histogram (Right):** This plot shows a more spread-out distribution for false positives. While some FPs have a high ratio, a significant portion has a VOTE_RATIO lower than 1.0.
+*   A dashed vertical line indicates a proposed filtering threshold, **τ ≈ 0.8**.
+
+**Key Messages of the Visualizations (Figures 1 & 2):**
+The diagrams introduce the concept of quantifying evidence for a somatic variant as a ratio of somatic path support to total support. The histograms provide a strong rationale for this method, demonstrating that the "VOTE_RATIO" is a powerful discriminator between true and false positive calls. By setting a threshold `τ` at 0.8, one can eliminate a large number of FPs while retaining most of the TPs, thereby increasing the precision of the final variant set.
+
+**Figure 3: VOTE_RATIO Distributions at Different Tumor Purity Levels**
+
+Located on the right side of the slide, this panel displays a series of paired histograms (TP in blue, FP in red) showing the VOTE_RATIO distributions at varying levels of tumor sample purity (from 1.0 down to 0.2).
+
+**Key Message of the Visualization (Figure 3):**
+This analysis demonstrates the robustness of the filtering method. As tumor purity decreases, the VOTE_RATIO for true positives naturally decreases (the blue peak shifts slightly to the left), because the proportion of reads with the somatic variant is lower. However, even at low purity levels like 0.2, the TP distribution remains largely concentrated at high ratio values and distinct from the FP distribution. This shows that the VOTE_RATIO remains an effective filtering metric across a wide range of clinically relevant tumor purities.
+
+### **Equations**
+
+The slide presents the core filtering rule and an example calculation. The rule is that a variant is kept if its somatic path ratio is greater than a threshold `τ`.
+
+The example calculation demonstrates how this ratio is computed for a candidate variant. Here, the evidence for the somatic path is '2', while the total evidence from all paths is '1+0+0+2 = 3' (the numbers likely represent read counts supporting different paths). The resulting ratio of 2/3 is then compared to the threshold `τ`. Since 2/3 is less than a typical `τ` of 0.8, this variant would be filtered out as a likely artifact.
+
+```markdown
+Somatic path ratio > τ
+
+Example:
+(2) / (1 + 0 + 0 + 2) = 2/3 < τ
+```
+
+**Key Message of the Equations:**
+The key message is that the abstract concept of pattern confidence can be translated into a simple, quantitative rule. By calculating the ratio of somatic evidence to total evidence and applying a threshold, the algorithm can make a data-driven decision to either keep a variant or filter it as a likely artifact.
+
+### **Summary of Key Messages**
+
+This slide details a "Pattern Artifact Filtering" strategy to refine somatic variant calls. The main takeaways are:
+
+*   **Quantitative Filtering:** A "Somatic path ratio" (or VOTE_RATIO) is proposed as a robust metric to quantify the confidence in a somatic variant call.
+*   **Effective Discrimination:** This ratio effectively separates True Positives, which consistently show high ratios, from False Positives, which have a broader and lower distribution of ratios.
+*   **Threshold-Based Approach:** A simple threshold (`τ ≈ 0.8`) on this ratio can significantly improve the precision of variant calling by removing a large fraction of false positives while retaining the vast majority of true positives.
+*   **Robustness to Purity:** The method is shown to be effective across a wide range of tumor purity levels, making it applicable to diverse real-world samples.
+
+
+
+
+Page 40:
+This is a detailed analysis of the slide's content.
+
+### **Title**
+Somatic Variant Calling : V_L Somatic Variant Detection Formula
+
+### **Context**
+This slide presents a quantitative formula and a threshold-based method for detecting somatic variants. The core of the method is a ratio, termed "Vlow Ratio," which is used to discriminate between true somatic variants and false positives based on the supporting evidence derived from a sequence graph model. The effectiveness of this filtering approach is evaluated across different tumor purity levels.
+
+### **Visualizations**
+
+**Figure 1: Conceptual Diagram**
+
+Located at the top left, this diagram shows a sequence graph model, which is a common way to represent multiple sequencing reads aligned to a reference genome. An arrow points from this graph to the "Somatic Variant Detection Formula," indicating that the variables in the formula (`V_L` and `V_N`) are derived from evidence within this graph structure.
+
+**Figure 2: Vlow Ratio Distribution for True and False Positives**
+
+Located at the bottom left, this figure consists of two histograms comparing the distribution of the "Vlow Ratio" for known True Positives (TP) and False Positives (FP).
+*   **Legend:** Blue bars represent True Positives (TP), and red bars represent False Positives (FP).
+*   **True Positives (TP) Histogram (Left):** This plot shows that the Vlow Ratio for true variants is broadly distributed between 0.0 and 1.0. A significant number of TPs have a ratio greater than 0.2.
+*   **False Positives (FP) Histogram (Right):** This plot reveals that the vast majority of false positives have a very low Vlow Ratio, with a large, sharp peak near 0.0.
+*   A dashed vertical line labeled **θ** is placed at approximately 0.2 on the x-axis of both plots, representing a proposed filtering threshold.
+
+**Key Message of the Visualization (Figure 2):** The Vlow Ratio is a powerful feature for distinguishing true variants from artifacts. Most false positives have a ratio close to zero, while true positives are more broadly distributed. Setting a threshold `θ` at ~0.2 allows for the removal of a substantial number of false positives while retaining a majority of the true positive variants.
+
+**Figure 3: Vlow Ratio Distributions at Different Tumor Purity Levels**
+
+Located on the right side of the slide, this panel displays a series of paired histograms (TP in blue, FP in red) showing the Vlow Ratio distributions at decreasing levels of tumor sample purity, from 1.0 (100%) down to 0.2 (20%).
+
+**Key Message of the Visualization (Figure 3):** This analysis demonstrates the behavior of the Vlow Ratio under different conditions. As tumor purity decreases, the signal from the somatic variant weakens, causing the distribution for True Positives (blue histograms) to shift towards lower ratios. However, the distribution for False Positives (red histograms) remains strongly concentrated at very low ratios across all purity levels. This indicates that even at low purities like 20%, the threshold `θ` remains effective at filtering out a large proportion of false positives.
+
+### **Equations**
+
+The slide presents the central formula for this method under the heading "Somatic Variant Detection Formula." It defines the condition a candidate variant must meet to be considered somatic.
+
+The formula states that the ratio of evidence for the variant path (`V_L`) to the total evidence for both the variant and non-variant paths (`V_L + V_N`) must be greater than or equal to a threshold, `θ`. `V_L` likely represents the evidence (e.g., read counts) for the potential somatic variant, while `V_N` represents the evidence for the non-somatic (e.g., reference or germline) allele. The entire ratio represents the variant allele frequency as calculated from the graph.
+
+```markdown
+V_L / (V_L + V_N) ≥ θ
+```
+
+**Key Message of the Equations:**
+The decision to call a somatic variant is made using a simple, quantitative rule. A variant is accepted if its allele frequency (the Vlow Ratio) exceeds a predefined minimum threshold `θ`. This formalizes the filtering process based on the relative evidence supporting the variant.
+
+### **Summary of Key Messages**
+
+This slide outlines a method for somatic variant detection based on a calculated "Vlow Ratio." The main takeaways are:
+
+*   **Quantitative Filtering:** A specific formula, `V_L / (V_L + V_N)`, is used to calculate a ratio representing the strength of evidence for a somatic variant.
+*   **Effective Discrimination:** Histograms demonstrate that this ratio effectively separates the majority of False Positives (which have a very low ratio) from True Positives (which have a higher, more distributed ratio).
+*   **Threshold-Based Calling:** A threshold `θ` (empirically set around 0.2) is applied to this ratio to filter out low-confidence calls, which are predominantly false positives.
+*   **Robustness to Purity:** The method maintains its effectiveness in discriminating between true and false calls even when tumor purity is as low as 20%, making it suitable for a range of clinical samples.
+
+
+
+
+Page 41:
+### **Title**
+Somatic Variant Calling : Tumor Purity Prediction Equation
+
+### **Visualizations**
+
+This slide uses a comprehensive diagram to illustrate how tumor purity affects the allele frequencies of germline and somatic variants, and how this relationship can be used to identify specific genomic patterns.
+
+**Figure 1: Cellular Origin of Variants**
+
+Located on the far left, this diagram depicts the genetic makeup of normal and tumor cells.
+*   **Normal cells:** Shown with a pair of homologous chromosomes. A heterozygous germline variant is present, indicated by a blue-colored band on each chromosome at the same locus.
+*   **Tumor cells:** Also shown with a pair of homologous chromosomes. These cells carry the same heterozygous germline variant (blue bands) as the normal cells. Additionally, one of the chromosomes has acquired a new heterozygous somatic variant, indicated by an orange-colored band.
+*   **Key Message:** This establishes the fundamental difference between the two cell types: normal cells only have germline variants, while tumor cells have both germline and somatic variants.
+
+**Figure 2: Effect of Tumor Purity on Allele Frequency Distributions**
+
+This central part of the slide illustrates how mixing normal and tumor cells at different ratios (tumor purity) impacts the observable allele frequencies. The flow is shown for purity levels of 1.0, 0.8, 0.6, 0.4, and 0.2.
+*   **Purity Levels and Cell Mixtures:** Each purity level is accompanied by a small icon representing the proportion of tumor cells (orange outline) to normal cells (blue outline) in a sample. For instance, a purity of 1.0 means the sample is 100% tumor cells, while 0.2 means it is 20% tumor cells and 80% normal cells.
+*   **Allele Frequency Plots:** For each purity level, a graph plots variant counts against allele frequency (from 0 to 1).
+    *   **Legend:** The blue curve represents the distribution for the germline variant, and the orange curve represents the distribution for the somatic variant.
+    *   **Germline Variant (Blue Curve):** The peak for the germline variant remains centered at an allele frequency of 0.5 across all purity levels. This is because this heterozygous variant is present in all cells (both normal and tumor) in the sample.
+    *   **Somatic Variant (Orange Curve):** The peak for the somatic variant shifts depending on the tumor purity. At 100% purity, its peak is also at 0.5 (as it is heterozygous in the tumor cells). As purity decreases, the somatic variant becomes diluted by the normal cells that lack it, causing its allele frequency peak to shift towards zero. For example, at 20% purity, the peak is near 0.1 (0.5 allele frequency * 0.2 purity).
+*   **Key Message of the Visualization:** The allele frequency of somatic variants is directly proportional to tumor purity, while the allele frequency of heterozygous germline variants remains stable at 0.5. This difference in behavior allows for the statistical separation of the two variant types in mixed samples, provided the purity is not 100%.
+
+**Figure 3: Pattern Detection based on Allele Frequency Separation**
+
+Located on the right, this part of the diagram shows the outcome of analyzing the variant data.
+*   **High Purity (e.g., 1.0):** At 100% purity, the allele frequency distributions for germline and somatic variants overlap significantly. The diagram shows that this makes it impossible to resolve the underlying genomic pattern. It displays a set of aligned reads (A-C-A and G-T-G) but concludes that a distinct pattern cannot be identified (marked with an "X").
+*   **Lower Purity (e.g., 0.6):** At lower purities, the distinct allele frequencies allow the separation of reads belonging to the germline variant from those belonging to the somatic variant. This enables the reconstruction of the haplotype, or the specific sequence of variants on a single chromosome. The diagram shows a sequence graph where the germline variant (A vs. G) and the somatic variant (C vs. T) are resolved into a clear pattern: the somatic C-to-T mutation is linked to the chromosome carrying the 'G' germline allele, forming a G-T-G path.
+*   **Key Message of the Visualization:** By exploiting the differential allele frequencies caused by varying tumor purity, it is possible to identify which germline allele is physically linked to a specific somatic mutation. This "pattern" provides valuable information about the tumor's clonal evolution but is only detectable when the allele frequency distributions are separable (i.e., at purities less than 1.0).
+
+### **Summary of Key Messages**
+
+This slide explains the principle behind using tumor purity to analyze somatic variants. The core messages are:
+
+*   **Differential Allele Frequencies:** Heterozygous somatic variants have an allele frequency that is dependent on tumor purity, whereas heterozygous germline variants have a stable allele frequency of approximately 0.5.
+*   **Separation of Signals:** This difference allows for the statistical separation of somatic and germline variant signals in samples with a mixture of tumor and normal cells (i.e., purity < 1.0).
+*   **Pattern Identification:** Once separated, the linkage between a somatic mutation and a nearby germline variant can be determined. This "pattern" reveals which parental chromosome acquired the somatic mutation.
+*   **Purity as a Prerequisite:** The ability to detect these patterns is conditional on tumor purity. At 100% purity, the signals overlap, and the pattern is obscured. At lower purities, the signals separate, revealing the pattern. This principle forms the basis for a "Tumor Purity Prediction Equation," which is alluded to in the title.
+
+
+
+
+Page 42:
+### **Title**
+Somatic Variant Calling: Iterative Refinement for High Purity Samples
+
+### **Visualizations**
+
+This slide presents a detailed workflow diagram illustrating a computational pipeline for somatic variant calling, with a special emphasis on an iterative refinement process for high-purity tumor samples.
+
+**Figure 1: Workflow for Somatic Variant Calling and Phasing**
+
+The diagram outlines a multi-step process from sequencing data to tumor purity estimation. A legend in the top-left corner defines the color-coding for alleles: grey for Reference, blue for Germline, orange for Somatic, and yellow for Non-Somatic (e.g., sequencing errors).
+
+1.  **Input - Long-read Sequencing:** The process begins with long-read sequencing data, depicted as a set of DNA reads. These reads contain various types of alleles: reference (grey), heterozygous germline variants (blue), potential somatic variants (orange), and non-somatic variants/errors (yellow).
+
+2.  **Somatic Variant Candidate Generation:** The sequencing reads are processed to identify all potential variant sites, creating a pool of "Somatic Variant Candidates." This is represented by a circle containing dots of all four colors, indicating an un-filtered collection of germline, somatic, and non-somatic variants.
+
+3.  **Parallel Processing Paths:** The workflow splits into two main branches:
+    *   **Main Path (Left):**
+        *   **Somatic Variant Candidate Selection:** This step filters the initial candidates. The diagram shows the removal of the yellow "non-somatic" dot, signifying the elimination of likely sequencing errors or artifacts.
+        *   **Somatic Variant Calling:** Further refinement leads to the identification of true somatic (orange) and germline (blue) variants.
+        *   **Phasing:** This crucial step uses the long-read information to determine which variants co-occur on the same chromosome (haplotype). The output shows two distinct haplotypes, labeled HP1-1 and HP2. HP2 represents a chromosome with only germline variants, while HP1-1 represents the chromosome that has acquired the somatic mutation. This successfully separates the variants onto their respective parental chromosomes.
+        *   **Tumor Purity Prediction Equation:** The phased haplotypes provide the necessary input for a tumor purity prediction model. The diagram shows this step leading to an estimation of the proportion of different cell populations (one with the somatic mutation and one without).
+    *   **High Purity Path (Right):**
+        *   **LOH Detection:** This parallel path is specifically for handling "High purity" samples. It depicts Loss of Heterozygosity (LOH), where one copy of a chromosome (or a segment) is lost in the tumor cells. This is shown by a pair of homologous chromosomes where one is faded and marked with a dashed line, indicating its loss.
+        *   **Iterative Refinement Loop:** An orange arrow shows that the information from LOH detection feeds back into the main workflow, specifically influencing the "Phasing" and subsequent purity prediction. In a high-purity LOH scenario, nearly all reads would belong to a single haplotype (the one that wasn't lost), which provides strong evidence for phasing and helps in accurately calling somatic variants that might otherwise be difficult to distinguish from germline variants. The output of this path is shown as a population of exclusively tumor cells.
+
+*   **Key Message of the Visualization:** The slide details a sophisticated bioinformatics pipeline for identifying somatic mutations. It highlights that long-read sequencing enables "phasing," which is the process of assigning variants to specific chromosomes. The workflow includes a special iterative refinement loop involving "LOH Detection" to improve accuracy in challenging high-purity tumor samples, where standard methods may fail. The ultimate goal is to use this refined information to accurately predict tumor purity.
+
+### **Summary of Key Messages**
+
+This slide outlines a computational strategy for somatic variant analysis that leverages long-read sequencing. The key takeaways are:
+
+*   **Phasing is Key:** Long-read sequencing allows for the phasing of variants, which is critical for distinguishing the chromosomal origin of somatic mutations relative to germline variants.
+*   **Handling High Purity:** The pipeline incorporates a specific module for Loss of Heterozygosity (LOH) detection, which is particularly useful for refining variant calls in high-purity samples.
+*   **Iterative Refinement:** Information from LOH detection is used in a feedback loop to iteratively refine the phasing and subsequent analysis, improving the overall accuracy.
+*   **Foundation for Purity Prediction:** The entire workflow—from sequencing to filtering, calling, and phasing—serves as the foundation for applying a "Tumor Purity Prediction Equation," which was introduced conceptually in the previous slide.
+
+
+
+
+Page 43:
+### **Title**
+Result: Haplotagging somatic and LOH
+
+### **Visualizations**
+
+This slide presents a visualization from a genome browser (such as IGV), demonstrating the successful application of the previously described workflow on real sequencing data. The image shows long sequencing reads aligned to a reference genome and separated by haplotype.
+
+**Figure 1: Haplotagging of Somatic Variants and a Loss of Heterozygosity (LOH) Event**
+
+The visualization is split into four main tracks, representing phased sequencing reads. The horizontal axis represents a region of the genome. Each thin horizontal bar is a single long sequencing read. Vertical colored tick marks on the reads indicate genetic variants (i.e., differences from the reference genome).
+
+*   **Tracks:** The reads are separated into four groups based on their inferred haplotype of origin:
+    *   **HP1 (light purple background):** Reads assigned to Haplotype 1.
+    *   **HP2 (light red background):** Reads assigned to Haplotype 2.
+    *   **HP1-1 (light blue background):** A refined or sub-grouped set of reads from Haplotype 1.
+    *   **HP2-1 (light green background):** A refined or sub-grouped set of reads from Haplotype 2.
+
+*   **Annotations and Interpretation:**
+    *   **Somatic Variant (Left):** An arrow points to a specific genomic position on the left side. At this position, a variant (indicated by red vertical lines) is present in many reads assigned to HP1 but is absent from all reads assigned to HP2. This is the classic signature of a heterozygous somatic mutation that occurred on Haplotype 1.
+    *   **LOH (Right):** A large arrow indicates a region of Loss of Heterozygosity (LOH). In this genomic region, there is a dramatic drop-off in the number of reads assigned to HP1, while the coverage for HP2 remains high. This visually demonstrates that the tumor cells have lost the copy of the chromosome corresponding to Haplotype 1.
+    *   **Somatic Variant in LOH region (Right):** Within the LOH region, another arrow points to a second somatic variant (indicated by green vertical lines). This variant is present on the remaining Haplotype 2 reads. This shows the ability of the method to detect mutations that arise on the single remaining chromosome copy after an LOH event.
+
+*   **Key Message of the Visualization:** The visualization provides powerful evidence for the success of the analysis pipeline. It shows that long-read sequencing data can be used to phase reads into distinct haplotypes (haplotagging). This phasing makes it possible to not only identify somatic variants but also to assign them to a specific parental chromosome. Furthermore, the method can clearly detect and visualize large-scale structural changes like LOH and identify additional somatic mutations within these complex regions. The lower tracks (HP1-1 and HP2-1) likely represent the final, refined output of the iterative process described in the previous slide, cleanly separating the cellular populations.
+
+### **Summary of Key Messages**
+
+This slide serves as a "proof of concept" for the methodology outlined previously. The key takeaways are:
+
+*   **Successful Haplotagging:** The method effectively separates long sequencing reads into their respective haplotypes (HP1 and HP2).
+*   **Phased Somatic Variant Detection:** It demonstrates the clear identification of a somatic variant on a specific haplotype (HP1).
+*   **Visualization of LOH:** The pipeline can detect and visualize a large LOH event, a common and important feature in cancer genomes, by showing the specific loss of one haplotype's reads.
+*   **Analysis of Complex Events:** The slide shows the ability to identify a second somatic variant that occurred *after* the LOH event, highlighting the robustness of the approach for dissecting complex tumor evolution.
+
+

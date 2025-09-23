@@ -1,0 +1,26 @@
+---
+title: "Joint Somatic Phasing and Purity Estimation Incorporating Loss of Heterozygosity in Tumor-Only Long-Read Sequencing"
+author: "Zhen-Yu Chen"
+supervisor: "Yao-Ting Huang"
+date: "2025-08-01"
+documentclass: report
+toc: true
+toc-depth: 2
+figPrefix: Figure
+eqnPrefix: Equation
+tblPrefix: Table
+secPrefix: Section
+linkReferences: true
+abstract: |
+  The characterization of somatic haplotypes from tumor-only long-read sequencing data is critical for precision oncology but is confounded by interdependent challenges, including large-scale Loss of Heterozygosity (LOH) and unknown tumor purity. Existing analytical approaches often fail to model these biological phenomena jointly, leading to fragmented and inaccurate genomic interpretations. This thesis introduces LongPhase-TO, a novel, integrated bioinformatics pipeline designed to overcome these limitations. Using a unified statistical framework, LongPhase-TO simultaneously performs somatic phasing, detects chromosomal-scale LOH, refines somatic variant calls, and estimates tumor purity from a single tumor specimen. Validation on well-characterized cancer cell lines and in-silico mixtures demonstrates that LongPhase-TO achieves superior phasing contiguity (Block N50 > 10 Mbp) compared to standard germline phasers and accurately identifies LOH events with high concordance to gold-standard microarray data. Furthermore, the pipeline significantly enhances the precision of upstream somatic variant callers by leveraging haplotype information as a post-processing filter. A key capability is its highly accurate prediction of tumor purity derived from haplotype imbalance signals, obviating the need for a matched normal sample and outperforming established methods. Qualitative visualizations confirm its power to resolve the specific parental origin of somatic mutations, even when co-occurring with large structural events. By providing a comprehensive, haplotype-resolved genomic profile from a single tumor sample, LongPhase-TO establishes a powerful new methodology for cancer genomics, advancing the utility of long-read sequencing for both fundamental research and clinical applications where only tumor material is available.
+abstract-zh: |
+  從僅含腫瘤樣本之長讀長定序數據中解析體細胞單倍型，對精準腫瘤學至關重要，但此過程面臨著大規模雜合性缺失（Loss of Heterozygosity, LOH）與未知腫瘤純度等相互依存的挑戰。現有分析方法常無法對此類生物學現象進行聯合建模，因而導致破碎且不準確的基因組詮釋。本論文提出LongPhase-TO，一套為克服上述限制所設計的新穎整合性生物資訊分析流程。LongPhase-TO運用統一的統計框架，能從單一腫瘤檢體中，同時執行體細胞單倍型定相、偵測染色體尺度之LOH、精煉體細胞變異檢測結果，並估算腫瘤純度。在特性清晰的癌細胞株與電腦模擬混合樣本上的驗證結果顯示，相較於標準的生殖系定相工具，LongPhase-TO能達到更優越的定相連續性（Block N50 > 10 Mbp），並能準確辨識出與黃金標準微陣列數據具高度一致性的LOH事件。此外，此流程藉由利用單倍型資訊作為後續處理的篩選機制，顯著提升了上游體細胞變異偵測工具的精準度。其一項關鍵能力是可根據單倍型不平衡訊號，高度準確地預測腫瘤純度，此法無需配對的正常樣本，且表現優於現有方法。定性視覺化分析亦證實，即使在與大型結構變異共存的情況下，LongPhase-TO仍有能力解析體細胞突變的特定親源性。透過從單一腫瘤樣本提供全面且經單倍型解析的基因組圖譜，LongPhase-TO為癌症基因體學建立了一套強大的新方法學，進而提升了長讀長定序在基礎研究與臨床應用上的實用性，尤其是在僅能取得腫瘤材料的情況下。
+acknowledgements-zh: |
+  首先，謹以最誠摯之心，向我的指導教授黃耀廷老師致上最深的謝意。在碩士論文的研究過程中，每當我感到迷惘困惑時，老師總能以其淵博的學識與嚴謹的態度，為我指點迷津，引領我走出學術的迷霧。老師的諄諄教誨與無私支持，不僅奠定了我研究的基礎，更讓我學會了獨立思考與解決問題的能力。這份恩情，學生永銘在心。
+  
+  同時，感謝研究所提供優渥的學習環境與豐富的圖書資源，使我得以無後顧之憂地專注於學業。此外，亦要感謝實驗室的夥伴們與所有一同奮鬥的同學們。在無數個挑燈夜戰的日子裡，我們相互扶持、切磋琢磨，共同度過了研究生涯中的高低起伏。你們的陪伴與歡笑，是我求學路上最溫暖的光景。
+  
+  最後，我要將這份喜悅與榮耀，獻給我最摯愛的家人。感謝您們一直以來的默默支持、無私的奉獻與無盡的包容。是您們的愛與理解，成為我身後最堅實的後盾，讓我在面對挑戰時能無所畏懼，勇往直前。這份論文得以順利完成，您們功不可沒。
+  
+  謹此，向所有給予我幫助與關懷的師長、親友，致上最由衷的感謝。
+---

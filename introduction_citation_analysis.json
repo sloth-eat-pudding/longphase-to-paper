@@ -1,0 +1,131 @@
+{
+  "sentences": [
+    {
+      "sentence": "Cancer is, at its core, a disease of the genome, characterized by the accumulation of genetic and epigenetic alterations that drive the transformation of normal cells into malignant counterparts.",
+      "reason": "This is a foundational concept in cancer biology and should be attributed to seminal or review literature.",
+      "key_terms": [
+        "cancer",
+        "disease of the genome",
+        "genetic alterations",
+        "epigenetic alterations"
+      ]
+    },
+    {
+      "sentence": "The progressive accumulation of these somatic variants is the primary driver of tumorigenesis, leading to uncontrolled cell proliferation and the evolution of a complex neoplastic mass.",
+      "reason": "This sentence describes the established mechanism of tumorigenesis, which is a core factual claim.",
+      "key_terms": [
+        "somatic variants",
+        "tumorigenesis",
+        "uncontrolled cell proliferation"
+      ]
+    },
+    {
+      "sentence": "A haplotype is defined as the specific sequence of alleles co-located on a single chromosome that are statistically associated and typically inherited as a single unit.",
+      "reason": "This provides a standard scientific definition for a key term.",
+      "key_terms": [
+        "haplotype",
+        "alleles",
+        "chromosome"
+      ]
+    },
+    {
+      "sentence": "In Non-Small Cell Lung Cancer (NSCLC), for example, the relative phasing of the L858R and T790M mutations in the EGFR gene is a direct determinant of therapeutic strategy.",
+      "reason": "This is a specific clinical example with verifiable facts that require a source.",
+      "key_terms": [
+        "Non-Small Cell Lung Cancer",
+        "NSCLC",
+        "L858R",
+        "T790M",
+        "EGFR"
+      ]
+    },
+    {
+      "sentence": "Tumors with in trans mutations may respond to first-generation tyrosine kinase inhibitors (TKIs), whereas those with in cis mutations exhibit resistance, requiring treatment with third-generation TKIs.",
+      "reason": "This sentence makes a specific, factual claim about drug resistance and efficacy tied to genetic configurations.",
+      "key_terms": [
+        "in trans",
+        "in cis",
+        "tyrosine kinase inhibitors",
+        "TKIs"
+      ]
+    },
+    {
+      "sentence": "The emergence of long-read sequencing technologies, developed by firms such as Pacific Biosciences (PacBio) and Oxford Nanopore Technologies (ONT), offers new opportunities for resolving complex genomic structures, including haplotypes.",
+      "reason": "This sentence introduces specific technologies and their developers, and makes a claim about their capabilities.",
+      "key_terms": [
+        "long-read sequencing",
+        "Pacific Biosciences",
+        "PacBio",
+        "Oxford Nanopore Technologies",
+        "ONT"
+      ]
+    },
+    {
+      "sentence": "In contrast to short-read technologies, which generate fragments of only a few hundred base pairs, long reads can span tens of thousands of bases and thereby encompass multiple variant sites within a single sequenced molecule.",
+      "reason": "This sentence contains quantitative, factual claims comparing the specifications of different technologies.",
+      "key_terms": [
+        "short-read technologies",
+        "long reads",
+        "base pairs"
+      ]
+    },
+    {
+      "sentence": "The absence of a constitutional germline reference makes it difficult to differentiate pre-existing germline variants from newly acquired somatic mutations, a critical distinction that complicates subsequent analyses, including haplotype phasing.",
+      "reason": "This describes a well-established and significant technical challenge in the field of cancer genomics.",
+      "key_terms": [
+        "tumor-only",
+        "germline reference",
+        "somatic mutations",
+        "haplotype phasing"
+      ]
+    },
+    {
+      "sentence": "A frequent event in many cancers is chromosome-scale Loss of Heterozygosity (LOH), a state in which a large genomic region or an entire chromosome arm loses one of its two parental copies.",
+      "reason": "This defines a key biological concept (LOH) and makes a factual claim about its frequency in cancer.",
+      "key_terms": [
+        "Loss of Heterozygosity",
+        "LOH",
+        "parental copies"
+      ]
+    },
+    {
+      "sentence": "Existing phasing algorithms are often ill-equipped to model such profound allelic imbalances, which can lead to fragmented and erroneous haplotype reconstructions that fail to capture the contiguous nature of the LOH event.",
+      "reason": "This is a claim about the limitations of existing computational methods, which should be supported by evidence or citations to relevant literature.",
+      "key_terms": [
+        "phasing algorithms",
+        "allelic imbalances",
+        "haplotype reconstructions",
+        "LOH"
+      ]
+    },
+    {
+      "sentence": "Concurrently, tumor specimens are rarely composed of pure neoplastic cell populations; instead, they are typically heterogeneous mixtures of malignant cells and non-malignant stromal and immune cells.",
+      "reason": "This sentence describes the widely accepted concept of the tumor microenvironment and intra-tumor heterogeneity.",
+      "key_terms": [
+        "tumor specimens",
+        "heterogeneous mixtures",
+        "stromal cells",
+        "immune cells"
+      ]
+    },
+    {
+      "sentence": "In samples with low purity, the genomic signal from normal cells can obscure the signal from tumor-specific variants, introducing ambiguity that precipitates critical phasing artifacts, most notably \"switch errors,\" wherein the algorithm incorrectly alternates between tumor and normal haplotypes.",
+      "reason": "This sentence describes a specific technical challenge (low purity) and its known consequence (switch errors), which are established concepts.",
+      "key_terms": [
+        "tumor purity",
+        "phasing artifacts",
+        "switch errors"
+      ]
+    },
+    {
+      "sentence": "A fragmented strategy, wherein tumor purity estimation, LOH detection, and haplotype phasing are performed as separate, sequential steps, is susceptible to the propagation of errors between stages.",
+      "reason": "This is a critical claim about the weakness of a class of existing methodologies, requiring a citation to support the assertion.",
+      "key_terms": [
+        "fragmented strategy",
+        "purity estimation",
+        "LOH detection",
+        "propagation of errors"
+      ]
+    }
+  ]
+}

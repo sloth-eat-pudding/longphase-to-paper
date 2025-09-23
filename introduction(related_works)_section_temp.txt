@@ -1,0 +1,315 @@
+Page 1:
+This is the title slide of a master's thesis presentation.
+
+*   **Title**: Joint Somatic Phasing and Purity Estimation Incorporating Loss of Heterozygosity in Tumor-Only Long-Read Sequencing
+*   **Advisor**: Yao-Ting Huang
+*   **Speaker**: Zhen-Yu Chen
+
+### Summary of Key Messages
+
+This slide introduces the topic of the master's thesis. The research focuses on developing a computational method for analyzing cancer genomics data. The key aspects of the work, as indicated by the title, are:
+
+*   **Joint Somatic Phasing and Purity Estimation**: The method aims to simultaneously solve two problems:
+    1.  **Somatic Phasing**: Determining which parental chromosome (haplotype) a somatic mutation occurs on.
+    2.  **Purity Estimation**: Estimating the proportion of tumor cells within the sequenced sample, which is often a mix of tumor and normal cells.
+*   **Incorporating Loss of Heterozygosity (LOH)**: The method specifically uses information from LOH events—a common occurrence in cancer where a region of a chromosome loses one of its two alleles—to improve its estimations.
+*   **Tumor-Only Long-Read Sequencing**: The methodology is designed for a specific and challenging data type: long-read sequencing data obtained only from a tumor sample, without a matched normal sample from the same patient. Long reads are particularly useful for phasing because they can span multiple variant sites.
+
+
+
+
+Page 2:
+This slide presents the outline for the master's thesis presentation, setting the agenda for the topics that will be discussed. It follows a standard and logical structure for a scientific presentation, guiding the audience through the research from its conception to its conclusion.
+
+The outline consists of a bulleted list of six sections:
+
+*   **Introduction**: This section will likely provide the necessary background on cancer genomics, long-read sequencing, somatic mutations, phasing, and tumor purity, setting the stage for the research problem.
+*   **Related work**: Here, the speaker will probably review existing computational methods and studies relevant to the thesis topic, highlighting their strengths and limitations.
+*   **Motivation**: This part will explain the specific research gap or challenge that the thesis aims to address, justifying the need for a new method for joint somatic phasing and purity estimation.
+*   **Methods**: This section is expected to detail the novel algorithm and computational framework developed in the thesis. It will describe how the method incorporates information from Loss of Heterozygosity (LOH) and is tailored for tumor-only long-read sequencing data.
+*   **Result**: The speaker will present the findings from applying their method, likely including performance evaluations on simulated or real cancer data, and comparisons with existing tools.
+*   **Conclusion**: The presentation will end with a summary of the key contributions, a discussion of the results' implications, and potential directions for future research.
+
+### Summary of Key Messages
+
+This slide functions as a roadmap for the presentation. It informs the audience about the structure and flow of the talk, ensuring they can follow the logical progression from the background and motivation for the research to the methods, results, and final conclusions. The structure is comprehensive, covering all essential components of a thesis defense.
+
+
+
+
+Page 3:
+### Introduction: Germline and Somatic Variants
+
+This slide provides a foundational visual explanation of the distinction between germline and somatic genetic variants.
+
+### Figure Description
+
+The slide contains a central diagram that illustrates the origin, distribution, and inheritability of germline and somatic variants.
+
+*   **Left Side (Inheritance):** The process begins with fertilization. A paternal sperm cell and a maternal egg cell, each containing their respective genetic material (chromosomes), are shown. A blue bar on a paternal chromosome represents a pre-existing genetic variant. These gametes combine to form an embryo, which inherits a complete set of chromosomes, including the paternal variant. This embryo develops into an adult human, with every cell containing this inherited (germline) variant.
+
+*   **Right Side (Variant Types):** The diagram then branches to show two distinct types of variants present in the adult:
+    *   **Germline variants:** These are the "Inherited mutations" that were present from conception. The diagram shows that these variants are present in the normal cells (represented by blue circles) of the individual. Because they are also present in the germ cells (e.g., sperm), they are labeled as "Inheritable" and can be passed on to the next generation.
+    *   **Somatic variants:** These are "Novel mutations" that arise in specific body cells (somatic cells) during an individual's lifetime, often associated with factors like environmental exposure or errors in DNA replication. In the diagram, a new mutation (represented by an orange bar) appears in a subset of cells (orange circles), which could represent a tumor developing in a specific organ (indicated by a red dot on the person's torso). These variants are confined to the affected somatic cells and are not present in germ cells, making them "Uninheritable."
+
+### Key Messages of the Visualization
+
+*   **Germline variants** are inherited from parents, are present in virtually every cell of an individual's body from birth, and can be passed down to offspring.
+*   **Somatic variants** are acquired after conception, are present only in a specific subset of cells (e.g., a tumor), and are not passed on to offspring.
+*   This distinction is fundamental to cancer genetics, as cancer is driven by the accumulation of somatic mutations within a population of cells.
+
+### Summary of Key Messages
+
+This slide serves as an introduction to the core concepts of the thesis. By visually contrasting germline and somatic variants, it establishes the biological context necessary for the audience to understand the subsequent discussion on cancer genomics. The key takeaway is the different origin and fate of these two types of genetic alterations, which is a critical concept for methods that aim to distinguish them using sequencing data.
+
+
+
+
+Page 4:
+### Title
+Related work: Phasing and Germline Variant Calling
+
+### Figure Description
+
+This slide presents two parallel workflows to illustrate the concepts of phasing and germline variant calling using long-read sequencing data. The top workflow depicts an idealized process, while the bottom workflow introduces the real-world challenge of sequencing errors and the use of modern computational models to address it.
+
+**Top Workflow: Ideal Phasing Process**
+
+This workflow outlines the conceptual steps for determining haplotypes (the sequence of variants on a single chromosome).
+
+*   **1. Sample:** The process begins with a biological sample containing diploid cells, each with a pair of homologous chromosomes (one paternal, one maternal). These chromosomes contain different alleles at certain positions, known as heterozygous variants.
+*   **2. Long-read Sequencing:** The DNA is sequenced, generating long reads. In this ideal scenario, the sequencing is perfect. The reads accurately capture segments of each chromosome, including the true variants (shown as dark blue boxes).
+*   **3. Phasing:** The long reads are computationally grouped based on the variants they share. Because long reads often span multiple variant sites, they can be reliably assigned to their chromosome of origin. The diagram shows the reads being sorted into two distinct piles, one for each haplotype.
+*   **4. Inferred Haplotypes:** The final output is two fully resolved haplotype sequences, one representing the paternal chromosome (e.g., A-G-G-C) and the other the maternal one (e.g., C-T-T-A).
+
+**Bottom Workflow: Realistic Variant Calling with Error Correction**
+
+This workflow illustrates a more practical approach that accounts for technological imperfections. A legend indicates that dark blue boxes are true variants, while yellow boxes represent sequencing errors.
+
+*   **1. Long-read Sequencing:** As before, long reads are generated. However, these reads now contain not only true variants (blue) but also random sequencing errors (yellow). The challenge is to distinguish between these two.
+*   **2. Phasing:** The reads are again phased into two groups corresponding to the original haplotypes. However, these groups are now "noisy," containing both true variants and random errors.
+*   **3. Model Prediction:** The phased, noisy read alignments are fed into a sophisticated predictive model, represented by a neural network diagram. The slide names specific examples of such models: **DeepVariant** and **Clair3**. These deep learning models are trained to recognize the patterns of true variants versus the patterns of random sequencing errors.
+*   **4. Germline Variant Calling:** The model outputs the final, high-confidence germline variant calls. It resolves the ambiguity between signal (variants) and noise (errors) to produce a clean, inferred genotype. The diagram shows the final two haplotypes with a focus on a heterozygous site, indicating the model has successfully identified the true genetic difference while filtering out the noise.
+
+### Key Messages of the Visualizations
+
+*   **Phasing is the process of separating sequencing reads according to their parental chromosome of origin to reconstruct haplotypes.** Long-read sequencing is particularly effective for this because a single long read can link multiple variants together.
+*   **A major challenge in variant calling is differentiating true genetic variants from inevitable sequencing errors.** Simple consensus methods can be misled by these errors.
+*   **Modern variant calling pipelines, such as DeepVariant and Clair3, use deep learning models to improve accuracy.** These models analyze the raw, phased read data to learn the signatures of true variants versus errors, leading to more reliable germline variant calls.
+
+### Summary of Key Messages
+
+This slide provides background on the state-of-the-art methods for germline variant calling. It first establishes the ideal goal of phasing—to perfectly reconstruct the two parental haplotypes. It then introduces the practical challenge posed by sequencing errors and highlights how modern tools like DeepVariant and Clair3 leverage deep learning to overcome this challenge. The key takeaway is that accurately calling germline variants from real-world sequencing data requires sophisticated computational models capable of distinguishing true biological variation from technological noise.
+
+
+
+
+Page 5:
+### Title
+Related work: Somatic Variant Calling in Tumor-Normal Samples
+
+### Figure Description
+
+This slide presents a comprehensive workflow for identifying somatic mutations using long-read sequencing data from paired tumor and normal samples. A legend at the top left clarifies the color coding used throughout the diagram: orange boxes represent somatic variants, blue boxes represent germline variants, and yellow boxes represent sequencing errors.
+
+The workflow is broken down into four main stages:
+
+1.  **Long-read Sequencing:** The process begins with two biological samples from the same individual: a collection of **Tumor cells** and a collection of **Normal cells**. Both samples undergo long-read sequencing. The resulting reads from the tumor sample contain a mix of germline variants (blue), somatic variants (orange, which are unique to the tumor), and random sequencing errors (yellow). The reads from the normal sample contain only germline variants and sequencing errors.
+
+2.  **Variant Calling:** This stage involves a joint analysis of reads from both the tumor and normal samples. By comparing the aligned reads against a reference genome (represented by the gray bar), the pipeline identifies positions where the DNA sequence differs. In the example shown, a germline variant (G/T) is present in both samples, while a potential somatic variant (G -> A) is observed only in the tumor reads. Sequencing errors (e.g., the yellow 'C') are also present in the read pileups.
+
+3.  **Phasing:** The workflow then applies phasing specifically to the tumor reads. Phasing uses the linkage of variants along long reads to separate them into two groups, each corresponding to a parental chromosome (haplotype). This is a critical step because a somatic mutation typically occurs on only one of the two chromosomes. The diagram shows the tumor reads being successfully sorted: one haplotype group (top, green) contains the reference allele 'G', while the other haplotype group (bottom, light blue) contains the somatic allele 'A'. This separation concentrates the signal for the somatic variant and isolates it from the wild-type background, making it easier to distinguish from random noise. A sequencing error ('C') is also shown to be present in one of the phased groups.
+
+4.  **Somatic Variant Calling:** The phased read information is then fed into a sophisticated model, represented by a neural network icon. This step aims to make the final, high-confidence call. The slide lists several state-of-the-art tools that employ this approach, including **DeepSomatic**, **ClairS**, and **Severus**. These models are trained to differentiate the patterns of true somatic variants from those of germline variants and random sequencing errors. In the final step, the model correctly identifies the 'A' as the true somatic variant while filtering out the sequencing error ('C', which is crossed out). The final output shows the confident identification of the somatic G-to-A mutation.
+
+### Key Messages of the Visualizations
+
+*   **Tumor-Normal Comparison is Essential:** Accurate somatic variant calling relies on comparing sequencing data from a patient's tumor tissue with data from their normal tissue to isolate mutations specific to the cancer.
+*   **Phasing Enhances Somatic Signal:** By phasing the tumor reads, the signal from a low-frequency somatic variant can be concentrated onto a specific haplotype. This helps distinguish the true mutation from the background noise of sequencing errors, which are typically distributed randomly across both haplotypes.
+*   **Machine Learning Improves Accuracy:** Modern somatic variant callers like DeepSomatic, ClairS, and Severus utilize machine learning models. These models analyze complex patterns in the phased read data to achieve higher accuracy, effectively discriminating between true somatic mutations and sequencing artifacts.
+
+### Summary of Key Messages
+
+This slide builds upon the previously discussed concepts of phasing and deep learning for variant calling, applying them to the more complex challenge of identifying somatic mutations. The key takeaway is that a robust somatic variant calling pipeline for long-read data involves a multi-step process: comparing tumor and normal samples, phasing the tumor reads to isolate the mutational signal, and using advanced machine learning models to make a final, accurate call. This sophisticated approach is necessary to overcome the challenges posed by sequencing errors and the often low frequency of somatic variants within a heterogeneous tumor sample.
+
+
+
+
+Page 6:
+### Title
+Related work: Somatic Variant Calling in Tumor-Only Samples
+
+### Figure Description
+
+This slide illustrates a comprehensive workflow for identifying somatic mutations using long-read sequencing data from a **tumor-only sample**, which is a common scenario when a matched normal tissue sample is unavailable due to cost or accessibility. A legend at the top left clarifies the color coding: orange boxes represent somatic variants, blue boxes represent germline variants, and yellow boxes represent sequencing errors.
+
+The workflow is presented in four distinct stages:
+
+1.  **Long-read Sequencing & Filtering Source:** The process begins with **Tumor cells**, which contain a mixture of the individual's inherent germline variants (blue) and cancer-specific somatic variants (orange). These cells undergo long-read sequencing. In this workflow, the patient's **Normal cells** are unavailable (indicated by a cross-out). To compensate for the lack of a matched normal sample, a **Panel of Normals (PON)** is used. A PON is a database constructed from the sequencing data of a large cohort of healthy individuals, capturing common germline variants and recurrent sequencing artifacts.
+
+2.  **Variant Calling:** Reads from the tumor sample are aligned to a reference genome. This initial calling step identifies all variants present in the tumor, including a germline variant (T, colored blue) and a potential somatic variant (A, colored orange). The variants identified in the tumor are then compared against the Panel of Normals. Any variant found in the PON is assumed to be a common germline polymorphism or an artifact and is filtered out. The diagram shows the germline 'T' variant being removed because it is present in the PON.
+
+3.  **Phasing:** The remaining, filtered tumor reads undergo phasing. This process leverages the long-read information to separate the reads into groups corresponding to the two parental chromosomes (haplotypes). As a result, the true somatic variant ('A') is segregated onto one haplotype (light blue), effectively concentrating its signal. The reference allele ('G') is on the other haplotype (green). This step is crucial for distinguishing low-frequency somatic mutations from random sequencing errors (like the yellow 'C'), which tend to be distributed across both haplotypes.
+
+4.  **Somatic Variant Calling:** The final stage uses a machine learning model, represented by a neural network diagram, to analyze the phased read data and make a definitive call. The slide lists several state-of-the-art tools adapted for this tumor-only approach: **DeepSomatic(TO)**, **ClairS-TO**, and **Severus(TO)**, where "(TO)" signifies "Tumor-Only". The model is trained to recognize the distinct signatures of true somatic variants in phased data, ultimately identifying the 'A' as the somatic mutation while correctly classifying the reference 'G' and filtering out noise.
+
+### Key Messages of the Visualizations
+
+*   **Panel of Normals (PON) Replaces Matched Normal:** The key innovation in the tumor-only workflow is the use of a Panel of Normals as a filter to remove common germline variants and artifacts, compensating for the absence of a patient-matched normal sample.
+*   **Phasing Remains Essential for Signal Amplification:** Similar to the tumor-normal workflow, phasing the tumor's long reads is a critical step to separate haplotypes. This isolates the somatic variant's signal, making it easier to distinguish from the wild-type allele and random sequencing noise.
+*   **Specialized Models for Tumor-Only Calling:** The task of calling somatic variants without a matched normal sample is more challenging and requires specialized tools. The listed callers (DeepSomatic(TO), ClairS-TO) are specifically designed or have modes dedicated to this purpose.
+
+### Summary of Key Messages
+
+This slide contrasts with the previously discussed tumor-normal workflow by presenting an alternative strategy for somatic variant calling when only a tumor sample is available. The central message is that the absence of a matched normal sample can be addressed by using a Panel of Normals (PON) to filter out non-somatic variants. The slide reinforces the importance of long-read phasing to enhance the signal of true mutations and highlights that specialized deep learning models are required to achieve high accuracy in this challenging tumor-only context.
+
+
+
+
+Page 7:
+### Title
+Motivation: Lack of Somatic Phasing
+
+### Figure Description
+
+This slide presents the motivation for developing methods for somatic phasing by illustrating the concept of tumor evolution and its clinical implications. It is composed of two main visual sections.
+
+**Figure 1: Clonal Evolution and the Phasing Challenge**
+
+This figure, occupying the top half of the slide, explains the complexity of tumor genetics and the limitations of current phasing technologies.
+
+*   **Clonal Evolution Diagram (Left):** This part illustrates how a tumor develops and becomes a heterogeneous mixture of different cell populations (subclones).
+    *   The process starts with a **Founder mutation** (blue), which is a germline variant inherited from the parents and present in all of the individual's cells.
+    *   A **Driver mutation** (yellow) then occurs somatically, initiating the cancer and creating the primary tumor clone (clonal).
+    *   As the tumor grows, additional mutations occur, leading to the emergence of distinct **Subclones** (green and orange).
+    *   The final tumor is depicted as a mass containing a mix of these cell populations, each with a unique combination of mutations.
+
+*   **Haplotype Phasing Diagram (Right):** This part contrasts the established process of germline phasing with the challenge of somatic phasing.
+    *   **Germline Haplotypes:** Current standard tools (e.g., WhatsHap, LongPhase, HapCut2) can successfully perform germline phasing. They analyze sequencing reads to separate them into two groups corresponding to the two parental chromosomes, or haplotypes (HP1 and HP2). An example DNA sequence shows HP1 and HP2 differing by a single germline variant (T vs. G, highlighted in blue).
+    *   **Somatic Haplotypes:** This section, marked with a question mark, highlights the central problem. In a tumor, somatic mutations create new, cancer-specific haplotypes within each subclone. The diagram shows how the original germline haplotypes (HP1, HP2) can evolve into distinct somatic haplotypes like HP1-1, HP2-1, each defined by the acquisition of new somatic mutations (highlighted in orange). The goal of somatic phasing is to reconstruct these specific subclonal haplotypes, a task that current tools cannot perform.
+
+### Key Messages of the Visualizations
+
+*   **Tumors are Genetically Heterogeneous:** Cancers are not uniform masses but are composed of multiple subclones, each with a unique set of somatic mutations acquired during tumor evolution.
+*   **Somatic Phasing is an Unsolved Problem:** While tools exist to determine an individual's two inherited (germline) haplotypes, there is a lack of methods capable of reconstructing the specific, newly-evolved somatic haplotypes present in different cancer subclones.
+
+
+### Summary of Key Messages
+
+The slide highlights the problem of lacking methods for somatic phasing. While germline haplotypes can be reconstructed with existing tools, tumor evolution introduces somatic mutations that require new strategies for accurate haplotype reconstruction. This gap motivates the research.
+
+
+
+
+Page 8:
+### Title
+Challenge 1: Chromosome-scale Loss of Heterozygosity
+
+### Figure Description
+
+This slide illustrates the first major challenge in somatic phasing: accurately identifying and phasing through large, chromosome-scale Loss of Heterozygosity (LOH) events. It contrasts the output of existing bioinformatics tools with the desired, biologically correct result. The slide is divided into two main sections comparing phasing approaches and Copy Number Variation (CNV) detection.
+
+**Figure 1: Comparison of Phasing Approaches in the Presence of LOH**
+
+This figure, located in the upper half of the slide, visualizes how current phasing methods fall short when dealing with large-scale LOH and what the ideal output should look like.
+
+*   **Source of the Problem (Left):** A diagram labeled "Tumor cells" shows a cell containing two parental chromosome homologs (one light blue, one dark blue). A large portion of the light blue chromosome is shown as lost, which represents a major LOH event where the tumor cell loses one of the two inherited copies of a chromosomal region.
+*   **Existing Phasing Approaches (Top Right):** This diagram represents the output of current phasing tools. It shows sequencing reads aligned to a reference genome. Reads are colored to indicate their assigned haplotype (light blue for haplotype 1, dark blue for haplotype 2) or are left grey if unphased. The result is a set of fragmented haplotype "blocks." There are several distinct light blue and dark blue blocks, separated by large grey regions of unphased reads. This illustrates that existing methods fail to connect these blocks across the LOH region, breaking the chromosome into multiple, small, incorrectly phased segments.
+*   **Expected Phasing (Bottom Right):** This diagram shows the ideal, correct phasing result. The dark blue haplotype is reconstructed as a single, continuous block spanning the entire region. The light blue haplotype is present only at the beginning and then disappears, correctly reflecting the large LOH event shown in the "Tumor cells" diagram. This demonstrates a contiguous, chromosome-scale phased haplotype.
+
+**Figure 2: Comparison of LOH Detection by CNV Callers**
+
+This figure, in the lower half of the slide, compares how existing CNV detection tools interpret LOH versus the actual underlying event.
+
+*   **Existing Tool Output (Top Graph):** Associated with a list of standard CNV/SV callers (`CNVkit`, `ExomeDepth`, `Sniffles`, `Delly`), this graph plots copy number state against genomic loci. It shows both haplotypes (light and dark blue). The output depicts several separate, smaller regions labeled "LOH" where the light blue haplotype is lost. These are interspersed with regions where both haplotypes appear present. This output incorrectly suggests multiple independent LOH events.
+*   **Expected Output (Bottom Graph):** This graph shows the true biological state. It depicts a single, continuous "LOH (Chromosomal-Scale)" event where the entire light blue haplotype is lost across a vast chromosomal region. This contrasts with the fragmented interpretation from existing tools.
+
+### Summary of Key Messages
+
+*   **Chromosome-scale LOH is a Major Challenge:** Large genomic deletions, common in cancer, lead to the loss of one parental chromosome copy over a wide area.
+*   **Existing Tools Provide a Fragmented View:** Current phasing and CNV detection tools are not optimized for such large-scale events. They tend to break the analysis into smaller segments, misinterpreting a single, large LOH event as multiple, disconnected events or failing to phase across the region entirely.
+*   **The Goal is Contiguous, Biologically Accurate Phasing:** The desired outcome is a method that can reconstruct complete, chromosome-scale haplotypes, correctly identifying the precise boundaries of large LOH events and maintaining phase consistency across the entire chromosome. This is a critical step for accurately understanding the genomic landscape of a tumor.
+
+
+
+
+Page 9:
+### Title
+Challenge 2: Tumor Purity
+
+### Figure Description
+
+This slide addresses the second major challenge in somatic phasing: the impact of tumor purity. It illustrates how the proportion of tumor cells versus normal cells in a sequenced sample affects the accuracy of phasing and outlines a computational approach to estimate and correct for this mixture. The slide is divided into two main diagrams.
+
+**Figure 1: The Effect of Tumor Purity on Haplotype Phasing**
+
+This diagram, located in the upper half of the slide, contrasts the outcome of phasing in high-purity and low-purity tumor samples.
+
+*   **High Purity Scenario:**
+    *   **Input:** Shows a collection of sequencing reads. The majority of reads (indicated by an orange background and a male icon) originate from the tumor genome, while a smaller fraction (blue background, female icon) come from the contaminating normal genome. This represents a high-purity sample where the tumor signal is dominant.
+    *   **Output (Phasing):** The phasing algorithm successfully separates the reads into two distinct and correct haplotypes. One haplotype (`A-T-C`) corresponds to the normal cells, and the other (`G-C-A`) corresponds to the tumor cells. The result is clean and accurate.
+
+*   **Low Purity Scenario:**
+    *   **Input:** Shows sequencing reads where the number of reads from the tumor genome (orange) and the normal genome (blue) are nearly equal. This represents a low-purity sample with significant normal cell contamination.
+    *   **Output (Phasing):** The mixed signals from the tumor and normal cells confuse the phasing algorithm. It incorrectly links alleles from different haplotypes, resulting in a "switch error." For example, it incorrectly connects the `A` from the normal haplotype to the `A` from the tumor haplotype, and the `G` from the tumor to the `C` from the normal. This leads to an erroneous phased output.
+
+**Figure 2: Workflow for Estimating Tumor Purity and Ploidy**
+
+This diagram, in the lower half of the slide, illustrates a complete workflow for analyzing a mixed sample to determine its composition.
+
+*   **Step 1: Initial Cell Populations:** The process begins with a conceptual mixture of "Tumor cells" and "Normal cells."
+    *   **Tumor cells:** Depicted as being triploid (three copies of each chromosome shown), indicating a copy number aberration common in cancer.
+    *   **Normal cells:** Depicted as being diploid (two copies of each chromosome), representing the healthy state.
+
+*   **Step 2: Sample Sequencing:** The mixed cell population is sequenced (e.g., using "illumina" technology), generating a pool of short DNA reads. These reads originate from both the tumor and normal genomes.
+
+*   **Step 3: Purity and Ploidy Estimation:** A bioinformatics tool, exemplified by "Ascat," analyzes the mixed sequencing reads to computationally separate the signals.
+    *   The tool estimates key sample characteristics: **Purity = 0.5** (the sample is 50% tumor cells), **Tumor Ploidy = 3** (the average tumor cell is triploid), and **Normal Ploidy = 2** (the normal cells are diploid).
+    *   Based on these estimations, the reads are computationally assigned to either the tumor component (orange box) or the normal component (blue box).
+
+*   **Step 4: Reconstructed Genomes:** Using the estimated parameters, the tool reconstructs the distinct genomic profiles of the tumor and normal cell populations present in the original sample, reflecting the initial state. The value "0.5" is shown again, emphasizing the estimated purity.
+
+### Summary of Key Messages
+
+*   **Tumor Purity Critically Affects Phasing:** The accuracy of haplotype phasing is highly dependent on tumor purity. Low-purity samples, where normal cell DNA contamination is high, can introduce conflicting evidence that leads to significant phasing errors.
+*   **Contamination Causes Phasing Errors:** When signals from normal and tumor haplotypes are present in similar proportions, phasing algorithms may incorrectly connect segments from different origins, creating biologically incorrect haplotypes.
+*   **Purity and Ploidy Estimation is Essential:** To overcome this challenge, it is necessary to computationally estimate the tumor purity and ploidy from the mixed sequencing data. Tools like Ascat can perform this analysis.
+*   **Computational Separation Enables Accurate Analysis:** By estimating purity and ploidy, it becomes possible to computationally deconvolute the mixed signals, allowing for a more accurate reconstruction of the separate tumor and normal haplotypes, which is a prerequisite for reliable downstream analyses.
+
+
+
+
+Page 10:
+### Title
+Objective
+
+### Figure Description
+
+This slide presents a flowchart that outlines the objective of the master thesis: to develop and utilize a bioinformatics pipeline named **LongPhase-TO**. This pipeline is designed for the comprehensive analysis of "Tumor-Only" samples using data from long-read sequencing technologies.
+
+The flowchart is organized from left to right, illustrating the entire workflow from the biological sample to the final computational outputs.
+
+1.  **Input Sample and Sequencing:**
+    *   The process starts with a **"Tumor-Only sample"**, which is depicted as a heterogeneous collection of cells. The different colors of the cells (yellow, orange, green) represent different tumor subclones or a mixture of tumor and normal cells. The chromosomes within these cells show different combinations of alleles (represented by blue and orange blocks), indicating genetic diversity.
+    *   This sample undergoes **"Long-read Sequencing"**, which generates long DNA fragments (reads). Example reads are shown as sequences of nucleotides (A, T, C, G), with colored letters highlighting variant positions that differ between haplotypes.
+
+2.  **The LongPhase-TO Pipeline:**
+    The core of the slide is the "LongPhase-TO" pipeline, which processes the long-read data to perform three main tasks:
+
+    *   **LOH Detection (Chromosomal-Scale):** This module is designed to identify large-scale Loss of Heterozygosity (LOH) events. LOH is a genetic event common in cancer where a cell loses one of its two parental copies of a chromosome or a chromosomal region. The icon shows a pair of homologous chromosomes where a segment of one chromosome is lost, resulting in the presence of only one allele in that region.
+
+    *   **Somatic Phasing:** This is a central function of the pipeline. Phasing is the process of assigning alleles to their specific parental chromosome of origin (haplotype).
+        *   **Germline Haplotypes:** The pipeline first reconstructs the two fundamental **Germline Haplotypes** (labeled HP1 and HP2 and associated with male and female icons, representing the paternal and maternal inheritance). These represent the baseline genetic makeup of the individual before tumor development.
+        *   **Somatic Haplotypes:** The pipeline then identifies **Somatic Haplotypes** (e.g., HP1-1, HP2-1, HP2-1-1), which have evolved from the germline haplotypes through the accumulation of somatic mutations during tumor progression. The arrows in the diagram illustrate this evolutionary lineage: a mutation on HP1 gives rise to HP1-1, and successive mutations on HP2 give rise to HP2-1 and then HP2-1-1. This provides a detailed, haplotype-resolved view of the tumor's evolution. The LOH event is shown to influence the presence and combination of these haplotypes in the tumor.
+
+    *   **Purity Prediction:** This module aims to estimate the purity of the tumor sample (i.e., the proportion of cancer cells). The diagram shows the initial mixed cell population with one cell type crossed out, leading to a calculated **"Purity = 1"**. This suggests the pipeline can either work ideally with pure samples or can computationally determine that the sample consists entirely of tumor cells (even if clonally heterogeneous), effectively addressing the purity challenge mentioned in the previous context.
+
+### Summary of Key Messages
+
+*   **Main Goal:** The research objective is to develop "LongPhase-TO," an integrated pipeline for analyzing tumor-only samples using long-read sequencing.
+*   **Comprehensive Cancer Genome Analysis:** LongPhase-TO combines three critical analyses in one workflow: chromosomal-scale LOH detection, high-resolution somatic phasing, and tumor purity prediction.
+*   **Evolutionary Insight through Phasing:** A key focus is on somatic phasing to reconstruct the evolutionary history of tumor haplotypes, tracing the accumulation of mutations from the original germline state.
+*   **Clinical Relevance:** The pipeline is designed for a "Tumor-Only" workflow, which is advantageous in clinical settings where a matched normal sample is often unavailable.
+*   **Addressing Tumor Complexity:** The tool aims to tackle the complexities of tumor samples, such as clonal heterogeneity and purity, to provide a more accurate and detailed genomic characterization.
+
+
