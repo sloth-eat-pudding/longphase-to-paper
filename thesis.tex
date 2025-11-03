@@ -58,7 +58,7 @@
 
 
 
-% \setcounter{secnumdepth}{0}
+\setcounter{secnumdepth}{0}
 \begin{document}
 
 \abstract{
@@ -78,43 +78,65 @@ The characterization of somatic haplotypes from tumor-only long-read sequencing 
 
 Cancer is fundamentally a disease of the genome, initiated and propelled by the accumulation of somatic mutations~\cite{vogelstein2013, stratton2009, vogelstein2004}. These acquired genetic alterations, which arise in a specific cell during an individual's lifetime, are distinct from the germline variants inherited from one's parents and present in every cell of the body(Supplementary Fig.~\ref{fig:int-page-3-cropped-jpg}). This distinction is paramount in oncology, as identifying the unique landscape of somatic mutations within a tumor is essential for elucidating its biological behavior, diagnosing its subtype, and selecting targeted therapies. While the advent of high-throughput sequencing has transformed cancer research by enabling the comprehensive cataloging of these mutations, a mere inventory of variants is insufficient. To fully comprehend their functional impact, it is necessary to resolve their chromosomal context, a process known as haplotype phasing.
 
-Haplotype phasing is the computational process of assigning variants to their chromosome of origin, thereby reconstructing the distinct genetic sequences inherited from each parent. This resolution is critical because the functional consequence of multiple mutations is contingent upon whether they occur on the same chromosome copy (in cis) or on different copies (in trans)~\cite{garg2021, glusman2014}. The emergence of long-read sequencing technologies has significantly advanced phasing capabilities~\cite{warburton2023, maestri2020}. By generating reads that span tens of thousands of base pairs, these platforms can physically link numerous heterozygous variants on a single DNA molecule, facilitating the reconstruction of long, contiguous haplotype blocks. This technological leap has largely resolved the challenge of germline phasing, which aims to reconstruct the two stable, inherited haplotypes of an individual.
+Haplotype phasing is the computational process of assigning variants to their chromosome of origin, thereby reconstructing the distinct genetic sequences inherited from each parent. This resolution is critical because the functional consequence of multiple mutations is contingent upon whether they occur on the same chromosome copy (in cis) or on different copies (in trans)~\cite{garg2021, glusman2014}. The emergence of long-read sequencing technologies has significantly advanced phasing capabilities~\cite{warburton2023, maestri2020}. By generating reads that span tens of thousands of base pairs, these platforms can physically link numerous heterozygous variants on a single DNA molecule, facilitating the reconstruction of long, contiguous haplotype blocks. This technological leap has largely resolved the challenge of germline phasing, which aims to reconstruct the two stable, inherited haplotypes of an individual(Supplementary Fig.~\ref{fig:int-page-4-1-cropped-jpg}).
 
 In the domain of germline variant analysis, sophisticated computational methods have been developed to leverage the power of long-read data. A key challenge in this field is distinguishing true genetic variants from the inherent noise of sequencing errors. State-of-the-art tools, such as DeepVariant and Clair3, employ deep learning models that analyze patterns in aligned sequencing reads to render highly accurate predictions, effectively separating the biological signal from technological artifacts~\cite{poplin2018, kolesnikov2023, zheng2022}. These methods first phase the reads into two haplotype-specific groups and subsequently supply this partitioned data to a neural network, demonstrating that phasing is a foundational step for achieving high-fidelity variant calling. This principle of utilizing phase information to enhance signal has been successfully extended to cancer genomics.
 
-The standard approach for identifying somatic mutations is based on comparative analysis of matched tumor and normal samples from the same patient~\cite{cibulskis2013, koboldt2012, larson2012}. This approach permits the direct subtraction of the germline background, thereby isolating variants unique to the tumor. Modern somatic variant callers designed for long-read data, including DeepSomatic, ClairS, and Severus, have adopted a phase-centric strategy~\cite{park2024, zheng2023, keskus2025}. By first phasing the reads from the tumor sample, they concentrate the signal of a somatic mutation, which typically arises on a single haplotype, into one partition of the data (Fig. ~\ref{fig:int-page-5-cropped-jpg}). This segregation markedly improves the signal-to-noise ratio, enabling machine learning models to more readily distinguish a low-frequency somatic variant from randomly distributed sequencing errors.
+The standard approach for identifying somatic mutations is based on comparative analysis of matched tumor and normal samples from the same patient~\cite{cibulskis2013, koboldt2012, larson2012}. This approach permits the direct subtraction of the germline background, thereby isolating variants unique to the tumor. Modern somatic variant callers designed for long-read data, including DeepSomatic, ClairS, and Severus, have adopted a phase-centric strategy~\cite{park2024, zheng2023, keskus2025}. By first phasing the reads from the tumor sample, they concentrate the signal of a somatic mutation, which typically arises on a single haplotype, into one partition of the data. This segregation markedly improves the signal-to-noise ratio, enabling machine learning models to more readily distinguish a low-frequency somatic variant from randomly distributed sequencing errors.
+
+In many clinical and research settings, however, a matched normal sample is unavailable, which necessitates a tumor-only workflow. This scenario presents a significant analytical challenge: differentiating a true, low-frequency somatic mutation from a rare germline variant without a constitutional baseline from the same individual~\cite{sun2018, hiltemann2015, huang2018}. The standard mitigation strategy involves filtering candidate variants against a Panel of Normals (PON), a database of common germline variants and recurrent technical artifacts compiled from a large cohort of healthy individuals~\cite{cibulskis2013}. Although this method effectively eliminates many non-somatic variants, the substantial inter-individual variability means that no database can comprehensively capture all mutations. Consequently, specialized tumor-only callers such as DeepSomatic(TO), ClairS-TO and Severus(TO) continue to rely on phasing to enhance the somatic signal, underscoring its indispensable role even in the most challenging data contexts~\cite{park2024, chen2025, keskus2025} (Fig.~\ref{fig:met-page-6-cropped-jpg}).
 
 \begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio,alt={Workflow for somatic variant calling using paired tumor-normal long-read data. After sequencing both samples, variants are called and then phased in the tumor sample. The phasing step (Step 3) segregates reads by haplotype, concentrating the signal of a somatic mutation (orange) onto one haplotype and separating it from the wild-type allele, which improves the signal-to-noise ratio for machine learning-based callers like DeepSomatic or ClairS.}]{page_5_cropped.jpg}}
-\caption{Workflow for somatic variant calling using paired tumor-normal long-read data. After sequencing both samples, variants are called and then phased in the tumor sample. The phasing step (Step 3) segregates reads by haplotype, concentrating the signal of a somatic mutation (orange) onto one haplotype and separating it from the wild-type allele, which improves the signal-to-noise ratio for machine learning-based callers like DeepSomatic or ClairS.}\label{fig:int-page-5-cropped-jpg}
+	\centering
+	\includegraphics[width=\linewidth]{page_6_cropped.jpg}
+	\caption{Schematic overview of tumor-only somatic variant calling workflow.In the absence of matched normal samples, long-read sequencing of tumor DNA generates reads containing a mixture of somatic variants (orange), germline variants (blue), and sequencing errors (yellow). Candidate variants are first filtered against PONs to remove common germline variants and recurrent technical artifacts. Subsequently, phasing reconstructs haplotypes to distinguish true somatic mutations from error signals. Finally, tumor-only callers such as DeepSomatic(TO), ClairS-TO, and Severus(TO) integrate phasing information to output high-confidence somatic variant calls. Although slightly less accurate than analyses using paired tumor–normal samples, this workflow provides reliable variant detection in tumor-only contexts.}\label{fig:met-page-6-cropped-jpg}
 \end{figure}
-
-In many clinical and research settings, however, a matched normal sample is unavailable, which necessitates a tumor-only workflow. This scenario presents a significant analytical challenge: differentiating a true, low-frequency somatic mutation from a rare germline variant without a constitutional baseline from the same individual~\cite{sun2018, hiltemann2015, huang2018}. The standard mitigation strategy involves filtering candidate variants against a Panel of Normals (PON), a database of common germline variants and recurrent technical artifacts compiled from a large cohort of healthy individuals~\cite{cibulskis2013}. Although this method effectively eliminates many non-somatic variants, the substantial inter-individual variability means that no database can comprehensively capture all mutations. Consequently, specialized tumor-only callers such as ClairS-TO continue to rely on phasing to enhance the somatic signal, underscoring its indispensable role even in the most challenging data contexts~\cite{chen2025}.
 
 Despite these advances, a critical gap persists in the field: the inability of current tools to perform true somatic phasing. Existing methods excel at germline phasing within a tumor sample, meaning that they can separate reads according to the two inherited parental haplotypes, as exemplified by tools such as WhatsHap, HapCut2, and LongPhase~\cite{martin2016, edge2017, lin2022}. However, they are incapable of reconstructing the novel, complex somatic haplotypes that are the products of a tumor's evolution. Cancer is a dynamic process characterized by clonal evolution, where successive rounds of mutation and selection give rise to a heterogeneous population of subclones, each possessing a unique genetic identity~\cite{nowell1976}. Reconstructing the specific somatic haplotypes of these clones is essential for understanding co-mutation patterns, tracing tumor lineage, and deciphering the cooperative mechanisms that drive malignancy. This represents a frontier in cancer genomics that current methodologies have yet to cross.
 
 The path toward accurate somatic phasing is obstructed by two major biological and computational hurdles inherent to cancer genomes. The first is the prevalence of large-scale structural changes, particularly Loss of Heterozygosity (LOH), where vast regions of a chromosome lose one of the two parental copies~\cite{nichols2020, regan2024, hwang2021}. Such events disrupt the continuity of heterozygous markers upon which standard algorithms depend, leading to algorithmic failure and the production of fragmented, biologically inaccurate phase blocks. Achieving contiguous, chromosome-scale phasing requires a framework that can explicitly model and navigate these genomic discontinuities. The second challenge is tumor purity; clinical tumor samples are almost invariably a mixture of cancer cells and contaminating normal cells~\cite{yadav2015, zheng2017, rhee2018}. This cellular heterogeneity introduces conflicting haplotype signals into the sequencing data, which confounds phasing algorithms and prevents the reliable determination of the haplotype of somatic origin~\cite{foltz2024}.
 
-This thesis aims to overcome these fundamental limitations by developing \textbf{LongPhase-TO}, an integrated computational framework for the comprehensive analysis of tumor-only long-read sequencing data. The primary objective is to advance beyond conventional variant calling to achieve true somatic phasing. Through the development of novel algorithms, this method is designed to reconstruct the evolutionary lineage of somatic haplotypes that define a tumor's clonal architecture; to robustly handle chromosome-scale LOH, ensuring contiguous and accurate phasing across complex genomic rearrangements; and to jointly estimate tumor purity, thereby deconvolving the mixed signals from tumor and normal cells to prevent phasing errors. By addressing these challenges within a unified model, this work seeks to provide a more precise and complete reconstruction of the cancer genome, enabling deeper insights into the evolutionary dynamics of tumorigenesis.
+This thesis aims to overcome these fundamental limitations by developing LongPhase-TO, an integrated computational framework for the comprehensive analysis of tumor-only long-read sequencing data. The primary objective is to advance beyond conventional variant calling to achieve true somatic phasing. Through the development of novel algorithms, this method is designed to reconstruct the evolutionary lineage of somatic haplotypes that define a tumor's clonal architecture; to robustly handle chromosome-scale LOH, ensuring contiguous and accurate phasing across complex genomic rearrangements; and to jointly estimate tumor purity, thereby deconvolving the mixed signals from tumor and normal cells to prevent phasing errors. By addressing these challenges within a unified model, this work seeks to provide a more precise and complete reconstruction of the cancer genome, enabling deeper insights into the evolutionary dynamics of tumorigenesis.
 
 \section{Results}\label{results}
 
-This chapter presents the empirical evaluation of the developed methodologies for analyzing tumor-only long-read sequencing data. The results are structured to first establish the superiority of a somatic-aware phasing approach, followed by an in-depth analysis of its application to key downstream tasks, including Loss of Heterozygosity (LOH) detection, somatic variant calling refinement, and tumor purity estimation. The chapter concludes with qualitative visualizations that demonstrate the power of the integrated pipeline in resolving complex genomic events within cancer samples.
+\subsection{Overview of the LongPhase-TO framework}\label{overview-of-the-longphase-to-framework}
 
-\subsection{Superiority of Somatic-Aware Phasing for Tumor-Only Data}\label{superiority-of-somatic-aware-phasing-for-tumor-only-data}
-
-A fundamental prerequisite for analyzing allele-specific events in tumors is the accurate phasing of genetic variants into parental haplotypes. Standard germline phasing tools are designed to handle only heterozygous variants; however, in somatic cell lines, loss of heterozygosity (LOH) frequently eliminates heterozygosity. In this context, LongPhase-TO extends the capability by also incorporating homozygous variants, thereby enabling more comprehensive phasing. To evaluate this approach, the performance of the standard germline phaser LongPhase was compared with the proposed somatic-aware phaser LongPhase-TO. Both tools were tested on eight cancer cell line datasets, using variant calls generated by ClairS-TO in two different modes (ssrs and ss) as input. Performance was assessed based on phasing completeness (Phased Ratio) and contiguity (Block N50) (Figure~\ref{fig:met-page-29-cropped-jpg}).
+LongPhase-TO is an extension of the LongPhase algorithm, specifically designed for somatic haplotype phasing in tumor-only sequencing data. (Fig.~\ref{fig:met-page-11-cropped-jpg}) illustrates the workflow and overall architecture of LongPhase-TO. The framework achieves somatic haplotype phasing is achieved through four core modules, including haplotype-aware variant re-calling, chromosome-scale detection of loss of heterozygosity (LOH), somatic phasing, and tumor purity estimation. Each of these modules operates based on haplotype structures to enable more accurate and comprehensive somatic phasing results. Beyond haplotype reconstruction, LongPhase-TO also reports refined variant calls, identified LOH regions, and tumor purity estimates, providing a comprehensive and integrated interpretation of the somatic genome.
 
 \begin{figure}
 \centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_29_cropped.jpg}}
-\caption[Comparison of Somatic-aware and Germline Phasers]{Performance comparison of LongPhase-TO (somatic-aware) and LongPhase (germline) across eight cancer cell line datasets. Bars represent four pipelines: LongPhase-TO with ClairS-TO-ssrs calls (teal) and ClairS-TO-ss calls (light blue), and LongPhase with the same two variant sets (green and dark blue). (a) Phased Ratio: LongPhase-TO consistently achieves higher phasing completeness across all samples and input variant sets, typically in the range of 0.55–0.62. (b) Block N50: LongPhase-TO produces substantially longer phase blocks—often spanning several megabases and, in some datasets, reaching 20–25 Mb—whereas LongPhase results in shorter N50 values. These results indicate that incorporating homozygous sites through somatic-aware phasing improves both completeness and contiguity in tumor-only sequencing data.}\label{fig:met-page-29-cropped-jpg}
+\includegraphics[width=\linewidth]{page_11_cropped.png}
+\caption{
+  Overview of the LongPhase-TO somatic haplotype phasing framework.
+  (a) Haplotype-aware variant re-calling refines initial somatic variant calls by integrating PONs and haplotype linkage information, distinguishing true somatic variants (orange) from sequencing artifacts (yellow) and germline variants (blue).
+  (b) Chromosome-scale LOH detection identifies large-scale allelic imbalances by analyzing CNV/BFB intervals and heterozygosity ratios to distinguish LOH from non-LOH regions.
+  (c) Somatic phasing assigns somatic variants to their originating germline haplotypes (HP1, HP2) and reconstructs derived somatic haplotypes (HP1-1, HP2-1), spanning LOH regions.
+  (d) Tumor purity estimation quantifies tumor content based on haplotype imbalance, where deviation from balanced allelic representation reflects increasing tumor purity.}
+  \label{fig:met-page-11-cropped-jpg}
 \end{figure}
 
-The results demonstrate a clear advantage for the somatic-aware LongPhase-TO tool. LongPhase-TO consistently achieved higher Phased Ratios across multiple cancer cell line samples, irrespective of the input variant set. This reflects its ability to account for tumor genome complexities, including variable allele frequencies, the presence of somatic mutations, and the frequent occurrence of homozygous regions caused by LOH.
+% 這是篇nature論文，Result的部分
+\subsection{Superiority of Somatic-Aware Phasing}\label{superiority-of-somatic-aware-phasing}
+% 要確定namely用法
+To assess phasing performance, we analyzed several benchmark cancer cell line datasets, including HCC1395 from Zheng \textit{et al.}\cite{zheng2023} and two COLO829 datasets from the New York Genome Center (NYGC) and Epi2me (Oxford Nanopore Technologies). We further incorporated five additional datasets, namely HCC1395, HCC1937, HCC1954, H1437 and H2009 from Park \textit{et al.}\cite{park2024}, which are widely used for benchmarking somatic variant callers.
 
-This advantage is even more pronounced when considering phasing contiguity, a critical metric for the analysis of large-scale genomic events. A second analysis revealed a dramatic difference in Block N50 values. The LongPhase-TO pipelines produced highly contiguous phase blocks, with N50 values frequently ranging between 10 and 25 million base pairs (Mbp). In contrast, the germline LongPhase tool consistently failed to generate long-range phase information, with Block N50 values typically falling below 1 Mbp. This vast improvement in contiguity underscores the necessity of a somatic-aware model for reconstructing long, continuous haplotypes from tumor sequencing data. The ability to generate such long-range phase blocks is essential for accurately identifying structural variations such as LOH. In summary, these findings validate the use of LongPhase-TO as the core phasing engine for all subsequent analyses in this study.
+All samples were sequenced using the Oxford Nanopore platform. Sequencing reads were downsampled to a coverage depth of 50$\times$; if the original coverage was below this threshold, the full dataset was used for evaluation (see Supplementary Note~\nameref{supp:downsampling} for details on sampling strategy and coverage normalization).
+
+As all phasing tools depend on variant calls as input, we first performed variant calling using the ClairS-TO pipeline (Supplementary Note~\nameref{supp:clairsto} for software configuration and parameter settings). Using variant sites generated by ClairS-TO, we compared the performance of four phasing tools including WhatsHap, LongPhase, HapCUT2 and the proposed somatic-aware phaser LongPhase-TO across eight cancer datasets. 
+
+The phased ratio of LongPhase-TO ranged from 0.57 to 0.71, whereas the other methods achieved 0.40--0.65. In six out of eight samples, LongPhase-TO outperformed the next-best method by an average of 0.10--0.30, and by up to 0.71 in HCC1937\_UCSC (0.71 versus $\sim$0.40), with comparable performance observed only in HCC1395\_HKU and HCC1954\_UCSC (Fig.~\ref{fig:met-page-29-cropped-jpg}a). Notably, both HCC1395\_HKU and HCC1954\_UCSC also exhibited higher Block N50 values than all other methods. In HCC1937\_UCSC, H2009\_UCSC, H1437\_UCSC, HCC1395\_HKU, and HCC1395\_NYGC, the Block N50 exceeded 10 million base pairs(Mbp), representing a 2--10-fold improvement in phase continuity compared with other methods, which achieved a maximum of 7.7~Mbp (Fig.~\ref{fig:met-page-29-cropped-jpg}b).
+
+% LongPhase-TO 可以在不影響準確性的前提下顯著提高定相連續性，始終保持最高的定相變異比率。這些結果表明，凸顯了其在不同定序中心和技術生成的資料集上的穩健性。
+
+% 其中 germline phasing tool LongPhase, WhatsHap and HapCUT2的snp phasing percentages 均>99\%，其計算方式為 phased variants / total heterozygous variants，在
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{page_29_cropped.jpg}
+  \caption{
+    Performance comparison of LongPhase-TO (somatic-aware) and LongPhase (germline) across eight cancer cell line datasets. Bars represent four pipelines: LongPhase-TO with ClairS-TO-ssrs calls (teal) and ClairS-TO-ss calls (light blue), and LongPhase with the same two variant sets (green and dark blue). (a) Phased Ratio: LongPhase-TO consistently achieves higher phasing completeness across all samples and input variant sets, typically in the range of 0.55–0.62. (b) Block N50: LongPhase-TO produces substantially longer phase blocks—often spanning several megabases and, in some datasets, reaching 20–25 Mb—whereas LongPhase results in shorter N50 values. These results indicate that incorporating homozygous sites through somatic-aware phasing improves both completeness and contiguity in tumor-only sequencing data.}\label{fig:met-page-29-cropped-jpg}
+\end{figure}
 
 \subsection{Application and Validation of Phasing for LOH Detection}\label{application-and-validation-of-phasing-for-loh-detection}
 
@@ -168,18 +190,6 @@ As expected, the performance of all tested pipelines generally improved with inc
 \end{figure}
 % ~\cite{weber2020, kuo2023, cosentino2019}.
 
-\subsubsection{Characterization of the Precision-Recall Trade-off using Simulation-Trained Models}\label{characterization-of-the-precision-recall-trade-off-using-simulation-trained-models}
-
-To further investigate the filtering characteristics of LongPhase-TO, we conducted a benchmark using a variant caller (ClairS-TO-ss) trained on simulated data. This controlled experiment enables a clear characterization of the precision–recall dynamics when LongPhase-TO is applied as a post-processing step. The performance of ClairS-TO-ss with and without LongPhase-TO was evaluated across the same eight datasets and purity levels.
-
-The results unequivocally demonstrate that LongPhase-TO functions as a precision-enhancing filter. Across all eight datasets, the combined LongPhase-TO(ClairS-TO-ss) pipeline consistently achieved significantly higher precision compared to ClairS-TO-ss alone. This improvement, however, was consistently accompanied by a decrease in recall, confirming that the filtering process removes some true positive variants alongside false positives. Importantly, the relative impact of LongPhase-TO exhibited greater consistency at lower tumor purity levels, where gains in precision were more stable across datasets. The net effect on the F1-score, which balances precision and recall, was context-dependent. In datasets where the baseline precision of ClairS-TO-ss was lower, the gain in precision from LongPhase-TO outweighed the loss in recall, resulting in a higher F1-score. In other cases, the trade-off was less favorable. Collectively, these findings confirm the role of LongPhase-TO as a conservative but effective filter for somatic variant calls, offering a robust mechanism to increase confidence in the final call set, particularly under conditions of reduced tumor purity.
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_32_cropped.jpg}}
-\caption[Somatic variant calling performance with Simulation-Trained]{Somatic variant calling performance of ClairS-TO-ss with and without LongPhase-TO across eight cancer cell line datasets at tumor purities from 20\% to 100\%. LongPhase-TO generally improved precision, while recall was reduced to varying degrees.}
-\label{fig:met-page-32-cropped-jpg}
-\end{figure}
 
 \subsection{Accurate Tumor Purity Estimation from Tumor-Only Long-Read Data}\label{accurate-tumor-purity-estimation-from-tumor-only-long-read-data}
 
@@ -236,50 +246,6 @@ The implications of this research are significant for both basic cancer biology 
 While this work establishes a powerful new methodology, several avenues for future research can extend its capabilities and applications. Promising directions include the validation of LongPhase-TO across a broader spectrum of cancer types and a larger cohort of patient samples to further assess its generalizability and performance. The pipeline can also be extended to characterize other classes of complex structural variants, such as balanced translocations and chromothripsis, which are increasingly recognized for their role in cancer. Furthermore, integrating LongPhase-TO with other omics data, such as transcriptomics or epigenomics, could provide a more holistic understanding of how genetic and epigenetic alterations cooperate in a haplotype-specific manner to drive tumorigenesis. Such advancements will continue to build upon the foundation laid by this thesis, further unlocking the potential of long-read sequencing to transform our understanding and treatment of cancer.
 
 \section{Methods}\label{methods}
-
-\subsection{Introduction and Overall Objective}\label{introduction-and-overall-objective}
-
-The primary objective of this research is the development and application of LongPhase-TO, a comprehensive bioinformatics pipeline designed for the analysis of tumor-only samples using long-read sequencing data (Figure~\ref{fig:met-page-10-cropped-jpg}). The absence of a matched normal sample in many clinical and research settings poses significant analytical challenges, including the confident identification of somatic mutations and the characterization of tumor-specific genomic aberrations. LongPhase-TO is engineered to overcome these challenges by integrating multiple, haplotype-aware analyses into a single, cohesive workflow.
-
-\begin{figure}  
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_10_cropped.jpg}}
-\caption[LongPhase-TO Pipeline Overview]{Flowchart illustrating the overall objective of the LongPhase-TO pipeline. The process starts with a heterogeneous tumor-only sample, which undergoes long-read sequencing. The resulting data is processed by the LongPhase-TO pipeline, which performs three core analyses: chromosome-scale LOH detection, somatic phasing to reconstruct germline and somatic haplotypes, and tumor purity prediction.}\label{fig:met-page-10-cropped-jpg}
-\end{figure}
-
-The pipeline is structured to process raw long-read sequencing data from a tumor sample and produce a detailed genomic profile of the cancer. This process encompasses three core analytical modules.
-
-The analysis begins with chromosome-Scale Loss of Heterozygosity (LOH) Detection, which identifies large genomic regions where one of the two parental chromosome copies has been lost. This detection operates at the chromosome scale, enabling the characterization of major structural alterations.
-
-The second module, Somatic Phasing, leverages long sequencing reads to perform phasing, assigning genetic variants to their parental chromosome of origin (haplotype). The pipeline first reconstructs the patient's two germline haplotypes and then identifies novel somatic haplotypes that emerged during tumor evolution through the accumulation of somatic mutations, thereby providing a haplotype-resolved view of the tumor's genetic lineage.
-
-Finally, Tumor Purity Prediction estimates the proportion of cancerous cells within the bulk tumor sample. Tumor purity is a critical covariate for interpreting somatic variant allele frequencies and understanding the tumor microenvironment. It is derived from the relative abundance of the reconstructed germline and somatic haplotypes.
-
-By combining these three analyses, LongPhase-TO aims to provide a detailed and accurate genomic portrait of a tumor from a single sample, offering insights into its clonal heterogeneity, evolutionary history, and structural landscape.
-
-\subsection{Overview of the Analytical Workflow}\label{overview-of-the-analytical-workflow}
-
-To achieve its objectives, the LongPhase-TO pipeline employs a structured, multi-step methodology designed to progressively refine raw sequencing data into a comprehensive genomic characterization. The workflow integrates several distinct analytical stages, each building upon the output of the previous one (Figure~\ref{fig:met-page-11-cropped-jpg}). The six primary steps are outlined below.
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_11_cropped.jpg}}
-\caption[Six-Step Analytical Method]{Overview of the six-step analytical method. The workflow starts with (1) CNV/BFB interval calling, followed by (2) chromosome-scale LOH detection via heterozygosity ratio, (3) somatic variant candidate selection using a Panel of Normals, (4) graph-based somatic variant calling, (5) phasing of germline and somatic haplotypes, and concludes with (6) tumor purity prediction based on haplotype frequencies.}\label{fig:met-page-11-cropped-jpg}
-\end{figure}
-
-The analysis pipeline begins with a genome-wide screen for regions indicative of large-scale structural variations, termed CNV/BFB interval calling. This step involves analyzing the alignment patterns of long reads, particularly the locations of soft-clipped sequences, to identify candidate genomic intervals likely containing Copy Number Variations (CNVs) or complex rearrangements resulting from Breakage-Fusion-Bridge (BFB) cycles.
-
-Using the information from this initial screen, the pipeline proceeds to chromosome-Scale LOH Detection, which focuses on identifying large regions of Loss of Heterozygosity (LOH). The method quantifies the ratio of heterozygous to homozygous variants across the genome, and a significant, sustained drop in this ratio over an extended chromosome segment is interpreted as an LOH event, signifying the loss of one parental allele.
-
-To confidently identify tumor-specific mutations without a matched normal sample, the workflow next performs Somatic Variant Candidate Selection. An initial set of all detected variants is filtered against a Panel of Normals (PON), a comprehensive database of common germline variants and recurrent sequencing artifacts. This subtractive filtering enriches the candidate pool for high-confidence somatic mutations by removing known polymorphisms.
-
-The refined set of candidates is then subjected to Somatic Variant Calling, which employs a novel graph-based approach to model local haplotype structures. By analyzing the linkage of variants on the same long reads, the method distinguishes true, low-frequency somatic variants that form consistent new haplotypes from sporadic sequencing errors.
-
-In the Phasing step, the pipeline reconstructs the full-length haplotypes present in the sample, assigning identified somatic and germline variants to their respective chromosomes of origin. This resolves the two primary germline haplotypes (HP1 and HP2) and also identifies novel somatic haplotypes that have evolved from the germline state (e.g., HP1-1 derived from HP1). Information from the LOH detection step is integrated to correctly model haplotype composition in regions affected by allelic loss.
-
-Finally, Tumor Purity Prediction leverages the quantitative output of the phasing module to estimate tumor purity. The relative frequencies of reconstructed germline and somatic haplotypes serve as input to a predictive model; as tumor purity increases, the abundance of somatic haplotypes relative to their germline counterparts rises in a predictable manner, enabling an accurate purity score to be calculated.
-
-This integrated workflow ensures that each analytical component informs the others, leading to a robust and detailed characterization of the tumor genome from a single long-read sequencing experiment.
 
 \subsection{CNV and BFB Interval Calling}\label{cnv-and-bfb-interval-calling}
 
@@ -609,93 +575,6 @@ To test and evaluate the accuracy of variant calling under different tumor purit
 \centering
 \pandocbounded{\includegraphics[width=0.6\textwidth,keepaspectratio]{page_27_cropped.jpg}}
 \caption[In-Silico Mixture Generation]{Generation of in-silico tumor–normal mixtures for benchmarking. This diagram illustrates the method of creating synthetic samples with known tumor purity. Raw sequencing reads from a pure tumor sample (orange) and a pure normal sample (blue) are mixed in specific proportions to create samples with precise purity levels (e.g., 0.8 purity from 40x tumor and 10x normal reads), providing a ground-truth dataset for model training and validation.}\label{fig:met-page-27-cropped-jpg}
-\end{figure}
-
-\section{Appendix}\label{appendix}
-
-\subsection{Supplementary Methods for Somatic Variant Analysis}\label{supplementary-methods-for-somatic-variant-analysis}
-
-This appendix provides supplementary details on the computational methodologies developed and employed for the detection of somatic variants and structural alterations from long-read sequencing data. The sections below describe the algorithms for Loss of Heterozygosity (LOH) detection, the rationale and implementation of pattern-based filtering for somatic variant calls, the integrated workflow for variant analysis, and a case study demonstrating the application of these methods.
-
-\subsubsection{Methodology for Loss of Heterozygosity (LOH) Detection}\label{methodology-for-loss-of-heterozygosity-loh-detection}
-
-Loss of Heterozygosity (LOH) is a common genomic event in cancer wherein one parental allele of a chromosome segment is lost. To detect LOH regions, we developed a two-step classification method based on the local density of heterozygous variants. The approach first assigns a genotype to each variant based on its allele frequency and then calculates a Heterozygosity Ratio \(H_r\) for genomic windows to classify them as LOH or Non-LOH (Figure~\ref{fig:app-page-37-cropped-jpg}).
-
-The determination of classification thresholds was guided by empirical distributions of the data. As shown in Figure~\ref{fig:app-page-37-cropped-jpg}a, the violin plot illustrates the distribution of Variant Allele Frequencies (VAF) for variants located within predefined LOH (green) and Non-LOH (blue) regions. In Non-LOH regions, the VAF distribution is bimodal, with a prominent peak at 0.5 representing heterozygous variants and a smaller peak near 1.0 corresponding to homozygous variants. By contrast, LOH regions exhibit a unimodal distribution strongly skewed towards 1.0, consistent with the loss of one allele and the concomitant depletion of heterozygous variants. Based on these empirical patterns, a threshold of VAF ≥ 0.8 was selected to classify variants as homozygous in subsequent analyses.
-
-Similarly, Figure~\ref{fig:app-page-37-cropped-jpg}b presents a box plot of the Heterozygosity Ratio for regions classified as LOH and Non-LOH. The ratio, defined as the proportion of heterozygous variants within a genomic window, shows a clear separation between the two groups. Non-LOH regions consistently display higher values with a median around 0.55, whereas LOH regions approach zero. On the basis of this distribution, a threshold of $H_r = 0.09$ was established to distinguish LOH from Non-LOH regions.
-
-This quantitative framework, supported by empirical observations of allele frequency and heterozygosity ratio distributions, provides a robust and automated method for identifying LOH events across the genome by leveraging the statistical signature of heterozygote depletion.
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_37_cropped.jpg}}
-\caption[LOH Detection Methodology]{A two-panel plot illustrating the methodology for Loss of Heterozygosity (LOH) detection. (a) The violin plot shows the distribution of Variant Allele Frequencies (VAF) in Non-LOH (blue) and LOH (green) regions, demonstrating that LOH regions lack the characteristic heterozygous peak at VAF=0.5. (b) The box plot shows the distribution of the calculated Heterozygosity Ratio for the two region types, revealing a clear separation that allows for robust classification using a threshold (Hr = 0.09).}\label{fig:app-page-37-cropped-jpg}
-\end{figure}
-
-\subsubsection{Pattern-Based Filtering for Somatic Variant Calling}\label{pattern-based-filtering-for-somatic-variant-calling}
-
-Alongside the detection of large-scale genomic events, the accurate identification of individual somatic variants is a critical objective that is frequently challenged by sequencing artifacts and other sources of noise. To address this challenge, we developed a filtering strategy that evaluates the specific patterns of evidence supporting each candidate variant. This approach is based on the rationale that true somatic mutations exhibit characteristic, high-confidence evidence patterns that differ from those of artifacts.
-
-\paragraph{Rationale for Pattern-Based Evidence Selection}\label{rationale-for-pattern-based-evidence-selection}
-
-The rationale for selecting specific evidence patterns is grounded in their empirical association with variant call accuracy rather than arbitrary design. As shown in Figure~\ref{fig:app-page-38-cropped-jpg}, predefined patterns were evaluated by comparing their relative abundance across validated true positive (TP) and false positive (FP) variant sets. The analysis revealed that \(V_H\) (high-confidence) patterns are strongly enriched for TPs with minimal FP contribution, while \(V_L\) (low-confidence) patterns, although less frequent, remain reliable indicators of true variants. In contrast, \(V_N\) (non-somatic) patterns, dominated by the `DISAGREE' category, contribute substantially to both TPs and FPs, rendering them unreliable. These findings demonstrate that the prioritization of \(V_H\) and \(V_L\) patterns is empirically justified and provides a principled basis for the filtering strategy.
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_38_cropped.jpg}}
-\caption[Evidence Pattern Comparison]{Comparison of True Positive (TP, blue) and False Positive (FP, red) variant calls across predefined evidence patterns. The patterns are grouped into three categories: high-confidence (\(V_H\)), low-confidence (\(V_L\)), and non-somatic (\(V_N\)). \(V_H\) patterns are strongly enriched for TPs with minimal FP contribution, \(V_L\) patterns occur less frequently but remain reliable indicators of true variants, and \(V_N\) patterns are dominated by the DISAGREE' category, which contributes substantially to both TPs and FPs and is therefore ambiguous and unreliable. These distributions provide the rationale for adopting a filtering strategy that prioritizes variants supported by \(V_H\) and \(V_L\) patterns.}\label{fig:app-page-38-cropped-jpg}
-\end{figure}
-
-\paragraph{Pattern Artifact Filtering using a Somatic Path Ratio}\label{pattern-artifact-filtering-using-a-somatic-path-ratio}
-
-To evaluate the robustness of the Somatic Path Ratio as a filtering criterion, we systematically compared its distribution across validated true positive (TP) and false positive (FP) variant calls (Figure~\ref{fig:app-page-39-cropped-jpg}). As illustrated, TP variants are strongly enriched near a ratio of 1.0, whereas FP variants exhibit a broader and lower distribution. This clear separation indicates that the Somatic Path Ratio provides a reliable metric for discriminating true somatic mutations from sequencing artifacts.
-
-The choice of the threshold \(\tau\) was guided by empirical data. By analyzing the overlap of TP and FP distributions, a cutoff of approximately \(\tau = 0.8\) was identified as an optimal balance. At this threshold, a portion of FP calls can be effectively excluded while preserving high sensitivity for TP variants. Importantly, this cutoff minimizes the trade-off between precision and recall, ensuring that filtering improves accuracy without substantial loss of sensitivity.
-
-Overall, these analyses support the use of \(\tau = 0.8\) as a data-driven threshold derived from the empirical distributions of TP and FP calls. The application of this threshold enhances the reliability of variant filtering while maintaining broad sensitivity in detection.
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_39_cropped.jpg}}
-\caption[Somatic Path Ratio Distribution]{Distribution and robustness of the Somatic Path Ratio for artifact filtering. The histograms show that true positives (TP, blue) consistently have a high ratio near 1.0, whereas false positives (FP, red) have a lower, more dispersed distribution, enabling effective filtering with a threshold \(\tau \approx 0.8\). Additional plots demonstrate this separation is maintained across a wide range of tumor purities (1.0 to 0.2).}\label{fig:app-page-39-cropped-jpg}
-\end{figure}
-
-\paragraph{Low-Confidence Variant Detection using Vlow Ratio}\label{low-confidence-variant-detection-using-vlow-ratio}
-
-For variants supported by less definitive evidence patterns (\(V_L\)), an auxiliary filtering criterion was introduced. This measure is defined as the proportion of supporting evidence for the low-confidence variant path (\(V_L\)) relative to the total evidence from both the variant (\(V_L\)) and non-variant (\(V_N\)) paths:
-
-$$
-\frac{V_L}{V_L + V_N} \geq \theta
-$$
-
-To establish an appropriate threshold, the distribution of this measure was compared across validated true positive (TP) and false positive (FP) calls (Figure~\ref{fig:app-page-40-cropped-jpg}). FP variants are predominantly concentrated near zero, whereas TP variants display a broader distribution extending toward higher values. This separation enables the application of a threshold to reduce FP calls while retaining the majority of TP calls.
-
-Empirical analysis indicated that a cutoff of approximately \(\theta = 0.2\) provides a suitable balance: it effectively removes a considerable fraction of FP calls while largely preserving TP sensitivity. Furthermore, the FP distribution remains narrowly centered at zero across different tumor purity levels, whereas the TP distribution shifts moderately toward lower values. These findings support the adoption of \(\theta \approx 0.2\) as a robust filtering criterion across heterogeneous sample contexts.
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_40_cropped.jpg}}
-\caption[Low-confidence variant filtering using $V_{low}$ ratio.]{Distribution of the $V_{low}$ ratio for validated true positives (TP, blue) and false positives (FP, red). A threshold \(\theta \approx 0.2\) (dashed line) separates FP calls, which are predominantly concentrated near zero, from TP calls, which extend toward higher values. The left panels show TP distributions, and the right panels show FP distributions, across varying tumor purity levels (1.0 to 0.2). This analysis indicates that \(\theta \approx 0.2\) provides a robust filtering criterion, effectively reducing FP calls while preserving TP sensitivity across heterogeneous purity contexts.}\label{fig:app-page-40-cropped-jpg}
-\end{figure}
-
-\subsection{Purity-Aware Workflow Considerations}
-\label{app:purity-aware-workflow}
-
-The core principle underlying our method lies in the distinct behavior of germline and somatic variant allele frequencies (VAFs) in tumor--normal mixed samples. Specifically, the VAF of a heterozygous somatic variant is directly proportional to tumor purity, whereas the VAF of a heterozygous germline variant remains approximately 0.5 and is comparatively insensitive to purity (Figure~\ref{fig:app-page-41-cropped-jpg}). This statistical contrast forms the basis for separating somatic from germline signals.
-
-At high purity, however, the VAF distributions of somatic and germline variants substantially overlap, rendering their separation statistically challenging. To address this, the workflow in (Figure~\ref{fig:app-page-42-cropped-jpg}) adopts a conditional strategy. For samples not classified as high purity, somatic variant calling proceeds after candidate selection and phasing, and the pipeline terminates accordingly. For high-purity samples, the conventional somatic variant calling step is bypassed to prevent loss of recall; instead, evidence from loss-of-heterozygosity (LOH) detection is iteratively incorporated to refine haplotype phasing and maintain analytical robustness.
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_41_cropped.jpg}}
-\caption[Tumor Purity Effect on Allele Frequencies]{Effect of tumor purity on variant allele frequencies (VAFs). The VAF of a heterozygous germline variant remains stable at approximately 0.5 across purity levels, whereas the VAF of a heterozygous somatic variant decreases proportionally with decreasing purity. At high purity, the distributions of somatic and germline variants overlap, complicating statistical separation.}\label{fig:app-page-41-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_42_cropped.jpg}}
-\caption[Integrated Computational Workflow]{Purity-aware computational workflow for somatic variant analysis. For moderate- to low-purity samples, somatic variant calling is applied following candidate selection and phasing. For high-purity samples, where somatic and germline VAFs are indistinguishable, the standard somatic calling step is bypassed to avoid recall loss. Instead, loss-of-heterozygosity (LOH) detection results are iteratively integrated to refine haplotype phasing and preserve analytical accuracy.}\label{fig:app-page-42-cropped-jpg}
 \end{figure}
 
 \bibliographystyle{sn-nature}

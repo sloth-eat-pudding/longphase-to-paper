@@ -14,6 +14,9 @@
 \usepackage{fp}  % For \real command in table calculations
 \usepackage{caption}
 \usepackage[nameinlink,capitalize]{cleveref}
+\usepackage{float}
+
+% \usepackage{newfloat}
 
 % Define pandocbounded macro for pandoc compatibility
 \makeatletter
@@ -48,209 +51,352 @@
 \captionsetup[figure]{name=Supplementary Fig.}
 \captionsetup[table]{name=Supplementary Table}
 
+
+% \lstset{
+%   basicstyle=\ttfamily\small,
+%   frame=single,
+%   breaklines=true,
+% }
+
 \begin{document}
+\begin{center}
+    {\LARGE \textbf{Supplementary Information for:}}\\[1em]
+    {\Large Joint Somatic Phasing and Purity Estimation Incorporating Loss of Heterozygosity in Tumor-Only Long-Read Sequencing}\\[1em]
+	Yao-Ting Huang, Zhen-Yu Chen
+\end{center}
+
+\section{Supplementary Results}
+
+\subsubsection{Characterization of the Precision-Recall Trade-off using Simulation-Trained Models}\label{characterization-of-the-precision-recall-trade-off-using-simulation-trained-models}
+
+To further investigate the filtering characteristics of LongPhase-TO, we conducted a benchmark using a variant caller (ClairS-TO-ss) trained on simulated data. This controlled experiment enables a clear characterization of the precision–recall dynamics when LongPhase-TO is applied as a post-processing step. The performance of ClairS-TO-ss with and without LongPhase-TO was evaluated across the same eight datasets and purity levels.
+
+The results unequivocally demonstrate that LongPhase-TO functions as a precision-enhancing filter. Across all eight datasets, the combined LongPhase-TO(ClairS-TO-ss) pipeline consistently achieved significantly higher precision compared to ClairS-TO-ss alone. This improvement, however, was consistently accompanied by a decrease in recall, confirming that the filtering process removes some true positive variants alongside false positives. Importantly, the relative impact of LongPhase-TO exhibited greater consistency at lower tumor purity levels, where gains in precision were more stable across datasets. The net effect on the F1-score, which balances precision and recall, was context-dependent. In datasets where the baseline precision of ClairS-TO-ss was lower, the gain in precision from LongPhase-TO outweighed the loss in recall, resulting in a higher F1-score. In other cases, the trade-off was less favorable. Collectively, these findings confirm the role of LongPhase-TO as a conservative but effective filter for somatic variant calls, offering a robust mechanism to increase confidence in the final call set, particularly under conditions of reduced tumor purity.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{page_32_cropped.jpg}}
+\caption[Somatic variant calling performance with Simulation-Trained]{Somatic variant calling performance of ClairS-TO-ss with and without LongPhase-TO across eight cancer cell line datasets at tumor purities from 20\% to 100\%. LongPhase-TO generally improved precision, while recall was reduced to varying degrees.}
+\label{fig:met-page-32-cropped-jpg}
+\end{figure}
+
+\section{Supplementary Methods}
+
+\section{Appendix}\label{appendix}
+
+\subsection{Supplementary Methods for Somatic Variant Analysis}\label{supplementary-methods-for-somatic-variant-analysis}
+
+This appendix provides supplementary details on the computational methodologies developed and employed for the detection of somatic variants and structural alterations from long-read sequencing data. The sections below describe the algorithms for Loss of Heterozygosity (LOH) detection, the rationale and implementation of pattern-based filtering for somatic variant calls, the integrated workflow for variant analysis, and a case study demonstrating the application of these methods.
+
+\subsubsection{Methodology for Loss of Heterozygosity (LOH) Detection}\label{methodology-for-loss-of-heterozygosity-loh-detection}
+
+Loss of Heterozygosity (LOH) is a common genomic event in cancer wherein one parental allele of a chromosome segment is lost. To detect LOH regions, we developed a two-step classification method based on the local density of heterozygous variants. The approach first assigns a genotype to each variant based on its allele frequency and then calculates a Heterozygosity Ratio \(H_r\) for genomic windows to classify them as LOH or Non-LOH (Figure~\ref{fig:app-page-37-cropped-jpg}).
+
+The determination of classification thresholds was guided by empirical distributions of the data. As shown in Figure~\ref{fig:app-page-37-cropped-jpg}a, the violin plot illustrates the distribution of Variant Allele Frequencies (VAF) for variants located within predefined LOH (green) and Non-LOH (blue) regions. In Non-LOH regions, the VAF distribution is bimodal, with a prominent peak at 0.5 representing heterozygous variants and a smaller peak near 1.0 corresponding to homozygous variants. By contrast, LOH regions exhibit a unimodal distribution strongly skewed towards 1.0, consistent with the loss of one allele and the concomitant depletion of heterozygous variants. Based on these empirical patterns, a threshold of VAF ≥ 0.8 was selected to classify variants as homozygous in subsequent analyses.
+
+Similarly, Figure~\ref{fig:app-page-37-cropped-jpg}b presents a box plot of the Heterozygosity Ratio for regions classified as LOH and Non-LOH. The ratio, defined as the proportion of heterozygous variants within a genomic window, shows a clear separation between the two groups. Non-LOH regions consistently display higher values with a median around 0.55, whereas LOH regions approach zero. On the basis of this distribution, a threshold of $H_r = 0.09$ was established to distinguish LOH from Non-LOH regions.
+
+This quantitative framework, supported by empirical observations of allele frequency and heterozygosity ratio distributions, provides a robust and automated method for identifying LOH events across the genome by leveraging the statistical signature of heterozygote depletion.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{page_37_cropped.jpg}}
+\caption[LOH Detection Methodology]{A two-panel plot illustrating the methodology for Loss of Heterozygosity (LOH) detection. (a) The violin plot shows the distribution of Variant Allele Frequencies (VAF) in Non-LOH (blue) and LOH (green) regions, demonstrating that LOH regions lack the characteristic heterozygous peak at VAF=0.5. (b) The box plot shows the distribution of the calculated Heterozygosity Ratio for the two region types, revealing a clear separation that allows for robust classification using a threshold (Hr = 0.09).}\label{fig:app-page-37-cropped-jpg}
+\end{figure}
+
+\subsubsection{Pattern-Based Filtering for Somatic Variant Calling}\label{pattern-based-filtering-for-somatic-variant-calling}
+
+Alongside the detection of large-scale genomic events, the accurate identification of individual somatic variants is a critical objective that is frequently challenged by sequencing artifacts and other sources of noise. To address this challenge, we developed a filtering strategy that evaluates the specific patterns of evidence supporting each candidate variant. This approach is based on the rationale that true somatic mutations exhibit characteristic, high-confidence evidence patterns that differ from those of artifacts.
+
+\paragraph{Rationale for Pattern-Based Evidence Selection}\label{rationale-for-pattern-based-evidence-selection}
+
+The rationale for selecting specific evidence patterns is grounded in their empirical association with variant call accuracy rather than arbitrary design. As shown in Figure~\ref{fig:app-page-38-cropped-jpg}, predefined patterns were evaluated by comparing their relative abundance across validated true positive (TP) and false positive (FP) variant sets. The analysis revealed that \(V_H\) (high-confidence) patterns are strongly enriched for TPs with minimal FP contribution, while \(V_L\) (low-confidence) patterns, although less frequent, remain reliable indicators of true variants. In contrast, \(V_N\) (non-somatic) patterns, dominated by the `DISAGREE' category, contribute substantially to both TPs and FPs, rendering them unreliable. These findings demonstrate that the prioritization of \(V_H\) and \(V_L\) patterns is empirically justified and provides a principled basis for the filtering strategy.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{page_38_cropped.jpg}}
+\caption[Evidence Pattern Comparison]{Comparison of True Positive (TP, blue) and False Positive (FP, red) variant calls across predefined evidence patterns. The patterns are grouped into three categories: high-confidence (\(V_H\)), low-confidence (\(V_L\)), and non-somatic (\(V_N\)). \(V_H\) patterns are strongly enriched for TPs with minimal FP contribution, \(V_L\) patterns occur less frequently but remain reliable indicators of true variants, and \(V_N\) patterns are dominated by the DISAGREE' category, which contributes substantially to both TPs and FPs and is therefore ambiguous and unreliable. These distributions provide the rationale for adopting a filtering strategy that prioritizes variants supported by \(V_H\) and \(V_L\) patterns.}\label{fig:app-page-38-cropped-jpg}
+\end{figure}
+
+\paragraph{Pattern Artifact Filtering using a Somatic Path Ratio}\label{pattern-artifact-filtering-using-a-somatic-path-ratio}
+
+To evaluate the robustness of the Somatic Path Ratio as a filtering criterion, we systematically compared its distribution across validated true positive (TP) and false positive (FP) variant calls (Figure~\ref{fig:app-page-39-cropped-jpg}). As illustrated, TP variants are strongly enriched near a ratio of 1.0, whereas FP variants exhibit a broader and lower distribution. This clear separation indicates that the Somatic Path Ratio provides a reliable metric for discriminating true somatic mutations from sequencing artifacts.
+
+The choice of the threshold \(\tau\) was guided by empirical data. By analyzing the overlap of TP and FP distributions, a cutoff of approximately \(\tau = 0.8\) was identified as an optimal balance. At this threshold, a portion of FP calls can be effectively excluded while preserving high sensitivity for TP variants. Importantly, this cutoff minimizes the trade-off between precision and recall, ensuring that filtering improves accuracy without substantial loss of sensitivity.
+
+Overall, these analyses support the use of \(\tau = 0.8\) as a data-driven threshold derived from the empirical distributions of TP and FP calls. The application of this threshold enhances the reliability of variant filtering while maintaining broad sensitivity in detection.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{page_39_cropped.jpg}}
+\caption[Somatic Path Ratio Distribution]{Distribution and robustness of the Somatic Path Ratio for artifact filtering. The histograms show that true positives (TP, blue) consistently have a high ratio near 1.0, whereas false positives (FP, red) have a lower, more dispersed distribution, enabling effective filtering with a threshold \(\tau \approx 0.8\). Additional plots demonstrate this separation is maintained across a wide range of tumor purities (1.0 to 0.2).}\label{fig:app-page-39-cropped-jpg}
+\end{figure}
+
+\paragraph{Low-Confidence Variant Detection using Vlow Ratio}\label{low-confidence-variant-detection-using-vlow-ratio}
+
+For variants supported by less definitive evidence patterns (\(V_L\)), an auxiliary filtering criterion was introduced. This measure is defined as the proportion of supporting evidence for the low-confidence variant path (\(V_L\)) relative to the total evidence from both the variant (\(V_L\)) and non-variant (\(V_N\)) paths:
+
+$$
+\frac{V_L}{V_L + V_N} \geq \theta
+$$
+
+To establish an appropriate threshold, the distribution of this measure was compared across validated true positive (TP) and false positive (FP) calls (Figure~\ref{fig:app-page-40-cropped-jpg}). FP variants are predominantly concentrated near zero, whereas TP variants display a broader distribution extending toward higher values. This separation enables the application of a threshold to reduce FP calls while retaining the majority of TP calls.
+
+Empirical analysis indicated that a cutoff of approximately \(\theta = 0.2\) provides a suitable balance: it effectively removes a considerable fraction of FP calls while largely preserving TP sensitivity. Furthermore, the FP distribution remains narrowly centered at zero across different tumor purity levels, whereas the TP distribution shifts moderately toward lower values. These findings support the adoption of \(\theta \approx 0.2\) as a robust filtering criterion across heterogeneous sample contexts.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{page_40_cropped.jpg}}
+\caption[Low-confidence variant filtering using $V_{low}$ ratio.]{Distribution of the $V_{low}$ ratio for validated true positives (TP, blue) and false positives (FP, red). A threshold \(\theta \approx 0.2\) (dashed line) separates FP calls, which are predominantly concentrated near zero, from TP calls, which extend toward higher values. The left panels show TP distributions, and the right panels show FP distributions, across varying tumor purity levels (1.0 to 0.2). This analysis indicates that \(\theta \approx 0.2\) provides a robust filtering criterion, effectively reducing FP calls while preserving TP sensitivity across heterogeneous purity contexts.}\label{fig:app-page-40-cropped-jpg}
+\end{figure}
+
+\subsection{Purity-Aware Workflow Considerations}
+\label{app:purity-aware-workflow}
+
+The core principle underlying our method lies in the distinct behavior of germline and somatic variant allele frequencies (VAFs) in tumor--normal mixed samples. Specifically, the VAF of a heterozygous somatic variant is directly proportional to tumor purity, whereas the VAF of a heterozygous germline variant remains approximately 0.5 and is comparatively insensitive to purity (Figure~\ref{fig:app-page-41-cropped-jpg}). This statistical contrast forms the basis for separating somatic from germline signals.
+
+At high purity, however, the VAF distributions of somatic and germline variants substantially overlap, rendering their separation statistically challenging. To address this, the workflow in (Figure~\ref{fig:app-page-42-cropped-jpg}) adopts a conditional strategy. For samples not classified as high purity, somatic variant calling proceeds after candidate selection and phasing, and the pipeline terminates accordingly. For high-purity samples, the conventional somatic variant calling step is bypassed to prevent loss of recall; instead, evidence from loss-of-heterozygosity (LOH) detection is iteratively incorporated to refine haplotype phasing and maintain analytical robustness.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{page_41_cropped.jpg}}
+\caption[Tumor Purity Effect on Allele Frequencies]{Effect of tumor purity on variant allele frequencies (VAFs). The VAF of a heterozygous germline variant remains stable at approximately 0.5 across purity levels, whereas the VAF of a heterozygous somatic variant decreases proportionally with decreasing purity. At high purity, the distributions of somatic and germline variants overlap, complicating statistical separation.}\label{fig:app-page-41-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{page_42_cropped.jpg}}
+\caption[Integrated Computational Workflow]{Purity-aware computational workflow for somatic variant analysis. For moderate- to low-purity samples, somatic variant calling is applied following candidate selection and phasing. For high-purity samples, where somatic and germline VAFs are indistinguishable, the standard somatic calling step is bypassed to avoid recall loss. Instead, loss-of-heterozygosity (LOH) detection results are iteratively integrated to refine haplotype phasing and preserve analytical accuracy.}\label{fig:app-page-42-cropped-jpg}
+\end{figure}
 
 \section{Supplementary Figures}
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{page_3_cropped.jpg}
 	\caption{Diagram illustrating the fundamental difference between germline and somatic variants. Germline variants (blue) are inherited from parents, present in every cell from fertilization, and are heritable. Somatic variants (orange) are acquired mutations that arise in a specific cell population (e.g., a tumor) during an individual's lifetime and are not heritable.}
 	\label{fig:int-page-3-cropped-jpg}
 \end{figure}
-% \begin{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{page_4_1_cropped.png}
+	\caption{...}
+	\label{fig:int-page-4-1-cropped-jpg}
+\end{figure}
+
+% \begin{figure}[H]
 % 	\centering
-% 	\pandocbounded{\includegraphics[keepaspectratio,alt={aasdasdffDiagram illustrating the fundamental difference between germline and somatic variants. Germline variants (blue) are inherited from parents, present in every cell from fertilization, and are heritable. Somatic variants (orange) are acquired mutations that arise in a specific cell population (e.g., a tumor) during an individual's lifetime and are not heritable.}]{page_3_cropped.jpg}}
-% 	\caption{Diagram illustrating the fundamental difference between germline and somatic variants. Germline variants (blue) are inherited from parents, present in every cell from fertilization, and are heritable. Somatic variants (orange) are acquired mutations that arise in a specific cell population (e.g., a tumor) during an individual's lifetime and are not heritable.}
-% 	\label[suppfigure]{fig:int-page-3-cropped-jpg}
+% 	\includegraphics[width=\linewidth]{page_4_2_cropped.png}
+% 	\caption{...}
+% 	\label{fig:int-page-4-2-cropped-jpg}
 % \end{figure}
 
-\begin{figure}
-	\centering
-	\pandocbounded{\includegraphics[keepaspectratio,alt={aasdasdffDiagram illustrating the fundamental difference between germline and somatic variants. Germline variants (blue) are inherited from parents, present in every cell from fertilization, and are heritable. Somatic variants (orange) are acquired mutations that arise in a specific cell population (e.g., a tumor) during an individual's lifetime and are not heritable.}]{page_4_cropped.jpg}}
-	\caption{Diagram illustrating the fundamental difference between germline and somatic variants. Germline variants (blue) are inherited from parents, present in every cell from fertilization, and are heritable. Somatic variants (orange) are acquired mutations that arise in a specific cell population (e.g., a tumor) during an individual's lifetime and are not heritable.}
-	\label[suppfigure]{fig:int-page-4-cropped-jpg}
-\end{figure}
-\begin{figure}
-	\centering
-	\pandocbounded{\includegraphics[keepaspectratio,alt={aasdasdffDiagram illustrating the fundamental difference between germline and somatic variants. Germline variants (blue) are inherited from parents, present in every cell from fertilization, and are heritable. Somatic variants (orange) are acquired mutations that arise in a specific cell population (e.g., a tumor) during an individual's lifetime and are not heritable.}]{page_8_cropped.jpg}}
-	\caption{Diagram illustrating the fundamental difference between germline and somatic variants. Germline variants (blue) are inherited from parents, present in every cell from fertilization, and are heritable. Somatic variants (orange) are acquired mutations that arise in a specific cell population (e.g., a tumor) during an individual's lifetime and are not heritable.}
-	\label[suppfigure]{fig:int-page-8-cropped-jpg}
-\end{figure}
+% \begin{figure}[H]
+% 	\centering
+% 	\includegraphics[width=\linewidth]{page_5_cropped.jpg}
+% 	\caption{Workflow for somatic variant calling using paired tumor-normal long-read data. After sequencing both samples, variants are called and then phased in the tumor sample. The phasing step (Step 3) segregates reads by haplotype, concentrating the signal of a somatic mutation (orange) onto one haplotype and separating it from the wild-type allele, which improves the signal-to-noise ratio for machine learning-based callers like DeepSomatic or ClairS.}\label{fig:int-page-5-cropped-jpg}
+% \end{figure}
 
 \section{Supplementary Tables}
+...
 
-\section{Supplementary Methods}
+\section{Supplementary References}
 
-\subsection{Detailed Algorithmic Implementation}
+\section{Command lines}
 
-This section provides comprehensive details on the computational algorithms implemented in LongPhase-TO, including specific parameter settings, optimization strategies, and implementation considerations.
+\subsection{Read Alignment}
+\subsubsection{Alignment}
+\label{supp:alignment}
+\textbf{minimap2} (\url{https://github.com/lh3/minimap2})
+\begin{verbatim}
+  minimap2 --MD -t {THREADS} -a {REFERENCE} {INPUT_FASTA} -o {OUTPUT_SAM}
+  samtools view -@ {THREADS} -bS {OUTPUT_SAM} > {OUTPUT_BAM}
+  samtools sort -@ {THREADS} {OUTPUT_BAM} -o {OUTPUT_BAM_SORTED}
+  samtools index {OUTPUT_BAM_SORTED}
+\end{verbatim}
 
-\subsubsection{CNV and BFB Interval Detection Parameters}
+\subsubsection{Downsampling}
+\label{supp:downsampling}
+\textbf{mosdepth} (\url{https://github.com/brentp/mosdepth})
+\begin{verbatim}
+  mosdepth -t {THREADS} -n -x --quantize 0:15:150: {SAMPLE_BAM}
+  # get depth profile to determine the downsampling fraction
+  samtools view -@ {THREADS} -bh --subsample {FRACTION} {SAMPLE_BAM} -o {DOWN_SAMPLED_BAM}
+  samtools index {DOWN_SAMPLED_BAM}
+\end{verbatim}
 
-The detection of structural variant intervals relies on several key parameters that were empirically optimized:
+\subsection{Variant Calling}
+\subsubsection{ClairS-TO v0.3.0} (\url{https://github.com/HKU-BAL/ClairS-TO})
+\label{supp:clairsto}
+\begin{verbatim}
+  // MODEL = <ont_r10_dorado_sup_5khz_ssrs|ont_r10_dorado_sup_5khz_ss>
+  docker run -i --rm \
+    -v ${INPUT_DIR}:${INPUT_DIR} \
+    -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
+    -u $(id -u):$(id -g) \
+    hkubal/clairs-to:v0.3.0 \
+    /opt/bin/run_clairs_to \
+    --tumor_bam_fn ${TUMOR_BAM} \
+    --ref_fn ${REF} \
+    --threads ${THREADS} \
+    --platform ${MODEL} \
+    --output_dir ${OUTPUT_DIR}
+\end{verbatim}
 
-\begin{itemize}
-\item \textbf{Window size (w):} Set to 6 base pairs for the Forward Pileup calculation
-\item \textbf{Amplitude threshold ($\lambda$):} 0.3 for signal enhancement
-\item \textbf{Signal swing ratio ($\alpha$):} 0.7 for amplitude similarity
-\item \textbf{Spatial proximity ($\beta$):} 50 base pairs maximum distance
-\end{itemize}
+\textbf{DeepSomatic v1.8.0} (\url{https://github.com/google/deepsomatic})
+\label{supp:deepsomatic}
+\begin{verbatim}
+  docker run -i --rm --gpus all \
+    -v ${INPUT_DIR}:${INPUT_DIR} \
+    -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
+    -u $(id -u):$(id -g) \
+    google/deepsomatic:1.8.0-gpu \
+    run_deepsomatic \
+    --model_type ONT_TUMOR_ONLY \
+    --ref ${REF} \
+    --reads_tumor  ${TUMOR_BAM} \
+    --output_vcf  ${OUTPUT_DIR}/${OUTPUT_VCF_FILE_PATH} \
+    --sample_name_tumor ${SAMPLE_NAME_TUMOR} \
+    --num_shards ${THREADS} \
+    --logging_dir ${OUTPUT_DIR}/logs \
+    --intermediate_results_dir ${OUTPUT_DIR}/intermediate_results_dir \
+    --use_default_pon_filtering=true
+\end{verbatim}
 
-\subsubsection{LOH Detection Thresholds}
+\subsection{Phasing}
+\textbf{LongPhase-TO v1.0.0} (\url{https://github.com/CCU-Bioinformatics-Lab/longphase-to})
+\label{supp:longphaseto}
+\begin{verbatim}
+  # caller options: clairs_to_ss, clairs_to_ssrs, deepsomatic_to
+  longphase-to phase \
+  -b ${TUMOR_BAM} \
+  -r ${REF} \
+  -s ${VCF} \
+  -t ${THREADS} \
+  --ont \
+  -o ${OUTPUT}
+  --caller ${CALLER} \
+  --pon-file ${PON_FILE} \
+  --strict-pon-file ${STRICT_PON_FILE} \
+  --ont # or --pb for PacBio Hifi \
+  # --loh # if need out loh bed
+\end{verbatim}
 
-The chromosome-scale LOH detection employs the following empirically determined thresholds:
+\textbf{LongPhase v1.7.3} (\url{https://github.com/twolinin/longphase})
+\label{supp:longphase}
+\begin{verbatim}
+  longphase phase \
+  -b ${TUMOR_BAM} \
+  -r ${REF} \
+  -s ${VCF} \
+  -t ${THREADS} \
+  --ont \
+  -o ${OUTPUT}
+\end{verbatim}
 
-\begin{itemize}
-\item \textbf{Heterozygosity ratio threshold ($\sigma$):} 0.09
-\item \textbf{VAF threshold for homozygous classification:} 0.8
-\item \textbf{Minimum LOH segment length:} 1 Mb
-\end{itemize}
+\textbf{WhatsHap v2.1} (\url{https://github.com/whatshap/whatshap})
+\label{supp:whatshap}
+\begin{verbatim}
+  whatshap phase \
+  --ignore-read-groups \
+  -o ${OUTPUT}.vcf \
+  -r ${REF} \
+  ${VCF} \
+  ${TUMOR_BAM}
+\end{verbatim}
 
-\subsection{Performance Benchmarking Details}
+\textbf{HapCUT2 v1.3.4} (\url{https://github.com/vibansal/HapCUT2})
+\label{supp:hapcut2}
+\begin{verbatim}
+  HapCUT2/build/extractHAIRS \
+  --ont 1 \
+  --bam ${TUMOR_BAM} \
+  --VCF ${VCF} \
+  --out ${OUTPUT}.fragment_file \
+  --ref ${REF} \
+  && \
+  HapCUT2/build/HAPCUT2 \
+  --fragments ${OUTPUT}.fragment_file \
+  --VCF ${VCF} \
+  --output ${OUTPUT}
+\end{verbatim}
 
-\subsubsection{Computational Resources}
+\subsection{Purity Estimation}
+\textbf{Ascat v3.2.0} (\url{https://github.com/VanLoo-lab/ascat})
+\label{supp:ascat}
+\begin{verbatim}
+  R_SCRIPT=$(mktemp --suffix=.R)
 
-All analyses were performed on high-performance computing clusters with the following specifications:
-\begin{itemize}
-\item CPU: Intel Xeon processors with 24-48 cores
-\item Memory: 128-256 GB RAM per node
-\item Storage: High-speed SSD arrays
-\item Runtime: 12-48 hours per sample depending on coverage
-\end{itemize}
+  cat <<EOF > $R_SCRIPT
+  library(ASCAT)
 
-\subsubsection{Statistical Validation Methods}
+  setwd("${OUTPUT_PREFIX}")
 
-The validation of LongPhase-TO performance employed several statistical approaches:
+  ascat.prepareHTS(
+    tumourseqfile = "${TUMOR_BAM}",
+    normalseqfile = "${NORMAL_BAM}",
+    tumourname = "tumor",
+    normalname = "normal",
+    allelecounter_exe = "${ALLELE_COUNTER}",
+    skip_allele_counting_normal = FALSE,
+    skip_allele_counting_tumour = FALSE,
+    alleles.prefix = "${ALLELES_PREFIX}",
+    loci.prefix = "${LOCI_PREFIX}",
+    gender = "${gender}",
+    genomeVersion = "hg38",
+    nthreads = 50,
+    tumourLogR_file = "Tumor_LogR.txt",
+    tumourBAF_file = "Tumor_BAF.txt",
+    normalLogR_file = "Germline_LogR.txt",
+    normalBAF_file = "Germline_BAF.txt",
+    loci_binsize = 500,
+    min_base_qual= 10,
+    additional_allelecounter_flags="-f 0")
 
-\begin{enumerate}
-\item \textbf{Concordance Analysis:} Pearson correlation coefficients between predicted and ground-truth values
-\item \textbf{Precision-Recall Curves:} ROC analysis for variant calling accuracy
-\item \textbf{Bootstrap Confidence Intervals:} 95\% CI for purity estimation accuracy
-\end{enumerate}
+  ascat.bc = ascat.loadData(
+    Tumor_LogR_file = "Tumor_LogR.txt",
+    Tumor_BAF_file = "Tumor_BAF.txt",
+    Germline_LogR_file = "Germline_LogR.txt",
+    Germline_BAF_file = "Germline_BAF.txt",
+    gender = "${gender}",
+    genomeVersion = "hg38"
+  )
 
-\section{Supplementary Results}
+  ascat.plotRawData(ascat.bc, img.prefix = "Before_correction_")
 
-\subsection{Extended Performance Metrics}
+  ascat.bc = ascat.aspcf(ascat.bc)
+  ascat.plotSegmentedData(ascat.bc)
+  ascat.output = ascat.runAscat(ascat.bc, write_segments = TRUE)
+  EOF
 
-\subsubsection{Phasing Completeness Across Chromosomes}
+  # run R script
+  Rscript $R_SCRIPT
+\end{verbatim}
 
-Table~\ref{tab:phasing-by-chromosome} presents detailed phasing statistics for each chromosome across all tested samples.
 
-\begin{longtable}[]{@{}lcccc@{}}
-\caption{Phasing completeness by chromosome across all cancer cell line samples.}
-\label{tab:phasing-by-chromosome} \\
-\toprule
-Chromosome & Mean Phased Ratio & Std Dev & Mean Block N50 (Mb) & Std Dev \\
-\midrule
-\endfirsthead
-\toprule
-Chromosome & Mean Phased Ratio & Std Dev & Mean Block N50 (Mb) & Std Dev \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-1 & 0.58 & 0.12 & 15.2 & 8.4 \\
-2 & 0.61 & 0.09 & 18.7 & 9.1 \\
-3 & 0.55 & 0.14 & 12.8 & 6.9 \\
-4 & 0.59 & 0.11 & 16.3 & 7.8 \\
-5 & 0.62 & 0.08 & 19.1 & 8.2 \\
-6 & 0.57 & 0.13 & 14.6 & 7.5 \\
-7 & 0.60 & 0.10 & 17.2 & 8.7 \\
-8 & 0.58 & 0.12 & 15.8 & 8.1 \\
-9 & 0.56 & 0.15 & 13.4 & 6.8 \\
-10 & 0.61 & 0.09 & 18.9 & 9.3 \\
-11 & 0.59 & 0.11 & 16.7 & 8.0 \\
-12 & 0.57 & 0.13 & 14.9 & 7.2 \\
-13 & 0.54 & 0.16 & 11.8 & 6.1 \\
-14 & 0.58 & 0.12 & 15.1 & 7.9 \\
-15 & 0.56 & 0.14 & 13.7 & 6.5 \\
-16 & 0.60 & 0.10 & 17.5 & 8.3 \\
-17 & 0.62 & 0.08 & 19.4 & 9.0 \\
-18 & 0.55 & 0.15 & 12.5 & 6.7 \\
-19 & 0.58 & 0.12 & 15.3 & 7.6 \\
-20 & 0.59 & 0.11 & 16.8 & 8.1 \\
-21 & 0.53 & 0.17 & 10.9 & 5.8 \\
-22 & 0.57 & 0.13 & 14.2 & 7.0 \\
-X & 0.56 & 0.14 & 13.6 & 6.9 \\
-Y & 0.52 & 0.18 & 9.8 & 5.2 \\
-\end{longtable}
+\subsection{Benchmarking}
+\textbf{Som.py} (\url{https://github.com/Illumina/hap.py})
+\label{supp:sompy}
+\begin{verbatim}  
+  docker run -i --rm \
+    -v ${INPUT_DIR}:${INPUT_DIR} \
+    -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
+    -e HGREF=${REF} \
+    pkrusche/hap.py:latest \
+    /opt/hap.py/bin/som.py \
+    -N ${ANSWER_VCF} \
+    ${DIFF_VCF} \
+    -r ${REF} \
+    -o ${OUTPUT_PATH} \
+    --feature-table generic \
+    ${BED_OPTION} \
+    ${PASS_ONLY_OPTION}
+\end{verbatim}
 
-\subsubsection{LOH Detection Sensitivity Analysis}
 
-% Figure~\ref{fig:supp-loh-sensitivity} demonstrates the sensitivity of LOH detection across different segment sizes and purity levels.
 
-% \begin{figure}
-% \centering
-% \pandocbounded{\includegraphics[keepaspectratio]{loh_sensitivity_analysis.jpg}}
-% \caption{Sensitivity analysis of LOH detection across different segment sizes and tumor purity levels. The heatmap shows detection rates (0-100\%) for LOH segments of varying lengths (1-50 Mb) at different purity levels (20-100\%).}
-% \label{fig:supp-loh-sensitivity}
-% \end{figure}
-
-\subsection{Additional Validation Studies}
-
-\subsubsection{Cross-Platform Validation}
-
-To ensure the robustness of our approach, we performed cross-validation against multiple sequencing platforms and variant calling pipelines:
-
-\begin{itemize}
-\item \textbf{ONT vs PacBio:} Comparison of phasing performance across different long-read technologies
-\item \textbf{Multiple Variant Callers:} Validation using ClairS, DeepVariant, and custom pipelines
-\item \textbf{Replicate Analysis:} Technical replicates to assess reproducibility
-\end{itemize}
-
-\subsubsection{Clinical Sample Validation}
-
-Preliminary validation on clinical samples demonstrated the practical applicability of LongPhase-TO:
-
-\begin{itemize}
-\item \textbf{Sample Types:} Primary tumors, metastases, and circulating tumor DNA
-\item \textbf{Purity Range:} 15-95\% tumor content
-\item \textbf{Success Rate:} 89\% of samples yielded reliable phasing results
-\end{itemize}
-
-\section{Supplementary Discussion}
-
-\subsection{Limitations and Future Directions}
-
-\subsubsection{Current Limitations}
-
-While LongPhase-TO represents a significant advancement, several limitations should be acknowledged:
-
-\begin{enumerate}
-\item \textbf{Coverage Requirements:} Minimum 20x coverage recommended for reliable phasing
-\item \textbf{Complex Rearrangements:} Limited performance on highly complex structural variants
-\item \textbf{Computational Resources:} Requires substantial computational infrastructure
-\end{enumerate}
-
-\subsubsection{Future Enhancements}
-
-Several directions for future development are identified:
-
-\begin{itemize}
-\item \textbf{Multi-sample Integration:} Extension to analyze multiple samples simultaneously
-\item \textbf{Real-time Analysis:} Development of streaming analysis capabilities
-\item \textbf{Clinical Integration:} Implementation in clinical diagnostic workflows
-\end{itemize}
-
-\subsection{Reproducibility and Data Availability}
-
-\subsubsection{Software Availability}
-
-LongPhase-TO is freely available under the MIT license:
-\begin{itemize}
-\item \textbf{GitHub Repository:} https://github.com/username/longphase-to
-\item \textbf{Docker Container:} Available for easy deployment
-\item \textbf{Documentation:} Comprehensive user manual and tutorials
-\end{itemize}
-
-\subsubsection{Data Sharing}
-
-All datasets used in this study are publicly available:
-\begin{itemize}
-\item \textbf{Sequencing Data:} SRA accession numbers provided in main text
-\item \textbf{Analysis Scripts:} Complete computational workflows available
-\item \textbf{Results:} Processed data and intermediate files shared
-\end{itemize}
+\bibliographystyle{naturemag}
+\bibliography{supp_references}
 
 \end{document}
