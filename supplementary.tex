@@ -16,8 +16,6 @@
 \usepackage[nameinlink,capitalize]{cleveref}
 \usepackage{float}
 
-% \usepackage{newfloat}
-
 % Define pandocbounded macro for pandoc compatibility
 \makeatletter
 \def\pandocbounded#1{%
@@ -227,11 +225,12 @@ At high purity, however, the VAF distributions of somatic and germline variants 
 \end{verbatim}
 
 \subsection{Variant Calling}
-\subsubsection{ClairS-TO v0.3.0} (\url{https://github.com/HKU-BAL/ClairS-TO})
+\subsubsection{ClairS-TO} 
+version: v0.3.0 (\url{https://github.com/HKU-BAL/ClairS-TO})
 \label{supp:clairsto}
 \begin{verbatim}
-  // MODEL = <ont_r10_dorado_sup_5khz_ssrs|ont_r10_dorado_sup_5khz_ss>
-  docker run -i --rm \
+  # MODEL = <ont_r10_dorado_sup_5khz_ssrs|ont_r10_dorado_sup_5khz_ss>
+  docker run -it --rm \
     -v ${INPUT_DIR}:${INPUT_DIR} \
     -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
     -u $(id -u):$(id -g) \
@@ -244,10 +243,11 @@ At high purity, however, the VAF distributions of somatic and germline variants 
     --output_dir ${OUTPUT_DIR}
 \end{verbatim}
 
-\textbf{DeepSomatic v1.8.0} (\url{https://github.com/google/deepsomatic})
+\subsubsection{DeepSomatic} 
+version: v1.8.0 (\url{https://github.com/google/deepsomatic})
 \label{supp:deepsomatic}
 \begin{verbatim}
-  docker run -i --rm --gpus all \
+  docker run -it --rm --gpus all \
     -v ${INPUT_DIR}:${INPUT_DIR} \
     -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
     -u $(id -u):$(id -g) \
@@ -265,7 +265,8 @@ At high purity, however, the VAF distributions of somatic and germline variants 
 \end{verbatim}
 
 \subsection{Phasing}
-\textbf{LongPhase-TO v1.0.0} (\url{https://github.com/CCU-Bioinformatics-Lab/longphase-to})
+\subsubsection{LongPhase-TO} 
+version: v1.0.0 (\url{https://github.com/CCU-Bioinformatics-Lab/longphase-to})
 \label{supp:longphaseto}
 \begin{verbatim}
   # caller options: clairs_to_ss, clairs_to_ssrs, deepsomatic_to
@@ -274,16 +275,16 @@ At high purity, however, the VAF distributions of somatic and germline variants 
   -r ${REF} \
   -s ${VCF} \
   -t ${THREADS} \
-  --ont \
   -o ${OUTPUT}
   --caller ${CALLER} \
   --pon-file ${PON_FILE} \
   --strict-pon-file ${STRICT_PON_FILE} \
-  --ont # or --pb for PacBio Hifi \
+  --ont \ # or --pb for PacBio Hifi 
   # --loh # if need out loh bed
 \end{verbatim}
 
-\textbf{LongPhase v1.7.3} (\url{https://github.com/twolinin/longphase})
+\subsubsection{LongPhase} 
+version: v1.7.3 (\url{https://github.com/twolinin/longphase})
 \label{supp:longphase}
 \begin{verbatim}
   longphase phase \
@@ -295,7 +296,8 @@ At high purity, however, the VAF distributions of somatic and germline variants 
   -o ${OUTPUT}
 \end{verbatim}
 
-\textbf{WhatsHap v2.1} (\url{https://github.com/whatshap/whatshap})
+\subsubsection{WhatsHap} 
+version: v2.1 (\url{https://github.com/whatshap/whatshap})
 \label{supp:whatshap}
 \begin{verbatim}
   whatshap phase \
@@ -306,7 +308,8 @@ At high purity, however, the VAF distributions of somatic and germline variants 
   ${TUMOR_BAM}
 \end{verbatim}
 
-\textbf{HapCUT2 v1.3.4} (\url{https://github.com/vibansal/HapCUT2})
+\subsubsection{HapCUT2} 
+version: v1.3.4 (\url{https://github.com/vibansal/HapCUT2})
 \label{supp:hapcut2}
 \begin{verbatim}
   HapCUT2/build/extractHAIRS \
@@ -323,7 +326,8 @@ At high purity, however, the VAF distributions of somatic and germline variants 
 \end{verbatim}
 
 \subsection{Purity Estimation}
-\textbf{Ascat v3.2.0} (\url{https://github.com/VanLoo-lab/ascat})
+\subsubsection{Ascat} 
+version: v3.2.0 (\url{https://github.com/VanLoo-lab/ascat})
 \label{supp:ascat}
 \begin{verbatim}
   R_SCRIPT=$(mktemp --suffix=.R)
@@ -376,10 +380,11 @@ At high purity, however, the VAF distributions of somatic and germline variants 
 
 
 \subsection{Benchmarking}
-\textbf{Som.py} (\url{https://github.com/Illumina/hap.py})
+\subsubsection{Som.py} 
+(\url{https://github.com/Illumina/hap.py})
 \label{supp:sompy}
 \begin{verbatim}  
-  docker run -i --rm \
+  docker run -it --rm \
     -v ${INPUT_DIR}:${INPUT_DIR} \
     -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
     -e HGREF=${REF} \
@@ -393,8 +398,6 @@ At high purity, however, the VAF distributions of somatic and germline variants 
     ${BED_OPTION} \
     ${PASS_ONLY_OPTION}
 \end{verbatim}
-
-
 
 \bibliographystyle{naturemag}
 \bibliography{supp_references}
