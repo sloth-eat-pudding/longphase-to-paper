@@ -347,9 +347,9 @@ version: v3.2.0 (\url{https://github.com/VanLoo-lab/ascat})
     skip_allele_counting_tumour = FALSE,
     alleles.prefix = "${ALLELES_PREFIX}",
     loci.prefix = "${LOCI_PREFIX}",
-    gender = "${gender}",
+    gender = "${GENDER}",
     genomeVersion = "hg38",
-    nthreads = 50,
+    nthreads = "${THREADS}",
     tumourLogR_file = "Tumor_LogR.txt",
     tumourBAF_file = "Tumor_BAF.txt",
     normalLogR_file = "Germline_LogR.txt",
@@ -363,7 +363,7 @@ version: v3.2.0 (\url{https://github.com/VanLoo-lab/ascat})
     Tumor_BAF_file = "Tumor_BAF.txt",
     Germline_LogR_file = "Germline_LogR.txt",
     Germline_BAF_file = "Germline_BAF.txt",
-    gender = "${gender}",
+    gender = "${GENDER}",
     genomeVersion = "hg38"
   )
 
@@ -372,6 +372,54 @@ version: v3.2.0 (\url{https://github.com/VanLoo-lab/ascat})
   ascat.bc = ascat.aspcf(ascat.bc)
   ascat.plotSegmentedData(ascat.bc)
   ascat.output = ascat.runAscat(ascat.bc, write_segments = TRUE)
+  QC = ascat.metrics(ascat.bc,ascat.output)
+  save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
+  EOF
+
+  # run R script
+  Rscript $R_SCRIPT
+\end{verbatim}
+
+\subsubsection{Ascat-TO} 
+version: v3.2.0 (\url{https://github.com/VanLoo-lab/ascat})
+\label{supp:ascat}
+\begin{verbatim}
+  R_SCRIPT=$(mktemp --suffix=.R)
+
+  cat <<EOF > $R_SCRIPT
+  library(ASCAT)
+  
+  setwd("${OUTPUT_PREFIX}")
+  
+  ascat.prepareHTS(
+    tumourseqfile = "${TUMOR_BAM}",
+    tumourname = "tumor",
+    allelecounter_exe = "${ALLELE_COUNTER}",
+    alleles.prefix = "${ALLELES_PREFIX}",
+    loci.prefix = "${LOCI_PREFIX}",
+    gender = "${GENDER}",
+    genomeVersion = "hg38",
+    nthreads = "${THREADS}",
+    tumourLogR_file = "Tumor_LogR.txt",
+    tumourBAF_file = "Tumor_BAF.txt",
+    loci_binsize = 500,
+    min_base_qual= 10,
+    additional_allelecounter_flags="-f 0")
+  
+  ascat.bc = ascat.loadData(
+    Tumor_LogR_file = "Tumor_LogR.txt",
+    Tumor_BAF_file = "Tumor_BAF.txt",
+    gender = "${GENDER}",
+    genomeVersion = "hg38"
+  )
+  
+  ascat.plotRawData(ascat.bc, img.prefix = "Before_correction_")
+  gg = ascat.predictGermlineGenotypes(ascat.bc, platform = "WGS_hg38_50X")
+  ascat.bc = ascat.aspcf(ascat.bc, ascat.gg=gg)
+  ascat.plotSegmentedData(ascat.bc)
+  ascat.output = ascat.runAscat(ascat.bc, write_segments = TRUE)
+  QC = ascat.metrics(ascat.bc,ascat.output)
+  save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
   EOF
 
   # run R script
