@@ -1,0 +1,298 @@
+\documentclass[pdflatex,sn-nature]{sn-jnl}
+
+% Standard packages for Nature journals
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{textcomp}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{tabularx}
+\usepackage{fp}  % For \real command in table calculations
+\usepackage{xr-hyper}
+
+\externaldocument{Supplementary} % supplementary.aux will be read
+
+% Define pandocbounded macro for pandoc compatibility
+\makeatletter
+\def\pandocbounded#1{%
+  \begingroup
+  % Override any existing includegraphics settings to ensure proper sizing
+  \setkeys{Gin}{width=1.0\linewidth,height=1.0\textheight,keepaspectratio}%
+  #1%
+  \endgroup
+}
+\makeatother
+
+% Define \real command for table calculations (used by pandoc)
+\makeatletter
+\def\real#1{#1}
+\makeatother
+
+% Define pandoc-generated list commands
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% Define other common pandoc commands that might be missing
+\providecommand{\passthrough}[1]{#1}
+\providecommand{\BeginKnitrBlock}[1]{}
+\providecommand{\EndKnitrBlock}[1]{}
+
+% Handle pandoc's CSL citations if they appear
+\newcommand{\cslhangindent}[1]{}
+\newcommand{\cslentryspacingunit}[1]{}
+\newcommand{\cslreferences}[2]{}
+
+% Document metadata
+\title{Somatic haplotype phasing and tumor DNA fraction estimation from tumor-only long-read sequencing with LongPhase-TO}
+\author{\fnm{Zhen-Yu} \sur{Chen}\textsuperscript{1}}
+\author{\fnm{Zhenxian} \sur{Zheng}\textsuperscript{2}}
+\author{\fnm{Ruibang} \sur{Luo}\textsuperscript{2}}
+\author{\fnm{Hsu-Fen} \sur{Fu}\textsuperscript{1}}
+\author{\fnm{Yao-Ting} \sur{Huang}\textsuperscript{1} \email{ythuang@cs.ccu.edu.tw}}
+
+\affil[1]{\orgdiv{Department of Computer Science and Information Engineering}, \orgname{National Chung Cheng University}, \country{Taiwan}}
+\affil[2]{\orgdiv{School of Computing and Data Science}, \orgname{The University of Hong Kong}, \city{Hong Kong}, \country{China}}
+
+
+\setcounter{secnumdepth}{0}
+\begin{document}
+
+\abstract{
+Somatic analysis of tumor-only long-read sequencing is confounded by large-scale loss of heterozygosity (LOH) and unknown tumor DNA fraction, which existing tools do not model jointly. Here we present LongPhase-TO, the first tumor-only somatic phasing method for long-read sequencing. From a single tumor sample it reconstructs somatic haplotypes across chromosome-scale LOH, recalibrates somatic variant calls, and estimates tumor DNA fraction within one framework. Across eight cancer cell-line datasets at varying tumor DNA fractions, LongPhase-TO produced longer, less fragmented haplotypes than germline phasers and delineated contiguous chromosome-scale LOH concordant with microarray. Used as a haplotype-aware variant recalibrator, it increased the mean somatic SNV F1-score of ClairS-TO and DeepSomatic-TO from $\sim$0.55 to $\sim$0.65, and the mean indel F1-score of both from $\sim$0.19 to $\sim$0.23. It also estimates the tumor DNA fraction was via a haplotype-aware regression within very low error rates ($\sim$0.04--0.06). Together, these results establish a unified framework for haplotype-resolved analysis of somatic variation, chromosome-scale LOH and tumor DNA fraction from tumor-only long-read sequencing.
+}
+
+\keywords{Long-read sequencing, Somatic phasing, Loss of Heterozygosity (LOH), Tumor DNA fraction estimation}
+
+\maketitle
+
+
+\section{Introduction}
+
+Cancer genomes acquire somatic mutations that distinguish tumor cells from the inherited germline and shape tumor development, diagnosis, and therapeutic response~\cite{vogelstein2013,stratton2009,vogelstein2004}. Cataloging these variants alone does not reveal their allelic relationships: mutations on the same chromosome copy (in cis) can have different functional and evolutionary consequences from those on opposite copies (in trans)~\cite{garg2021,glusman2014}. Resolving the chromosomal origin of variants by haplotype phasing therefore adds an important layer to somatic genome analysis.
+
+Long-read sequencing has transformed read-based phasing because individual molecules span many heterozygous sites, enabling the reconstruction of extended haplotypes~\cite{warburton2023,maestri2020}. Germline phasers such as WhatsHap, HapCUT2, and LongPhase use this linkage to partition reads between the two inherited parental haplotypes~\cite{martin2016,edge2017,lin2022}. Their diploid formulation, however, does not capture the additional haplotype structure created as somatic mutations accumulate during clonal evolution~\cite{nowell1976}.
+
+Phasing also improves long-read variant calling by organizing reads according to local haplotypes, thereby strengthening coherent allelic signals relative to sequencing noise. Germline callers such as DeepVariant and Clair3 incorporate haplotype-aware read representations into deep neural networks to improve genotyping accuracy~\cite{poplin2018,kolesnikov2023,zheng2022}. The same principle applies to somatic small- and structural-variant calling, where genuine somatic alleles generally remain associated with one parental haplotype, whereas sequencing artifacts are less likely to show consistent haplotype support~\cite{park2024,zheng2023,keskus2025}. In matched tumor-normal workflows, the normal sample provides complementary patient-specific germline evidence, allowing somatic variants to be distinguished from inherited alleles~\cite{cibulskis2013,koboldt2012,larson2012}.
+
+When a matched normal sample is unavailable, tumor-only calling must distinguish low-frequency somatic mutations from sequencing errors and rare or private germline variants~\cite{sun2018,hiltemann2015,huang2018}. Population germline resources and panels of normals can filter known polymorphisms and recurrent technical artifacts, respectively, but neither fully captures individual-specific germline variation or all platform-specific errors~\cite{cibulskis2013}. Tumor-only callers such as DeepSomatic-TO and ClairS-TO therefore combine learned sequence features, external filtering resources, and local phasing information to strengthen somatic variant classification~\cite{park2024,chen2025}.
+
+Local phase-aware calling, however, is not equivalent to reconstructing extended tumor-specific haplotypes. Large-scale loss of heterozygosity (LOH) depletes the heterozygous markers that connect parental phase blocks, while normal-cell admixture dilutes somatic alleles and weakens evidence for their haplotype of origin~\cite{nichols2020,regan2024,hwang2021,yadav2015,zheng2017,rhee2018,foltz2024}. Together, these features limit the reconstruction of contiguous somatic haplotypes. A tumor-only framework must therefore link somatic alleles to their parental haplotypes across chromosome-scale LOH while accounting for tumor DNA fraction.
+
+Here we present LongPhase-TO, a tumor-only framework for haplotype-resolved analysis of long-read cancer genomes. LongPhase-TO integrates haplotype-aware recalibration of somatic SNVs and indels, arm-level LOH detection, LOH-aware somatic phasing, and estimation of tumor DNA fraction from genome-wide haplotype imbalance. Across eight cancer cell-line datasets, it produced more contiguous haplotypes than conventional germline phasers, improved somatic calls from ClairS-TO and DeepSomatic-TO, and accurately estimated tumor DNA fraction. Together, these results establish a unified framework for analyzing somatic variation, chromosome-scale LOH, and tumor DNA fraction from a single tumor sample.
+
+\section{Results}\label{results}
+
+\subsection{Overview of the LongPhase-TO framework}
+We developed LongPhase-TO, a somatic phasing method for tumor-only long-read sequencing that reconstructs somatic haplotypes and infers tumor DNA fraction in an LOH-aware manner (Figure~\ref{Figure_1.pdf}; see Methods). The workflow proceeds in four stages: somatic variant recalibration, arm-level LOH detection, LOH-aware somatic phasing, and phase-aware DNA fraction estimation. First, candidate SNVs and indels from ClairS-TO or DeepSomatic-TO are recalibrated with a triplet-graph model built on a simple biological expectation (Figure~\ref{Figure_1.pdf}(a)): because a somatic mutation arises post-zygotically on one parental chromosome, reads carrying its alternate allele should track a single germline haplotype, whereas residual germline variants and sequencing artifacts scatter across both. A trained model scores this local haplotype evidence to decide whether each candidate is retained.
+
+Second, LongPhase-TO delineates arm-level LOH with a breakpoint-guided procedure that jointly maps LOH and CNV/BFB intervals (Figure~\ref{Figure_1.pdf}(b)). Small CNV/BFB islands often sit within a broad LOH tract and, left unchecked, fragment it into many disjoint calls. LongPhase-TO therefore reconciles the candidate intervals against the genome-wide heterozygosity profile, retaining heterozygosity-depleted segments as LOH and absorbing embedded high-heterozygosity islands into a single arm-level event, so that LOH is recovered at chromosome scale.
+
+Third, using the recalibrated variants and the LOH map, LongPhase-TO performs LOH-aware somatic phasing over a variant graph of germline and somatic alleles (Figure~\ref{Figure_1.pdf}(c)). It reconstructs the two germline haplotypes (HP1, HP2) and, on reaching a somatic allele, branches a somatic haplotype (HP1-1 or HP2-1) from its parent. This lineage-aware traversal preserves clonal ancestry (e.g., HP1-1 from HP1) and extends both germline and somatic haplotypes across arm-level LOH, where conventional diploid phasers break.
+
+Fourth, LongPhase-TO estimates tumor DNA fraction from the resulting somatic haplotagged reads (Figure~\ref{Figure_1.pdf}(d)). In a nearly normal sample the two germline haplotypes are balanced across the genome; as tumor content rises, the somatic reads (HP1-1 or HP2-1) over-represent one haplotype by an amount proportional to tumor abundance. Because arm-level LOH imposes maximal imbalance regardless of tumor fraction, the estimate must also account for LOH burden, and a regression on summary statistics of the imbalance distribution together with the LOH map yields the final DNA fraction.
+
+LongPhase-TO yields a genome-wide, phase-resolved view that partitions long reads into parental germline haplotypes and their somatic descendants. In a tumor-only dataset (HCC1395\_HKU), reads carrying a somatic variant from the SEQC2 truth set were assigned to the somatic haplotype (HP2-1) and anchored to its parental lineage HP2, cleanly separated from HP1-/HP2-tagged germline reads. Within an LOH region of HP1-deleted haplotype, LongPhase-TO continued to accurately tag somatic reads as HP2-1 rather than collapsing them to their ancestral haplotype (HP2) or misassigning them to HP1. Therefore, the somatic haplotyping by LongPhase-TO preserves the clonal ancestry and is robust to LOH in heterogeneous tumors.
+
+\subsection{LongPhase-TO improves phasing and maps chromosome-scale LOH}
+We first benchmarked LongPhase-TO against three germline phasers, WhatsHap, HapCUT2 and LongPhase, across eight datasets from six cell lines representing breast cancer, melanoma and lung cancer (Supplementary Table~\ref{tab:cell-line-datasets-and-benchmark-sources}). Tumor coverage ranged from 33 to 158$\times$ (median, 81$\times$). Across all datasets, LongPhase-TO produced markedly longer and less fragmented haplotypes than the germline phasers (Figure~\ref{Figure_2.pdf}(a), Supplementary Table~\ref{tab:phasing-performance}). LongPhase-TO increased block N50 in every dataset by 1.1--48$\times$ (median, 2.9$\times$), reaching 25.2 Mb, while reducing the number of blocks by 1.7--5.1$\times$ (median, 3.7$\times$). The magnitude of improvement tracked each cell line's LOH burden, defined as the fraction of the autosomal genome affected by LOH. HCC1954\_UCSC ($\sim$10\% LOH) showed only a modest increase in block N50 ($\sim1.1\times$), whereas the LOH-rich HCC1395 and HCC1937 cell lines ($\sim$51--56\% LOH) showed increases of up to $\sim48\times$. The total length of phased blocks also increased (median, 11\%; range, 3--38\%; Figure~\ref{Figure_2.pdf}(b)), and the fraction of phased SNVs increased in six of eight datasets (by up to 31\% in HCC1395\_NYGC). Together, these results show that LongPhase-TO reconstructs more contiguous tumor haplotypes, with the largest gains in LOH-rich genomes.
+
+We next compared arm-level LOH segments generated by LongPhase-TO with those produced by ASCAT, a CNV-based method~\cite{vanloo2010}. ASCAT was run in tumor-only (TO) and tumor-normal (T+N) modes, whereas LongPhase-TO delineated LOH using somatic variants called by ClairS-TO or DeepSomatic-TO. Because independent LOH annotations were unavailable for most cell lines, these cross-method comparisons assess segmentation contiguity and agreement rather than accuracy against a ground truth. Across datasets, LongPhase-TO produced more contiguous LOH segments than ASCAT with either DeepSomatic-TO or ClairS-TO calls (Figure~\ref{Figure_2.pdf}(c), Supplementary Table~\ref{tab:loh_summary}). The median LOH N50 was 34.8 Mb for LongPhase-TO with DeepSomatic-TO and 33.1 Mb with ClairS-TO, compared with 18.6 Mb for ASCAT (TO) and 4.1 Mb for ASCAT (T+N). The magnitude of improvement varied across cell lines. In H2009\_UCSC, LongPhase-TO with DeepSomatic-TO increased LOH N50 from 9.21 Mb for ASCAT (TO) to 34.94 Mb ($\sim4\times$), and in HCC1937\_UCSC it increased LOH N50 from 20.88 Mb to 43.8 Mb ($\sim2\times$). The gain was even more pronounced relative to ASCAT (T+N) (e.g., 43.8 Mb versus 2.21 Mb in HCC1937\_UCSC). By reducing fragmentation at CNV/BFB events within LOH, LongPhase-TO yielded median segment counts of 137 and 162 with ClairS-TO and DeepSomatic-TO, respectively, compared with 558 for ASCAT (TO) and 1,948 for ASCAT (T+N). The two LongPhase-TO configurations also produced similar per-sample LOH N50 values (median difference, $\sim$8\%), supporting robustness to the choice of somatic caller.
+
+Finally, we compared LOH burdens estimated by LongPhase-TO and ASCAT. Across cell lines, LongPhase-TO with ClairS-TO or DeepSomatic-TO yielded consistent burdens ranging from 10\% to 56\%: 10\% in HCC1954\_UCSC, 27--29\% in COLO829 across ONT and NYGC, 35--36\% in H1437\_UCSC and H2009\_UCSC, 51--52\% in HCC1395 across HKU and NYGC, and 56\% in HCC1937\_UCSC (Figure~\ref{Figure_2.pdf}(d)). ASCAT reproduced this ordering but reported systematically higher burdens (median, 43.4\% for T+N and 54\% for TO, versus 35.3\% and 35.4\% for LongPhase-TO with DeepSomatic-TO and ClairS-TO). The largest discrepancy occurred in HCC1954\_UCSC, for which ASCAT (TO) estimated 58.7\% LOH and ASCAT (T+N) failed to converge, whereas the two LongPhase-TO configurations estimated 9.6--10.3\%. This discrepancy may reflect the whole-genome-duplication structure of HCC1954. For the two cell lines with independently sequenced datasets, COLO829 (ONT and NYGC) and HCC1395 (HKU and NYGC), LOH burdens differed by at most 2\% for LongPhase-TO, versus up to 6\% (T+N) and 7\% (TO) for ASCAT. Comparison of the LongPhase-TO chromosome ideograms with the published CytoScan HD microarray profile of HCC1395 (Figure~\ref{Figure_2.pdf}(e))~\cite{garciadiez2019, fang2021} showed that the extended LOH tracts recapitulated the arm-level architecture reported by the array across the autosomes. Together, these analyses support the contiguity and technical reproducibility of LongPhase-TO LOH calls across the panel, with orthogonal biological concordance demonstrated in HCC1395.
+
+
+\subsection{Haplotype-aware recalibration improves somatic SNV and indel calls}
+To test whether somatic haplotyping can sharpen existing callers, we used LongPhase-TO to recalibrate the somatic SNVs of ClairS-TO and DeepSomatic-TO across eight tumor-only datasets, comparing each caller alone against the same caller followed by recalibration over an \emph{in silico} dilution series spanning 20--100\% tumor DNA fraction (see Methods). Averaged over all datasets and fractions, recalibration raised the mean SNV F1-score from 0.55 to 0.62 for ClairS-TO and from 0.55 to 0.65 for DeepSomatic-TO (Figure~\ref{Figure_3.pdf}(a), Supplementary Table~\ref{tab:somatic_purity}). The gain was consistently precision-driven, reflecting the nature of the recalibration: the triplet-graph filter discards candidates whose local haplotype pattern is inconsistent with a single-haplotype somatic origin, predominantly residual germline variants and sequencing artifacts, raising mean precision by 0.14 for ClairS-TO at near-constant recall and by 0.24 for DeepSomatic-TO against a moderate recall reduction of 0.10.  
+
+Because such false positives are proportionally most abundant when the true somatic signal is diluted, the benefit was largest at low-to-intermediate tumor content. Baseline F1-scores of both callers fell monotonically as tumor DNA fraction decreased, and recalibration improved F1 at every level while blunting this decline (Figure~\ref{Figure_3.pdf}(a)). Absolute F1 gains of 0.07--0.13 were obtained across 20--80\% DNA fraction. At 20\% fraction, for instance, mean F1 rose from 0.30 to 0.37 for ClairS-TO and from 0.40 to 0.48 for DeepSomatic-TO, with the corresponding precision gain over this range averaging $\sim$0.17 and $\sim$0.27, respectively. Individual low-fraction cases were more pronounced: in HCC1954\_UCSC at 80\% fraction, recalibration raised F1 from 0.33 to 0.58 for ClairS-TO and from 0.32 to 0.65 for DeepSomatic-TO. At 100\% DNA fraction, where the standalone callers were already strongest, gains were smaller but still consistent (mean F1 from 0.68 to 0.70 for ClairS-TO and from 0.63 to 0.70 for DeepSomatic-TO).
+
+We next asked whether recalibration offers comparable gains for somatic indels. Indels were substantially harder to detect than SNVs, with a baseline mean F1 of only 0.19 for both callers versus 0.55 for SNVs (Figure~\ref{Figure_3.pdf}(b), Supplementary Table~\ref{tab:somatic_indel_purity}), a gap inherited from the lower baseline accuracy of both callers on long-read indels. Recalibration nonetheless improved mean indel F1 to 0.23 for each caller, again through precision (0.23 to 0.29 for ClairS-TO; 0.19 to 0.42 for DeepSomatic-TO) with little net change in recall. As for SNVs, the gains concentrated at low-to-intermediate fraction. For example, in HCC1937\_UCSC at 60\% fraction, F1 rose from 0.27 to 0.40 for ClairS-TO and from 0.29 to 0.44 for DeepSomatic-TO, and gains remained positive even at 100\% fraction. Thus, across both variant classes, LongPhase-TO improves the somatic calls of ClairS-TO and DeepSomatic-TO through a common, precision-driven mechanism whose magnitude scales with the difficulty of the sample.
+
+\subsection{Accurate tumor-only DNA fraction estimation with LongPhase-TO}
+We evaluated tumor DNA fraction estimation using LongPhase-TO on in silico dilution series constructed from eight tumor cell line datasets. LongPhase-TO was run using somatic variants called by either DeepSomatic-TO or ClairS-TO, and its performance was compared to ASCAT using tumor-only (TO) and tumor-normal (T+N) paired sequencing. Across all datasets, LongPhase-TO closely tracked the ground truth DNA fraction, with overall mean absolute errors (MAEs) of 0.04 for the DeepSomatic-TO configuration and 0.06 for ClairS-TO, and strong correlations between estimated and expected DNA fraction (Pearson $r$ = 0.97 and 0.91, respectively) (Figure~\ref{Figure_4.pdf}, Supplementary Table~\ref{tab:tumor-purity}). In contrast, ASCAT exhibited substantially larger deviations, with overall MAEs of 0.31 for TO and 0.19 for T+N and weak or even inverse correlation with the true DNA fraction ($r$ = 0.34 and 0.29, respectively). ASCAT also failed to return an estimate in 7 of 40 datasets, whereas LongPhase-TO produced a DNA fraction estimate in all cases.
+
+At high tumor DNA fraction (expected DNA fraction $\ge$ 0.6), all methods performed similarly well, with average MAEs between 0.02 and 0.06 across configurations, indicating that both ASCAT and LongPhase-TO can recover nearly clonal tumor DNA fraction from strongly enriched samples. The performance gap widened markedly at lower tumor concentrations. For mixtures with expected DNA fraction $\leq$ 0.4, ASCAT systematically overestimated DNA fraction, frequently saturating near 1.0 even when the true DNA fraction was 0.2, resulting in MAEs of 0.67 for ASCAT (TO) and 0.41 for ASCAT (T+N) in the low-DNA-fraction regime. LongPhase-TO remained accurate in the same mixtures, with MAEs of 0.04 for DeepSomatic-TO and 0.08 for ClairS-TO at expected DNA fraction $\leq$ 0.4. Consistent with this, 72.5\% and 65.0\% of LongPhase-TO estimates (DeepSomatic-TO and ClairS-TO, respectively) were within 0.05 of the true DNA fraction, compared with 56.8\% for ASCAT (T+N) and 27.8\% for ASCAT (TO). The 90th percentile absolute error was at most 0.12 for LongPhase-TO across both variant-caller configurations, whereas it reached 0.80 for both ASCAT modes, reflecting the strong saturation of ASCAT's estimates at low tumor content.
+
+These trends were consistent across sequencing centers and cell lines. For the COLO829 datasets (ONT and NYGC), LongPhase-TO generally recovered the nominal DNA fraction within a few percentage points at all mixture levels, while ASCAT overcalled the 0.4 and 0.2 mixtures, often reporting DNA fractions of 0.9-1.0. Similar behavior was observed for the lung cancer cell lines H1437 and H2009 and the breast cancer lines HCC1395 and HCC1937, where LongPhase-TO maintained low bias across the entire DNA fraction range and ASCAT increasingly overestimated DNA fraction as tumor content decreased. The HCC1954\_UCSC mixtures constituted the most challenging series (MAE 0.17 for DeepSomatic-TO and 0.25 for ClairS-TO). Its errors were not random but compressed toward the middle of the DNA fraction range: LongPhase-TO underestimated the high-fraction mixtures (0.70 and 0.80 at an expected fraction of 1.0, and 0.47 and 0.49 at 0.6, for DeepSomatic-TO and ClairS-TO respectively) and overestimated the lowest mixture (0.37 and 0.84 at an expected fraction of 0.2), the expected signature of a weak haplotype-imbalance signal in this whole-genome-duplicated, low-LOH genome, which we examine as the principal limitation of the estimator in the Discussion. Even so, LongPhase-TO errors remained substantially smaller than those of ASCAT, which either failed to produce an estimate or returned DNA fractions near 1.0 for several mixtures. Overall, LongPhase-TO provided robust and quantitatively accurate tumor DNA fraction estimates across diverse datasets and DNA fraction levels, outperforming ASCAT even when ASCAT leveraged matched tumor-normal sequencing.
+
+
+\section{Discussion}
+
+Tumor-only long-read analysis must distinguish somatic from germline variation while preserving phase through chromosome-scale loss of heterozygosity (LOH). LongPhase-TO addresses these coupled problems by representing parental germline haplotypes and their somatic descendants within an LOH-aware graph. Across eight cell-line datasets, this common representation yielded longer and less fragmented haplotypes than germline phasers, delineated contiguous arm-level LOH, and improved somatic SNV and indel calls through precision-driven recalibration. It also enabled tumor DNA fraction to be inferred from germline haplotype imbalance without a matched normal sample. Concordance with CytoScan HD supported the biological plausibility of the LOH calls in HCC1395, whereas agreement across somatic callers and independently sequenced datasets established technical reproducibility across the remainder of the panel.
+
+These results distinguish LongPhase-TO from both conventional germline phasing and current tumor-only somatic calling. Germline phasers such as WhatsHap, HapCUT2, and LongPhase partition reads between two inherited haplotypes~\cite{martin2016,edge2017,lin2022}; extended LOH removes the heterozygous markers that connect those haplotypes and consequently fragments phase. LongPhase-TO instead tracks somatic haplotypes as descendants of their parental haplotypes and reconciles chromosome-scale LOH before graph traversal, allowing phase to continue across these regions. The same local haplotype structure provides a biological constraint for refining calls from ClairS-TO and DeepSomatic-TO~\cite{park2024,chen2025}: a genuine somatic allele should remain confined to one parental lineage, whereas residual germline alleles or sequencing errors are less likely to satisfy this constraint. The reproducible precision gains across both callers indicate that this haplotype evidence complements caller-specific models rather than replacing them.
+
+Resolving parental and somatic lineages from one tumor sample provides a direct link between variant identity and allelic context. LongPhase-TO can determine the parental background of a somatic mutation and preserve that assignment across LOH, information that is absent from an unphased call set. In practice, this tumor-only framework may be useful when matched normal material is unavailable because the same long-read data support somatic-call refinement, LOH delineation, and estimation of read-level tumor content. The present benchmarks, however, are based on cell-line dilution series and do not establish performance in primary tumors, highly subclonal lesions, or diagnostic specimens. The results therefore support methodological feasibility and controlled technical accuracy, but not diagnostic or prognostic application.
+
+The tumor DNA fraction reported by LongPhase-TO should not be interpreted as tumor cellular purity. ASCAT~\cite{vanloo2010}, PURPLE~\cite{priestley2019}, and Battenberg~\cite{nikzainal2012} infer cellular purity jointly with ploidy from allele-specific copy-number profiles and therefore model aneuploidy and copy-number alterations explicitly. LongPhase-TO instead estimates the proportion of sequenced DNA molecules of tumor origin directly from germline haplotype imbalance, without fitting a global ploidy or copy-number model. The two quantities may be similar in near-diploid genomes with limited copy-number change, but they can diverge under widespread aneuploidy or whole-genome duplication because tumor and normal cells then contribute different amounts of DNA per cell. Accordingly, the LongPhase-TO estimate is a read-level measure of tumor content rather than a ploidy-adjusted estimate of cellular purity.
+
+The HCC1954\_UCSC series defines the principal mechanistic boundary of this estimator. Its errors were compressed toward the middle of the dilution range under both variant-caller configurations. LongPhase-TO derives tumor DNA fraction from germline haplotype imbalance, and that signal increases with tumor content only where one parental allele has been lost; low LOH burden therefore limits the information available to the model. HCC1954 carries a whole-genome duplication~\cite{ghandi2019} and, at $\sim$10\%, had the lowest LOH burden in the panel. In a duplicated genome, loss of one chromosomal copy can leave an imbalanced but still heterozygous 2:1 state rather than eliminate a parental allele, allowing extensive aneuploidy with little true LOH. HCC1954 thus represents the specific regime in which a phasing-based, copy-number-free estimate is least constrained and most likely to diverge from cellular purity. The accompanying LOH burden can therefore serve as a practical indicator of confidence in the DNA fraction estimate, and explicit allele-specific copy-number modeling is the principled extension for genome-doubled, low-LOH samples. Validation is also limited by the scarcity of independent chromosome-scale LOH references: a published orthogonal profile was available only for HCC1395, whereas the remaining datasets establish contiguity and technical reproducibility rather than biological accuracy across distinct tumor genomes. Primary tumors with matched allele-specific array or sequencing references, complemented by controlled simulations with known LOH boundaries, will be required to establish generalizability across event sizes, coverage levels, and tumor DNA fractions.
+
+LongPhase-TO therefore establishes that tumor-only long reads contain sufficient linked information to reconstruct LOH-aware somatic haplotypes, refine somatic variant calls, and estimate tumor DNA fraction within one framework. The results also define the boundary of this approach: the estimator is most informative when LOH provides a measurable haplotype-imbalance signal, whereas genome-doubled, low-LOH tumors require copy-number-aware modeling. Validation in primary tumors with orthogonal allele-specific references is now needed to determine generalizability. More broadly, treating somatic variants as descendants of parental haplotypes provides a coherent basis for tumor-only long-read analysis.
+
+\section{Methods}
+
+Before LOH-aware somatic phasing, LongPhase-TO independently recalibrates somatic variant candidates and detects arm-level LOH. The resulting somatic call set and LOH map are then integrated for phasing, after which tumor DNA fraction is estimated (Figure~\ref{Figure_1.pdf}).
+
+\subsection{Triplet-graph recalibration of somatic variants}
+
+Recalibration of somatic variant candidates from tumor-only long-read data proceeds in two steps: candidate enrichment by filtering, followed by triplet-graph evidence modeling that exploits local haplotype linkage (Figure~\ref{Figure_1.pdf}(a)).
+
+\subsubsection{Somatic candidate filtering using external resources and allele concordance}
+
+\noindent\textbf{External-resource filtering.} In the absence of a matched normal sample, LongPhase-TO screens candidate variants against four external germline and normal-panel resources adopted from the ClairS-TO workflow. The 1000 Genomes PON and CoLoRSdb GRCh38 v1.1.0 sites with allele frequency $\ge 0.001$ are queried by genomic position, whereas dbSNP build 138 non-somatic sites and gnomAD r2.1 sites with allele frequency $\ge 0.001$ require concordance of both position and alternate allele. Candidates matching either set are excluded from somatic classification before triplet-graph recalibration (Supplementary Fig.~\ref{fig:met-page-18-cropped-jpg}).
+
+\noindent\textbf{Allele-concordance filtering.} Systematic sequencing and alignment errors can produce nearby non-reference mismatches that recur on the same reads. For each candidate, LongPhase-TO examined 100 aligned positions on either side and compared each mismatch between reads supporting the candidate reference and alternate alleles. A mismatch was considered concordant when it occurred in at least 50\% of alternate-supporting reads and when at least 60\% of reads carrying that mismatch also supported the candidate alternate allele. Candidates with two or more concordant mismatches were removed as clustered artifacts (Supplementary Fig.~\ref{fig:met-page-19-cropped-jpg}). These criteria were fixed and applied unchanged to all datasets.
+
+\subsubsection{Candidate evaluation with the triplet-graph model}
+
+\noindent\textbf{Triplet-graph construction and pattern classification.} Because a somatic allele is expected to descend from one parental haplotype whereas artifacts lack consistent haplotype-specific support, LongPhase-TO represents local allele linkage with a triplet graph spanning three adjacent variant positions. Nodes represent reference or alternate alleles, and weighted paths record the observed three-variant haplotypes and their read support (Supplementary Fig.~\ref{fig:met-page-20-cropped-jpg}). Each locus can carry a reference (R) or alternate (A) allele, giving eight possible paths. A true somatic mutation is expected to produce two parental germline paths and a third path that diverges from one parent at the candidate allele. Each candidate-containing triplet contributes at most one of three mutually exclusive evidence categories: \(V_H\) denotes high-confidence three-path evidence comprising two parental germline paths and one somatic-descendant path; \(V_L\) denotes lower-confidence, effectively two-path evidence that remains compatible with a single haplotype-specific somatic origin; and \(V_N\) denotes a sufficiently supported topology accepted as neither \(V_H\) nor \(V_L\). We enumerated 12 \(V_H\) patterns, comprising four evolutionary configurations for each placement of the candidate at the left, middle or right node (Supplementary Fig.~\ref{fig:met-page-21-cropped-jpg}).
+
+\noindent\textbf{Regression-based scoring of triplet patterns.} For each triplet, let \(r_1\geq r_2\geq r_3\) denote the read supports of the three highest-ranked paths among the eight possible paths. LongPhase-TO first evaluates the predefined \(V_H\) configurations. A \(V_H\) configuration is eligible only when its three constituent paths are the three highest-ranked paths and both parental germline paths have at least two supporting reads. The read supports of the two parental paths (\(x\) and \(y\)) and the somatic-descendant path (\(z\)) are scored by separate pre-trained models: a linear predictor for indels and a third-order polynomial predictor in \(x\), \(y\) and \(z\) for SNVs. Both models were fitted on the HCC1395\_HKU mixture at 0.6 tumor DNA fraction and then held fixed for all other datasets and DNA-fraction levels; fitted coefficients are provided in the Supplementary Methods. A triplet contributes a \(V_H\) vote when its predicted probability \(p\geq0.5\).
+
+If no \(V_H\) configuration is accepted for that triplet, LongPhase-TO considers \(V_L\) evidence only when \(r_3<0.5r_2\), indicating that the graph is effectively supported by two paths. For each candidate position, three configurations are permitted for the weak third path: the all-reference path (RRR) and two other paths that do not carry the candidate alternate allele, yielding nine \(V_L\) patterns in total. A weak third path carrying the candidate alternate allele is incompatible with a single haplotype-specific somatic origin and therefore cannot contribute a \(V_L\) vote. If neither \(V_H\) nor \(V_L\) is accepted, the triplet contributes a \(V_N\) vote when \(r_2\geq2\); triplets with less support do not vote.
+
+\noindent\textbf{Candidate-level integration of triplet evidence.} The hierarchical classification described above is applied separately to every candidate-containing triplet. A candidate is evaluated in the triplets in which it occupies the left, middle or right node; with each edge spanning up to \(k\) neighboring variants, the two accompanying loci generate up to \(k^2\) triplets per placement and \(3k^2\) in total. Different triplets for the same candidate may therefore contribute \(V_H\), \(V_L\) or \(V_N\) votes, even though each individual triplet contributes at most one vote. Let \(H\), \(L\) and \(N\) denote the numbers of accepted \(V_H\), accepted \(V_L\) and non-somatic votes across these triplets. For each accepted \(V_H\) triplet we record the somatic-path proportion \(s_g\), defined as the support for the selected somatic-descendant path relative to the total support for the paths carrying the candidate alternate allele, and summarize the high-confidence evidence by its mean \(S_H\) over the \(H\) accepted triplets. The candidate is retained through either the high-confidence or low-confidence evidence route:
+
+\[
+\bigl(H\geq1\ \text{and}\ S_H>0.8\bigr)
+\quad\text{or}\quad
+\bigl(L>0\ \text{and}\ \tfrac{L}{L+N}\geq0.2\bigr),
+\]
+
+The OR combines alternative candidate-level evidence routes; it does not replace the hierarchical classification of each individual triplet. The two thresholds were fixed from the corresponding score distributions in the same training sample (Supplementary Methods). Mutation-type-specific regression thus governs whether an individual graph contributes evidence, whereas the site-level decision integrates the accepted high- and low-confidence evidence across the local graph ensemble.
+
+\subsection{Methylation-aware recalibration of somatic variants}
+
+When the input alignments carry 5-methylcytosine (5mC) tags, LongPhase-TO applies an optional recalibration of the candidates retained by the triplet-graph model that exploits allele-specific CpG methylation; the step is skipped, and the triplet-graph output returned unchanged, for data without methylation calls. Because a somatic variant arises within a tumor subpopulation whose CpG methylation state differs from that of admixed normal cells, reads carrying its alternate allele tend to share a single methylation state, whereas reads carrying the reference allele mix tumor- and normal-derived molecules; germline variants, present in both compartments, produce methylation heterogeneity on both alleles, and sequencing or alignment artifacts show no consistent allelic asymmetry. For both somatic SNV and indel candidates, LongPhase-TO summarizes this signal with ten features computed from the CpG sites flanking each candidate, spanning three complementary views of the methylation neighborhood: allelic methylation coverage, joint haplotype methylation proportions, and methylation-cloud geometry (Supplementary Fig.~\ref{fig:met-methylation-overview}). A gradient-boosted decision-tree classifier (XGBoost), trained once on a single sample and held fixed thereafter, uses these features to label each candidate as somatic, germline or artifact, retaining only candidates classified as somatic (Supplementary Methods).
+
+\subsection{Arm-level LOH detection}
+
+LongPhase-TO detects arm-level LOH, defined as the loss of one parental allele across a large genomic region, from the depletion of heterozygous sites (Figure~\ref{Figure_1.pdf}(b)). Small copy-number (CNV) and breakage--fusion--bridge (BFB) events embedded within an LOH tract locally restore heterozygosity, and their breakpoints can mimic LOH boundaries, fragmenting broad arm-level calls. LongPhase-TO therefore first maps breakpoint-associated intervals from directional read clipping, then calls LOH from the genome-wide heterozygosity profile, and finally reconciles LOH segments across the intervening intervals to recover chromosome-scale events.
+
+\subsubsection{Detection of breakpoint-associated intervals from directional read clipping}
+
+Breakpoint-associated rearrangements leave directional clipping signatures in long-read alignments when reads span their junctions. Soft- and hard-clipped alignments with more than five clipped bases were counted separately at the left and right alignment ends, and the difference between these counts defined the directional clipping signal. Strong isolated signals were treated as direct breakpoint candidates. To recover boundaries supported by distributed low-amplitude clipping, LongPhase-TO additionally smoothed the signal across 100 clip-bearing positions in each direction and quantified boundary support from the local change in the cumulative signal (Supplementary Figs.~\ref{fig:met-page-14-cropped-jpg} and~\ref{fig:met-page-15-cropped-jpg}). A boundary supported by at least five clips initiated a candidate interval and was paired with an opposite-orientation signal within 10 kb when the latter reached approximately one quarter of the initiating support. Paired signals defined local breakpoint-associated intervals that were excluded from heterozygosity counting, whereas isolated strong boundaries partitioned the chromosome for LOH evaluation (Supplementary Fig.~\ref{fig:met-page-16-cropped-jpg}). All criteria were fixed and applied unchanged across datasets.
+
+
+\subsubsection{LOH calling from regional heterozygosity ratios}
+
+The primary signal for LOH is a stark imbalance in allelic ratios at heterozygous variant sites. For each genomic window we compute a heterozygosity ratio, $\text{Het}/(\text{Het}+\text{Hom})$, from the counts supporting the heterozygous and homozygous states. In a normal diploid region this ratio is close to 1.0 (allowing for mapping bias), whereas in an LOH region the loss of one allele drives it toward zero; a window is called as LOH when the ratio falls below a threshold $\sigma$. Visually, this corresponds to the disappearance of long reads supporting one of the two haplotypes over a large genomic span.
+
+\subsubsection{Reconciliation of LOH segments across local rearrangements}
+
+A key challenge is that large LOH regions can be interrupted by localized rearrangements such as tandem duplications or BFB cycles, which restore heterozygosity locally and cause transient ratio increases that fragment the LOH call. LongPhase-TO excludes the breakpoint-associated intervals mapped in the preceding step when calculating regional heterozygosity, allowing adjacent LOH segments to be reconciled across these interruptions (Supplementary Fig.~\ref{fig:met-page-17-cropped-jpg}). This procedure preserves chromosome-scale LOH events that would otherwise be represented as multiple shorter segments.
+
+\subsection{LOH-aware somatic phasing}\label{haplotype-phasing}
+
+\subsubsection{Joint reconstruction of germline and somatic haplotypes}
+
+LongPhase-TO reconstructs haplotypes from a \(k\)-variant graph in which each node is an allele at a variant site and edges link alleles observed together on the same read, weighted by the number of supporting reads (Supplementary Fig.~\ref{fig:met-page-24-cropped-jpg}). Reconstruction is seeded by assigning the reference and alternate alleles at the first variant to haplotypes HP1 and HP2, and the two seeds are extended left to right by selecting, at each step, the two non-overlapping paths most consistent with the observed reads.
+
+Building on the recalibrated variants and the LOH map, the same graph assigns somatic variants to their haplotype of origin. Unlike conventional diploid phasing, it introduces additional branches (e.g., HP2-1) for somatic haplotypes that descend from a germline haplotype, and within an LOH region it tracks which parental path is retained and which is lost. LongPhase-TO thereby phases germline and somatic variants jointly, resolving somatic haplotypes even across LOH.
+
+\subsection{Tumor DNA fraction estimation from LOH-aware haplotype imbalance}
+
+Using the somatic haplotagged reads from the phasing stage, LongPhase-TO estimates the tumor DNA fraction, defined as the proportion of sequencing reads originating from tumor cells, directly from germline haplotype imbalance, modeling the genomic consequences of mixing tumor and normal cell populations (Figure~\ref{Figure_1.pdf}(d)).
+
+\subsubsection{Quantification of haplotype imbalance}
+
+LongPhase-TO reads tumor content from haplotype imbalance (HI). In a purely normal sample the two germline haplotypes are equally represented, giving HI values near 0.5; as the tumor DNA fraction rises, this balance is disrupted and HI shifts toward 1.0.
+
+Formally, HI at each heterozygous site is defined as:
+\[
+\text{HI} = \frac{\max(\text{Count}_{\text{HP1}}, \text{Count}_{\text{HP2}})}{\text{Count}_{\text{HP1}} + \text{Count}_{\text{HP2}}}
+\]
+
+where $\text{Count}_{\text{HP1}}$ and $\text{Count}_{\text{HP2}}$ are the allele-specific read counts assigned to the two germline haplotypes. HI is computed at all somatic variant sites and aggregated into a genome-wide distribution, which is tightly centered near 0.5 at low tumor DNA fraction and shifts systematically toward 1.0 as tumor content increases; this distribution forms the basis for the regression model below (Supplementary Fig.~\ref{fig:met-page-25-cropped-jpg}).
+
+\subsubsection{Tumor DNA fraction regression from haplotype imbalance and LOH}
+
+To formalize this relationship, a polynomial regression framework was applied to two sets of genomic features. The first is the LOH ratio, the proportion of the analyzable genome affected by LOH (total length of detected LOH regions divided by the total analyzable length). Although the model relied primarily on haplotype imbalance (HI), the LOH ratio provided complementary information: LOH becomes especially pronounced as the tumor DNA fraction approaches 1, thereby improving predictive accuracy in high-DNA-fraction samples.
+
+The second feature set comprised the haplotype imbalance statistics, namely the first (Q1) and third (Q3) quartiles of the genome-wide HI distribution, which summarize the central tendency and variability of allelic imbalance. These three predictors (Q1, Q3, and the LOH ratio) enter a fixed third-degree polynomial regression, a complete cubic comprising all 20 monomials of total degree at most three, that maps the feature vector to the tumor DNA fraction, with the estimate clamped to $[0,1]$ (Supplementary Fig.~\ref{fig:met-page-26-cropped-jpg}). The polynomial was fitted on seven of the eight datasets, with HCC1954\_UCSC held out as an independent test set, and thereafter held fixed, with the same coefficients applied regardless of the upstream somatic caller; the fitted coefficients are listed in the Supplementary Methods.
+
+For samples with an initial tumor DNA fraction estimate greater than 0.9, LongPhase-TO performs one additional phasing pass, treating all variants not marked by the normal-panel resources as somatic. The existing LOH map is reused, and the tumor DNA fraction is not re-estimated.
+
+
+\subsection{Benchmark datasets, variant callers and mixture design}
+
+\subsubsection{Long-read datasets and benchmark truth sets}
+
+We analyzed eight publicly available long-read datasets spanning six cancer cell lines (HCC1395, COLO829, HCC1937, HCC1954, H1437, and H2009) from multiple sequencing sources (Supplementary Table~\ref{tab:cell-lines}). For somatic variant benchmarking, the HCC1395 truth set was obtained from Sequencing Quality Control Phase 2 (SEQC2)~\cite{fang2021}, the COLO829 truth set from the New York Genome Center (NYGC)~\cite{arora2019}, and the HCC1937, HCC1954, H1437, and H2009 truth sets from Google DeepSomatic~\cite{park2024}. Tumor coverage ranged from 33.45$\times$ to 158.44$\times$ and matched normal coverage from 25.68$\times$ to 49.28$\times$ (Supplementary Table~\ref{tab:cell-line-datasets-and-benchmark-sources}); normal data were used only to generate the \emph{in silico} tumor-normal mixtures and to run ASCAT in tumor-normal mode as a comparator.
+
+
+
+\subsubsection{Somatic variant callers}
+
+We evaluated LongPhase-TO with the long-read somatic variant callers and versions listed in Supplementary Table~\ref{tab:callers}.
+
+
+\subsubsection{In silico tumor-normal mixture generation}
+
+We generated \emph{in silico} mixtures by downsampling high-coverage reads from each pure tumor cell line and its matched normal and combining them at a fixed total coverage of 50$\times$ (for example, 40$\times$ tumor plus 10$\times$ normal for a 0.8 fraction). The target tumor DNA fractions were 1.0, 0.8, 0.6, 0.4, and 0.2, with the pure tumor cell line assigned a fraction of 1.0. These assigned fractions served as ground truth for evaluating variant calling and for training and validating the tumor DNA fraction model.
+
+
+\backmatter
+
+\bmhead{Data availability}
+All sequencing data analyzed in this study are publicly available. The eight long-read datasets span six cancer cell lines (HCC1395, COLO829, HCC1937, HCC1954, H1437, and H2009) sequenced by HKU, NYGC, ONT, and UCSC; their sequencing sources, benchmark truth sets, and tumor and normal coverages are listed in Supplementary Table~\ref{tab:cell-line-datasets-and-benchmark-sources}. The somatic truth sets used for benchmarking were obtained from SEQC2 for HCC1395~\cite{fang2021}, from NYGC for COLO829~\cite{arora2019}, and from Google DeepSomatic for HCC1937, HCC1954, H1437, and H2009~\cite{park2024}. The CytoScan HD microarray LOH profile of HCC1395 used for the orthogonal comparison was taken from previously published data~\cite{garciadiez2019, fang2021}. The complete outputs of every tool benchmarked in this study (LongPhase-TO, ClairS-TO, DeepSomatic-TO, ASCAT, WhatsHap, HapCUT2, and LongPhase), together with the definitions of the \emph{in silico} tumor-normal mixtures, are deposited in a public Zenodo archive (DOI to be assigned upon acceptance).
+
+\bmhead{Code availability}
+The source code of LongPhase-TO is freely available at \href{https://github.com/CCU-Bioinformatics-Lab/longphase-to}{https://github.com/CCU-Bioinformatics-Lab/longphase-to}. The exact command lines and parameters used to run LongPhase-TO and every tool it was benchmarked against are provided in the Commandline arguments section of the Supplementary Information, enabling all reported statistics to be reproduced.
+
+\bmhead{Competing interests}
+R.L. receives research funding from Oxford Nanopore Technologies. The other authors declare no competing interests.
+
+\bmhead{Author contributions}
+Y.-T.H. conceived and supervised the study and designed the algorithms. Z.-Y.C. implemented LongPhase-TO and performed the experiments and analyses. H.-F.F. implemented the regression models for somatic SNV and indel recalibration. Z.Z. and R.L. contributed the somatic variant calling tools and datasets and advised on the benchmarking design. Z.-Y.C. and Y.-T.H. wrote the manuscript. All authors read and approved the final manuscript.
+
+\bibliography{references}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{Figure_1.pdf}
+    \caption{
+      Overview of the LongPhase-TO somatic haplotype phasing framework.
+      (a) Haplotype-aware recalibration refines initial somatic variant calls from ClairS-TO or DeepSomatic-TO by integrating PONs and haplotype linkage information, distinguishing true somatic variants (orange) from sequencing artifacts (yellow) and germline variants (blue).
+      (b) Chromosome-scale LOH detection identifies large-scale allelic imbalances by analyzing CNV/BFB intervals and heterozygosity ratios to distinguish LOH from non-LOH regions.
+      (c) Somatic phasing assigns somatic variants to their originating germline haplotypes (HP1, HP2) and reconstructs derived somatic haplotypes (HP1-1, HP2-1), spanning LOH regions.
+      (d) Tumor DNA fraction estimation quantifies tumor content based on haplotype imbalance, where deviation from balanced allelic representation reflects increasing tumor DNA fraction.}
+      \label{Figure_1.pdf}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{Figure_2.pdf}
+    \caption{Comparison of LOH-aware phasing and LOH calling.
+(a) Haplotype block N50 for three germline-based phasing tools (HapCUT2, WhatsHap, LongPhase) and the LOH- and somatic-aware phaser LongPhase-TO across eight cancer cell lines.
+(b) Total length of phased haplotypes for the same methods and datasets.
+(c) LOH N50 of ASCAT in tumor-normal (T+N) and tumor-only (TO) modes and of LongPhase-TO using somatic variants from ClairS-TO or DeepSomatic-TO.
+(d) LOH burden (fraction of the autosomal genome with LOH) of ASCAT (T+N), ASCAT (TO), and LongPhase-TO (ClairS-TO and DeepSomatic-TO).
+(e) Orthogonal comparison in HCC1395, the only cell line with an available independent LOH profile: chromosome ideograms show reference cytobands (top), LOH segments reported by CytoScan HD microarray (middle, purple), and LOH segments inferred by LongPhase-TO (bottom, blue).}
+    \label{Figure_2.pdf}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{Figure_3.pdf}
+    \caption{LongPhase-TO improves somatic SNV and indel calling accuracy across tumor DNA fractions. (a) F1-score, precision and recall of ClairS-TO and DeepSomatic-TO SNV calling, with or without LongPhase-TO recalibration, are shown for eight tumor cell line datasets across DNA fractions from 20\% to 100\%. LongPhase-TO consistently increases F1, with the largest gains at 20-80\% DNA fraction by improving precision while maintaining similar or modestly reduced recall for ClairS-TO and DeepSomatic-TO. (b) F1-score, precision and recall of ClairS-TO and DeepSomatic-TO indel calling, with or without LongPhase-TO recalibration, are shown for eight tumor cell line datasets across DNA fractions from 20\% to 100\%. 
+    }
+    \label{Figure_3.pdf}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{Figure_4.pdf}
+  \caption{Tumor DNA fraction estimation by LongPhase-TO across in-silico dilution series.
+(a) Genome-wide distribution of the haplotype imbalance ratio at simulated tumor DNA fractions from 1.0 to 0.2. As DNA fraction decreases, the distribution shifts away from 1.0 toward the balanced value of 0.5.
+(b) Summary statistics of the haplotype imbalance distribution (boxplots) together with the LOH burden are used as features in a polynomial regression to estimate tumor DNA fraction.
+(c) Estimated DNA fraction (y-axis) versus simulated DNA fraction (x-axis) for ASCAT (T+N), ASCAT (TO), LongPhase-TO (ClairS-TO), and LongPhase-TO (DeepSomatic-TO) across eight cancer cell line datasets; the diagonal indicates the ideal prediction ($y=x$). LongPhase-TO closely tracks the ground truth across DNA fraction levels, whereas ASCAT shows greater variability and overestimates DNA fraction at low tumor content.}
+  \label{Figure_4.pdf}
+\end{figure}
+
+\end{document} 

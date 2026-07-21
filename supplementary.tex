@@ -1,7 +1,7 @@
-
 \documentclass[pdflatex,sn-nature]{sn-jnl}
 
 % Standard packages for Nature journals
+\geometry{margin=0.75in}
 \usepackage{graphicx}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{booktabs}
@@ -15,8 +15,10 @@
 \usepackage{caption}
 \usepackage[nameinlink,capitalize]{cleveref}
 \usepackage{float}
+\usepackage{placeins}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning,shapes.geometric}
 
-% \usepackage{newfloat}
 
 % Define pandocbounded macro for pandoc compatibility
 \makeatletter
@@ -51,159 +53,1020 @@
 \captionsetup[figure]{name=Supplementary Fig.}
 \captionsetup[table]{name=Supplementary Table}
 
+% Customize List of Figures and List of Tables to include "Supplementary"
+\renewcommand{\listfigurename}{List of Supplementary Figures}
+\renewcommand{\listtablename}{List of Supplementary Tables}
 
-% \lstset{
-%   basicstyle=\ttfamily\small,
-%   frame=single,
-%   breaklines=true,
-% }
+% Add "Supplementary Figure/Table" prefix to entries with proper hyperlinks
+\makeatletter
+\let\oldnumberline\numberline
+\def\numberline#1{\oldnumberline{#1}}
+
+\let\oldcontentsline\contentsline
+\def\contentsline#1#2#3#4{%
+  \def\tempa{figure}%
+  \def\tempb{table}%
+  \def\tempc{#1}%
+  \ifx\tempc\tempa
+    \oldcontentsline{#1}{Supplementary Figure #2}{#3}{#4}%
+  \else
+    \ifx\tempc\tempb
+      \oldcontentsline{#1}{Supplementary Table #2}{#3}{#4}%
+    \else
+      \oldcontentsline{#1}{#2}{#3}{#4}%
+    \fi
+  \fi
+}
+\makeatother
+
 
 \begin{document}
-\begin{center}
-    {\LARGE \textbf{Supplementary Information for:}}\\[1em]
-    {\Large Joint Somatic Phasing and Purity Estimation Incorporating Loss of Heterozygosity in Tumor-Only Long-Read Sequencing}\\[1em]
-	Yao-Ting Huang, Zhen-Yu Chen
-\end{center}
+\title{Joint Somatic Phasing and Tumor DNA Fraction Estimation Incorporating Loss of Heterozygosity in Tumor-Only Long-Read Sequencing (Supplementary Material)}
+
+\author{\fnm{Zhen-Yu} \sur{Chen}\textsuperscript{1}}
+\author{\fnm{Zhenxian} \sur{Zheng}\textsuperscript{2}}
+\author{\fnm{Ruibang} \sur{Luo}\textsuperscript{2}}
+\author{\fnm{Hsu-Fen} \sur{Fu}\textsuperscript{1}}
+\author*{\fnm{Yao-Ting} \sur{Huang}\textsuperscript{1}*}\email{ythuang@cs.ccu.edu.tw}
+
+\affil[1]{\orgdiv{Department of Computer Science and Information Engineering}, \orgname{National Chung Cheng University}, \country{Taiwan}}
+\affil[2]{\orgdiv{School of Computing and Data Science}, \orgname{The University of Hong Kong}, \city{Hong Kong}, \country{China}}
+
+\maketitle
+
+% Table of Contents
+\tableofcontents
+
+% List of Figures
+\listoffigures
+
+% List of Tables
+\listoftables
+\clearpage
 
 \section{Supplementary Results}
 
-\subsubsection{Characterization of the Precision-Recall Trade-off using Simulation-Trained Models}\label{characterization-of-the-precision-recall-trade-off-using-simulation-trained-models}
+\subsubsection*{Characterization of the Precision-Recall Trade-off using Simulation-Trained Models}\label{characterization-of-the-precision-recall-trade-off-using-simulation-trained-models}
 
-To further investigate the filtering characteristics of LongPhase-TO, we conducted a benchmark using a variant caller (ClairS-TO-ss) trained on simulated data. This controlled experiment enables a clear characterization of the precision–recall dynamics when LongPhase-TO is applied as a post-processing step. The performance of ClairS-TO-ss with and without LongPhase-TO was evaluated across the same eight datasets and purity levels.
+To further investigate the filtering characteristics of LongPhase-TO, we conducted a benchmark using a variant caller (ClairS-TO-ss) trained on simulated data. This controlled experiment enables a clear characterization of the precision–recall dynamics when LongPhase-TO is applied as a post-processing step. The performance of ClairS-TO-ss with and without LongPhase-TO was evaluated across the same eight datasets and DNA fraction levels (Supplementary Fig.~\ref{fig:met-page-32-cropped-jpg}).
 
-The results unequivocally demonstrate that LongPhase-TO functions as a precision-enhancing filter. Across all eight datasets, the combined LongPhase-TO(ClairS-TO-ss) pipeline consistently achieved significantly higher precision compared to ClairS-TO-ss alone. This improvement, however, was consistently accompanied by a decrease in recall, confirming that the filtering process removes some true positive variants alongside false positives. Importantly, the relative impact of LongPhase-TO exhibited greater consistency at lower tumor purity levels, where gains in precision were more stable across datasets. The net effect on the F1-score, which balances precision and recall, was context-dependent. In datasets where the baseline precision of ClairS-TO-ss was lower, the gain in precision from LongPhase-TO outweighed the loss in recall, resulting in a higher F1-score. In other cases, the trade-off was less favorable. Collectively, these findings confirm the role of LongPhase-TO as a conservative but effective filter for somatic variant calls, offering a robust mechanism to increase confidence in the final call set, particularly under conditions of reduced tumor purity.
+The results unequivocally demonstrate that LongPhase-TO functions as a precision-enhancing filter. Across all eight datasets, the combined LongPhase-TO(ClairS-TO-ss) pipeline consistently achieved significantly higher precision compared to ClairS-TO-ss alone. This improvement, however, was consistently accompanied by a decrease in recall, confirming that the filtering process removes some true positive variants alongside false positives. Importantly, the relative impact of LongPhase-TO exhibited greater consistency at lower tumor DNA fraction levels, where gains in precision were more stable across datasets. The net effect on the F1-score, which balances precision and recall, was context-dependent. In datasets where the baseline precision of ClairS-TO-ss was lower, the gain in precision from LongPhase-TO outweighed the loss in recall, resulting in a higher F1-score. In other cases, the trade-off was less favorable. Collectively, these findings confirm the role of LongPhase-TO as a conservative but effective filter for somatic variant calls, offering a robust mechanism to increase confidence in the final call set, particularly under conditions of reduced tumor DNA fraction.
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_32_cropped.jpg}}
-\caption[Somatic variant calling performance with Simulation-Trained]{Somatic variant calling performance of ClairS-TO-ss with and without LongPhase-TO across eight cancer cell line datasets at tumor purities from 20\% to 100\%. LongPhase-TO generally improved precision, while recall was reduced to varying degrees.}
-\label{fig:met-page-32-cropped-jpg}
-\end{figure}
 
 \section{Supplementary Methods}
 
-\section{Appendix}\label{appendix}
+\subsection{Somatic variant recalibration and LOH detection}\label{supplementary-methods-for-somatic-variant-analysis}
 
-\subsection{Supplementary Methods for Somatic Variant Analysis}\label{supplementary-methods-for-somatic-variant-analysis}
+The following methods provide additional details on empirical threshold calibration for LOH detection and regression-calibrated triplet-graph recalibration of somatic variant candidates.
 
-This appendix provides supplementary details on the computational methodologies developed and employed for the detection of somatic variants and structural alterations from long-read sequencing data. The sections below describe the algorithms for Loss of Heterozygosity (LOH) detection, the rationale and implementation of pattern-based filtering for somatic variant calls, the integrated workflow for variant analysis, and a case study demonstrating the application of these methods.
+\subsubsection{Empirical calibration of LOH detection thresholds}\label{methodology-for-loss-of-heterozygosity-loh-detection}
 
-\subsubsection{Methodology for Loss of Heterozygosity (LOH) Detection}\label{methodology-for-loss-of-heterozygosity-loh-detection}
+Loss of Heterozygosity (LOH) is a common genomic event in cancer wherein one parental allele of a chromosome segment is lost. To detect LOH regions, we developed a two-step classification method based on the local density of heterozygous variants. The approach first assigns a genotype to each variant based on its allele frequency and then calculates a Heterozygosity Ratio \(H_r\) for genomic windows to classify them as LOH or Non-LOH (Supplementary Fig.~\ref{fig:app-page-37-cropped-jpg}).
 
-Loss of Heterozygosity (LOH) is a common genomic event in cancer wherein one parental allele of a chromosome segment is lost. To detect LOH regions, we developed a two-step classification method based on the local density of heterozygous variants. The approach first assigns a genotype to each variant based on its allele frequency and then calculates a Heterozygosity Ratio \(H_r\) for genomic windows to classify them as LOH or Non-LOH (Figure~\ref{fig:app-page-37-cropped-jpg}).
+The determination of classification thresholds was guided by empirical distributions of the data. As shown in Supplementary Fig.~\ref{fig:app-page-37-cropped-jpg}a, the violin plot illustrates the distribution of Variant Allele Frequencies (VAF) for variants located within predefined LOH (green) and Non-LOH (blue) regions. In Non-LOH regions, the VAF distribution is bimodal, with a prominent peak at 0.5 representing heterozygous variants and a smaller peak near 1.0 corresponding to homozygous variants. By contrast, LOH regions exhibit a unimodal distribution strongly skewed towards 1.0, consistent with the loss of one allele and the concomitant depletion of heterozygous variants. Based on these empirical patterns, a threshold of VAF $\ge$ 0.8 was selected to classify variants as homozygous in subsequent analyses.
 
-The determination of classification thresholds was guided by empirical distributions of the data. As shown in Figure~\ref{fig:app-page-37-cropped-jpg}a, the violin plot illustrates the distribution of Variant Allele Frequencies (VAF) for variants located within predefined LOH (green) and Non-LOH (blue) regions. In Non-LOH regions, the VAF distribution is bimodal, with a prominent peak at 0.5 representing heterozygous variants and a smaller peak near 1.0 corresponding to homozygous variants. By contrast, LOH regions exhibit a unimodal distribution strongly skewed towards 1.0, consistent with the loss of one allele and the concomitant depletion of heterozygous variants. Based on these empirical patterns, a threshold of VAF ≥ 0.8 was selected to classify variants as homozygous in subsequent analyses.
-
-Similarly, Figure~\ref{fig:app-page-37-cropped-jpg}b presents a box plot of the Heterozygosity Ratio for regions classified as LOH and Non-LOH. The ratio, defined as the proportion of heterozygous variants within a genomic window, shows a clear separation between the two groups. Non-LOH regions consistently display higher values with a median around 0.55, whereas LOH regions approach zero. On the basis of this distribution, a threshold of $H_r = 0.09$ was established to distinguish LOH from Non-LOH regions.
+Similarly, Supplementary Fig.~\ref{fig:app-page-37-cropped-jpg}b presents a box plot of the Heterozygosity Ratio for regions classified as LOH and Non-LOH. The ratio, defined as the proportion of heterozygous variants within a genomic window, shows a clear separation between the two groups. Non-LOH regions display higher values, with a median around 0.55, whereas LOH regions approach zero. On the basis of this distribution, a threshold of $H_r = 0.09$ was established to distinguish LOH from Non-LOH regions.
 
 This quantitative framework, supported by empirical observations of allele frequency and heterozygosity ratio distributions, provides a robust and automated method for identifying LOH events across the genome by leveraging the statistical signature of heterozygote depletion.
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_37_cropped.jpg}}
-\caption[LOH Detection Methodology]{A two-panel plot illustrating the methodology for Loss of Heterozygosity (LOH) detection. (a) The violin plot shows the distribution of Variant Allele Frequencies (VAF) in Non-LOH (blue) and LOH (green) regions, demonstrating that LOH regions lack the characteristic heterozygous peak at VAF=0.5. (b) The box plot shows the distribution of the calculated Heterozygosity Ratio for the two region types, revealing a clear separation that allows for robust classification using a threshold (Hr = 0.09).}\label{fig:app-page-37-cropped-jpg}
-\end{figure}
 
-\subsubsection{Pattern-Based Filtering for Somatic Variant Calling}\label{pattern-based-filtering-for-somatic-variant-calling}
+\subsubsection{Regression-calibrated triplet-graph recalibration}\label{pattern-based-filtering-for-somatic-variant-calling}
 
-Alongside the detection of large-scale genomic events, the accurate identification of individual somatic variants is a critical objective that is frequently challenged by sequencing artifacts and other sources of noise. To address this challenge, we developed a filtering strategy that evaluates the specific patterns of evidence supporting each candidate variant. This approach is based on the rationale that true somatic mutations exhibit characteristic, high-confidence evidence patterns that differ from those of artifacts.
+LongPhase-TO evaluates each candidate in the context of two neighboring variants. The reference and alternate alleles at the three loci define eight possible paths, whose weights are the numbers of spanning reads. Each candidate-containing triplet contributes at most one of three mutually exclusive evidence categories: \(V_H\) denotes high-confidence three-path evidence comprising two parental germline paths and one somatic-descendant path; \(V_L\) denotes lower-confidence, effectively two-path evidence that remains compatible with a single haplotype-specific somatic origin; and \(V_N\) denotes a sufficiently supported topology accepted as neither \(V_H\) nor \(V_L\). The 12 predefined \(V_H\) patterns represent four evolutionary configurations for each placement of the candidate at the left, middle or right node. Empirically, these patterns are enriched among validated true positive calls, whereas discordant \(V_N\) topologies are more common among false positive calls (Supplementary Fig.~\ref{fig:app-page-38-cropped-jpg}).
 
-\paragraph{Rationale for Pattern-Based Evidence Selection}\label{rationale-for-pattern-based-evidence-selection}
+\paragraph{Regression-based scoring of high-confidence triplets}\label{rationale-for-pattern-based-evidence-selection}
 
-The rationale for selecting specific evidence patterns is grounded in their empirical association with variant call accuracy rather than arbitrary design. As shown in Figure~\ref{fig:app-page-38-cropped-jpg}, predefined patterns were evaluated by comparing their relative abundance across validated true positive (TP) and false positive (FP) variant sets. The analysis revealed that \(V_H\) (high-confidence) patterns are strongly enriched for TPs with minimal FP contribution, while \(V_L\) (low-confidence) patterns, although less frequent, remain reliable indicators of true variants. In contrast, \(V_N\) (non-somatic) patterns, dominated by the `DISAGREE' category, contribute substantially to both TPs and FPs, rendering them unreliable. These findings demonstrate that the prioritization of \(V_H\) and \(V_L\) patterns is empirically justified and provides a principled basis for the filtering strategy.
+For each triplet, let \(r_1\geq r_2\geq r_3\) denote the read supports of the three highest-ranked paths. LongPhase-TO first evaluates the 12 predefined \(V_H\) configurations. For a candidate \(V_H\) configuration, the read counts of the two parental paths (\(x\) and \(y\)) and the somatic-descendant path (\(z\)) are used as model features. The configuration is eligible only when its constituent paths are the three highest-ranked paths and both parental paths have at least two supporting reads. LongPhase-TO then applies a fixed, mutation-type-specific logistic model whose linear predictor \(\eta\) is mapped to a probability \(p=\{1+\exp(-\eta)\}^{-1}\); the triplet contributes a \(V_H\) vote when \(p\geq0.5\). For indels, \(\eta\) is linear in the path supports,
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_38_cropped.jpg}}
-\caption[Evidence Pattern Comparison]{Comparison of True Positive (TP, blue) and False Positive (FP, red) variant calls across predefined evidence patterns. The patterns are grouped into three categories: high-confidence (\(V_H\)), low-confidence (\(V_L\)), and non-somatic (\(V_N\)). \(V_H\) patterns are strongly enriched for TPs with minimal FP contribution, \(V_L\) patterns occur less frequently but remain reliable indicators of true variants, and \(V_N\) patterns are dominated by the DISAGREE' category, which contributes substantially to both TPs and FPs and is therefore ambiguous and unreliable. These distributions provide the rationale for adopting a filtering strategy that prioritizes variants supported by \(V_H\) and \(V_L\) patterns.}\label{fig:app-page-38-cropped-jpg}
-\end{figure}
+\[
+\eta_{\mathrm{indel}}=-0.2337+0.7643x+0.7979y-0.7473z,
+\]
 
-\paragraph{Pattern Artifact Filtering using a Somatic Path Ratio}\label{pattern-artifact-filtering-using-a-somatic-path-ratio}
+whereas for SNVs \(\eta\) is a third-order polynomial in \(x\), \(y\) and \(z\),
 
-To evaluate the robustness of the Somatic Path Ratio as a filtering criterion, we systematically compared its distribution across validated true positive (TP) and false positive (FP) variant calls (Figure~\ref{fig:app-page-39-cropped-jpg}). As illustrated, TP variants are strongly enriched near a ratio of 1.0, whereas FP variants exhibit a broader and lower distribution. This clear separation indicates that the Somatic Path Ratio provides a reliable metric for discriminating true somatic mutations from sequencing artifacts.
+\[
+\begin{aligned}
+\eta_{\mathrm{SNV}}={}&0.003754+0.014223x+0.015017y+0.011169z\\
+&-0.000769x^2+0.000674xy+0.007199xz\\
+&-0.004500y^2+0.041002yz-0.009079z^2\\
+&+0.000015x^3+0.000010x^2y-0.000177x^2z\\
+&-0.000033xy^2-0.000075xyz-0.000055xz^2\\
+&+0.000111y^3-0.000754y^2z-0.000201yz^2+0.000092z^3.
+\end{aligned}
+\]
 
-The choice of the threshold \(\tau\) was guided by empirical data. By analyzing the overlap of TP and FP distributions, a cutoff of approximately \(\tau = 0.8\) was identified as an optimal balance. At this threshold, a portion of FP calls can be effectively excluded while preserving high sensitivity for TP variants. Importantly, this cutoff minimizes the trade-off between precision and recall, ensuring that filtering improves accuracy without substantial loss of sensitivity.
+The coefficients were fitted on a single training sample, the HCC1395\_HKU mixture at 0.6 tumor DNA fraction, and then held fixed and applied to all other datasets, which were used only for evaluation. Regression therefore calibrates the evidence contributed by each high-confidence triplet; it does not by itself make the final candidate-site call.
 
-Overall, these analyses support the use of \(\tau = 0.8\) as a data-driven threshold derived from the empirical distributions of TP and FP calls. The application of this threshold enhances the reliability of variant filtering while maintaining broad sensitivity in detection.
+\paragraph{Classification of low-confidence triplet patterns}\label{low-confidence-variant-detection-using-vlow-ratio}
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_39_cropped.jpg}}
-\caption[Somatic Path Ratio Distribution]{Distribution and robustness of the Somatic Path Ratio for artifact filtering. The histograms show that true positives (TP, blue) consistently have a high ratio near 1.0, whereas false positives (FP, red) have a lower, more dispersed distribution, enabling effective filtering with a threshold \(\tau \approx 0.8\). Additional plots demonstrate this separation is maintained across a wide range of tumor purities (1.0 to 0.2).}\label{fig:app-page-39-cropped-jpg}
-\end{figure}
+If no \(V_H\) configuration is accepted for that triplet, LongPhase-TO considers \(V_L\) evidence only when \(r_3<0.5r_2\), indicating that the graph is effectively supported by two paths. The nine \(V_L\) patterns comprise three candidate positions crossed with three permitted configurations for the weak third path: RRR and two other paths that do not carry the candidate alternate allele. A weak third path carrying the candidate alternate allele is incompatible with a single haplotype-specific somatic origin and therefore cannot contribute a \(V_L\) vote. If neither \(V_H\) nor \(V_L\) is accepted, the triplet contributes a \(V_N\) vote when \(r_2\geq2\); triplets with less support do not vote. This subdivision prevents all nominal two-path configurations from being treated as equivalent.
 
-\paragraph{Low-Confidence Variant Detection using Vlow Ratio}\label{low-confidence-variant-detection-using-vlow-ratio}
+\paragraph{Candidate-level integration of triplet evidence}\label{pattern-artifact-filtering-using-a-somatic-path-ratio}
 
-For variants supported by less definitive evidence patterns (\(V_L\)), an auxiliary filtering criterion was introduced. This measure is defined as the proportion of supporting evidence for the low-confidence variant path (\(V_L\)) relative to the total evidence from both the variant (\(V_L\)) and non-variant (\(V_N\)) paths:
+The hierarchical classification described above is applied separately to every candidate-containing triplet. Different triplets for the same candidate may therefore contribute \(V_H\), \(V_L\) or \(V_N\) votes, even though each individual triplet contributes at most one vote. Let \(H\), \(L\) and \(N\) be the numbers of accepted \(V_H\), accepted \(V_L\) and non-somatic triplet votes for a candidate. For each accepted high-confidence triplet \(g\), the somatic-path proportion \(s_g\) is the support for the selected somatic-descendant path divided by the total support for paths carrying the candidate alternate allele, and \(S_H=H^{-1}\sum_g s_g\). Let \(\tau=0.8\) and \(\theta=0.2\) denote the high- and low-confidence aggregation thresholds, respectively. The candidate is retained through either the high-confidence or low-confidence evidence route:
 
-$$
-\frac{V_L}{V_L + V_N} \geq \theta
-$$
+\[
+\left(H\geq1\ \text{and}\ S_H>\tau\right)
+\quad\text{or}\quad
+\left(L>0\ \text{and}\ \frac{L}{L+N}\geq\theta\right).
+\]
 
-To establish an appropriate threshold, the distribution of this measure was compared across validated true positive (TP) and false positive (FP) calls (Figure~\ref{fig:app-page-40-cropped-jpg}). FP variants are predominantly concentrated near zero, whereas TP variants display a broader distribution extending toward higher values. This separation enables the application of a threshold to reduce FP calls while retaining the majority of TP calls.
+The OR combines alternative candidate-level evidence routes; it does not replace the hierarchical classification of each individual triplet. The distributions of \(S_H\) and \(L/(L+N)\) among truth-labelled calls support the selected values of \(\tau=0.8\) and \(\theta=0.2\), respectively (Supplementary Figs.~\ref{fig:app-page-39-cropped-jpg} and~\ref{fig:app-page-40-cropped-jpg}). Thus, the upgraded procedure combines mutation-type-specific regression at the individual-graph level with deterministic evidence aggregation at the candidate-site level.
 
-Empirical analysis indicated that a cutoff of approximately \(\theta = 0.2\) provides a suitable balance: it effectively removes a considerable fraction of FP calls while largely preserving TP sensitivity. Furthermore, the FP distribution remains narrowly centered at zero across different tumor purity levels, whereas the TP distribution shifts moderately toward lower values. These findings support the adoption of \(\theta \approx 0.2\) as a robust filtering criterion across heterogeneous sample contexts.
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_40_cropped.jpg}}
-\caption[Low-confidence variant filtering using $V_{low}$ ratio.]{Distribution of the $V_{low}$ ratio for validated true positives (TP, blue) and false positives (FP, red). A threshold \(\theta \approx 0.2\) (dashed line) separates FP calls, which are predominantly concentrated near zero, from TP calls, which extend toward higher values. The left panels show TP distributions, and the right panels show FP distributions, across varying tumor purity levels (1.0 to 0.2). This analysis indicates that \(\theta \approx 0.2\) provides a robust filtering criterion, effectively reducing FP calls while preserving TP sensitivity across heterogeneous purity contexts.}\label{fig:app-page-40-cropped-jpg}
-\end{figure}
+\subsection{Methylation-aware recalibration of somatic variants}
+\label{app:methylation-recalibration}
 
-\subsection{Purity-Aware Workflow Considerations}
+Long-read platforms report 5-methylcytosine (5mC) status per read, allowing the CpG methylation neighborhood of each candidate to be examined at single-read resolution. When the input alignments carry 5mC tags, LongPhase-TO performs an additional recalibration of the somatic candidates retained by the triplet-graph model; when methylation calls are absent, the step is skipped and the triplet-graph output is returned unchanged. The rationale is developmental: a somatic variant arises post-zygotically within a tumor subpopulation that carries a characteristic CpG methylation state, whereas admixed normal cells retain the germline state. Consequently, reads carrying the somatic alternate allele tend to share a single methylation state (methylation-``pure''), whereas reads carrying the reference allele are a mixture of tumor- and normal-derived molecules and are therefore methylation-``mixed''. Germline variants, which segregate in both compartments, yield methylation heterogeneity on both alleles, and sequencing or alignment artifacts produce no reproducible allelic asymmetry. This module is applied to both somatic SNV and indel candidates; the accompanying schematics illustrate the indel case.
+
+For each candidate, reads are partitioned by the allele they carry at the candidate locus, reference-allele reads and alternate-allele reads, and the CpG sites falling within a symmetric window of \(\pm d\) base pairs around the candidate position are analyzed. Ten features are computed and grouped into three complementary views of the local methylation pattern (Supplementary Fig.~\ref{fig:met-methylation-overview}).
+
+\paragraph{Allelic methylation coverage.} At each flanking CpG site, the number of methylated reads is counted separately for the reference and alternate alleles. Three features summarize these counts across the window: the mean reference-allele methylated-read count, the mean alternate-allele methylated-read count, and the mean absolute difference between the per-site reference and alternate counts. Because the somatic alternate allele is confined to the uniformly methylated tumor fraction, a somatic candidate exhibits a large allelic count difference, whereas germline variants and artifacts do not (Supplementary Fig.~\ref{fig:met-methylation-allelic}).
+
+\paragraph{Joint haplotype methylation proportions.} At each flanking CpG site, the reads of each allele are labeled ``pure'' when they share a single methylation state (all methylated or all unmethylated) and ``mixed'' when both states are present. Pairing the reference- and alternate-allele labels assigns each site to one of four joint states: reference-pure/alternate-pure, reference-pure/alternate-mixed, reference-mixed/alternate-pure and reference-mixed/alternate-mixed. Three features record the fraction of covered CpG sites in the reference-mixed/alternate-mixed, reference-pure/alternate-mixed and reference-mixed/alternate-pure states; the fourth fraction is omitted as redundant, since the four proportions sum to one. The somatic signature of a methylation-pure alternate allele against a methylation-mixed reference allele is captured by an elevated reference-mixed/alternate-pure fraction (Supplementary Fig.~\ref{fig:met-methylation-joint}).
+
+\paragraph{Methylation-cloud geometry.} At each flanking CpG site, an allele methylation ratio is defined as the number of methylated reads divided by the total number of methylated and unmethylated reads, computed separately for the two alleles. Plotting the per-site alternate-allele ratio against the reference-allele ratio yields a cloud of points whose centroid, at coordinates (mean alternate ratio, mean reference ratio), locates the candidate in this methylation-ratio space. Four features are derived: the two centroid coordinates, the perpendicular distance of the centroid from the diagonal \(y=x\), which measures the overall imbalance between reference- and alternate-allele methylation, and the mean absolute per-site difference between the reference and alternate ratios. Balanced, symmetric methylation places the centroid on the diagonal, whereas the allele-specific methylation expected of a somatic variant displaces it (Supplementary Fig.~\ref{fig:met-methylation-cloud}).
+
+Together these ten features are supplied to a gradient-boosted decision-tree classifier (XGBoost), which assigns each candidate to the somatic, germline or artifact class; only candidates classified as somatic are retained. Consistent with the training strategy used elsewhere in LongPhase-TO, the classifier was trained on a single sample, the HCC1395\_NYGC mixture at 0.6 tumor DNA fraction, and then held fixed and applied unchanged to all other cell-line datasets and DNA-fraction levels, which were used only for evaluation.
+
+\paragraph{Classifier and training-set selection.} The choice of a gradient-boosted tree model was made empirically (Supplementary Fig.~\ref{fig:met-classifier-selection}). Seven candidate classifiers (XGBoost, histogram-based gradient boosting, random forests, extremely randomized trees, logistic regression, a linear support-vector machine and linear discriminant analysis) were compared by held-out ROC-AUC on the binary somatic-versus-non-somatic indel task under two cross-validation schemes, each applied both across cell lines and across tumor DNA fractions: leave-one-out, in which the model was trained on all groups but one and evaluated on the held-out group, and leave-four-out, in which it was trained on a single group and evaluated on the remaining four. The four tree-ensemble methods consistently outperformed the three linear methods, and XGBoost attained the highest or tied-highest held-out ROC-AUC in every scheme (median approximately 0.93 for leave-one-cell-line-out and approximately 0.96 for leave-one-fraction-out), motivating its selection. Under the more stringent leave-four-out setting, in which a single group supplied the training data, the held-out ROC-AUC of XGBoost remained at approximately 0.90 or above, confirming that the single-sample training strategy generalizes robustly across both cell lines and tumor DNA fractions.
+
+
+\subsection{High-DNA-fraction phasing refinement}
 \label{app:purity-aware-workflow}
 
-The core principle underlying our method lies in the distinct behavior of germline and somatic variant allele frequencies (VAFs) in tumor--normal mixed samples. Specifically, the VAF of a heterozygous somatic variant is directly proportional to tumor purity, whereas the VAF of a heterozygous germline variant remains approximately 0.5 and is comparatively insensitive to purity (Figure~\ref{fig:app-page-41-cropped-jpg}). This statistical contrast forms the basis for separating somatic from germline signals.
+The variant allele frequency (VAF) of a heterozygous somatic variant scales with tumor DNA fraction, whereas that of a heterozygous germline variant remains near 0.5. At high tumor DNA fraction, overlap between these distributions reduces the reliability of haplotype-based candidate recalibration (Supplementary Fig.~\ref{fig:app-page-41-cropped-jpg}).
 
-At high purity, however, the VAF distributions of somatic and germline variants substantially overlap, rendering their separation statistically challenging. To address this, the workflow in (Figure~\ref{fig:app-page-42-cropped-jpg}) adopts a conditional strategy. For samples not classified as high purity, somatic variant calling proceeds after candidate selection and phasing, and the pipeline terminates accordingly. For high-purity samples, the conventional somatic variant calling step is bypassed to prevent loss of recall; instead, evidence from loss-of-heterozygosity (LOH) detection is iteratively incorporated to refine haplotype phasing and maintain analytical robustness.
+LongPhase-TO applies candidate recalibration and LOH-aware phasing to all samples and estimates tumor DNA fraction from the initial phasing result. When this estimate exceeds 0.9, all variants not marked by the normal-panel resources are treated as somatic and phasing is repeated once using the existing LOH map (Supplementary Fig.~\ref{fig:app-page-42-cropped-jpg}). Otherwise, the initial phasing result is retained. The tumor DNA fraction is not re-estimated after the additional pass.
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_41_cropped.jpg}}
-\caption[Tumor Purity Effect on Allele Frequencies]{Effect of tumor purity on variant allele frequencies (VAFs). The VAF of a heterozygous germline variant remains stable at approximately 0.5 across purity levels, whereas the VAF of a heterozygous somatic variant decreases proportionally with decreasing purity. At high purity, the distributions of somatic and germline variants overlap, complicating statistical separation.}\label{fig:app-page-41-cropped-jpg}
-\end{figure}
+\subsection{Tumor DNA fraction regression from haplotype imbalance and LOH}
+\label{app:dna-fraction-regression}
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{page_42_cropped.jpg}}
-\caption[Integrated Computational Workflow]{Purity-aware computational workflow for somatic variant analysis. For moderate- to low-purity samples, somatic variant calling is applied following candidate selection and phasing. For high-purity samples, where somatic and germline VAFs are indistinguishable, the standard somatic calling step is bypassed to avoid recall loss. Instead, loss-of-heterozygosity (LOH) detection results are iteratively integrated to refine haplotype phasing and preserve analytical accuracy.}\label{fig:app-page-42-cropped-jpg}
-\end{figure}
+The tumor DNA fraction is predicted from three genome-wide features: the first and third quartiles of the haplotype-imbalance distribution, \(q_1\) and \(q_3\), and the LOH ratio \(r\) (total LOH length divided by the analyzable genome length). A single complete third-degree (cubic) polynomial in these features, comprising all 20 monomials of total degree at most three, was fitted on seven of the eight cell-line datasets, with HCC1954\_UCSC held out as an independent test set, and then held fixed; the same coefficients are applied whether somatic variants are supplied by ClairS-TO or DeepSomatic-TO. The fitted predictor is
 
+\[
+\begin{aligned}
+f ={}& -40.7226 + 194.2179\,q_1 - 13.4902\,q_3 - 8.6631\,r \\
+&- 169.4964\,q_1^2 - 161.1149\,q_1 q_3 + 71.1042\,q_1 r + 74.7865\,q_3^2 - 38.3745\,q_3 r + 22.1523\,r^2 \\
+&+ 6.5747\,q_1^3 + 145.5591\,q_1^2 q_3 + 25.5427\,q_1^2 r - 4.7007\,q_1 q_3^2 - 127.0712\,q_1 q_3 r + 19.2526\,q_1 r^2 \\
+&- 30.2605\,q_3^3 + 74.4106\,q_3^2 r - 33.5680\,q_3 r^2 - 4.5039\,r^3,
+\end{aligned}
+\]
+
+and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
+
+\clearpage
 \section{Supplementary Figures}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\linewidth]{page_3_cropped.jpg}
-	\caption{Diagram illustrating the fundamental difference between germline and somatic variants. Germline variants (blue) are inherited from parents, present in every cell from fertilization, and are heritable. Somatic variants (orange) are acquired mutations that arise in a specific cell population (e.g., a tumor) during an individual's lifetime and are not heritable.}
-	\label{fig:int-page-3-cropped-jpg}
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=0.8\textwidth,keepaspectratio]{page_18_cropped.jpg}}
+  \caption[Panel of Normals Filtering]{Filtering somatic variant candidates using a Panel of Normals (PON). This schematic shows that an initial set of variant candidates, containing a mix of somatic (brown), germline (blue), and other variants, is filtered by subtracting all variants found in the PON. This process enriches the final candidate list for true somatic mutations by removing common germline polymorphisms and known artifacts.}\label{fig:met-page-18-cropped-jpg}
 \end{figure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\linewidth]{page_4_1_cropped.png}
-	\caption{...}
-	\label{fig:int-page-4-1-cropped-jpg}
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_19_cropped.jpg}}
+  \caption[Allele concordance filtering]{Filtering clustered artifacts by allele concordance. For each candidate, non-reference mismatches within 100 aligned positions on either side are compared between reference- and alternate-supporting reads. A candidate is removed when at least two mismatches occur in at least 50\% of alternate-supporting reads and at least 60\% of all reads carrying the corresponding mismatch.}\label{fig:met-page-19-cropped-jpg}
 \end{figure}
 
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[width=\linewidth]{page_4_2_cropped.png}
-% 	\caption{...}
-% 	\label{fig:int-page-4-2-cropped-jpg}
-% \end{figure}
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_20_cropped.jpg}}
+  \caption[Graph Models Comparison]{Comparison of graph models for somatic variant recalibration. The figure contrasts the proposed triplet graph, which models haplotypes across three adjacent variant sites, with a simpler pairwise graph that only considers pairs. The triplet graph captures more linkage information, making it more powerful for distinguishing true somatic variants from artifacts, while the pairwise graph is labeled noninformative for this complex task.}\label{fig:met-page-20-cropped-jpg}
+\end{figure}
 
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[width=\linewidth]{page_5_cropped.jpg}
-% 	\caption{Workflow for somatic variant calling using paired tumor-normal long-read data. After sequencing both samples, variants are called and then phased in the tumor sample. The phasing step (Step 3) segregates reads by haplotype, concentrating the signal of a somatic mutation (orange) onto one haplotype and separating it from the wild-type allele, which improves the signal-to-noise ratio for machine learning-based callers like DeepSomatic or ClairS.}\label{fig:int-page-5-cropped-jpg}
-% \end{figure}
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_21_cropped.jpg}}
+  \caption[Combinatorial Haplotype Pattern Classification]{High-confidence patterns ($V_H$) arise from three-haplotype scenarios with two parental germline paths and one somatic-descendant path. The three illustrated low-confidence ($V_L$) topologies correspond to the candidate occupying the middle, left or right node; each is further subdivided by the third-path topology during graph evaluation. Sufficiently supported configurations not accepted as $V_H$ or $V_L$ are classified as non-somatic ($V_N$), whereas configurations with insufficient support do not vote.}\label{fig:met-page-21-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_overview.png}}
+  \caption[Methylation-aware recalibration overview]{Overview of methylation-aware recalibration of somatic variant candidates. When the input alignments carry 5-methylcytosine (5mC) tags, reads spanning each candidate are partitioned by the allele they carry at the candidate locus (reference, ``G''; alternate, e.g.\ ``GT''), and the CpG sites within a symmetric window of $\pm d$ base pairs are analyzed at single-read resolution (methylated, red ``M''; unmethylated, cyan ``U''). Ten features are computed across three complementary views: allelic methylation coverage (per-site methylated-read counts on each allele), joint haplotype methylation proportions (per-site classification of each allele as methylation-pure or methylation-mixed), and methylation-cloud geometry (per-site allele methylation ratios and the geometry of their centroid; kernel-density clouds are shown for somatic, germline and artifact indels in HCC1395\_NYGC at 0.6 tumor DNA fraction). A gradient-boosted decision-tree classifier (XGBoost) uses these features to label each candidate as a somatic variant, germline variant or sequencing artifact, retaining only candidates classified as somatic.}\label{fig:met-methylation-overview}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_14_cropped.jpg}}
+  \caption[Directional clipping signal and distributed boundary detection]{Soft- and hard-clipped alignments with more than five clipped bases are counted separately at the left and right alignment ends. The resulting directional signal is smoothed across 100 clip-bearing positions to consolidate distributed low-amplitude support, while isolated strong signals are retained as direct breakpoint candidates. The schematic uses a six-position window for clarity.
+  }\label{fig:met-page-14-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_15_cropped.jpg}}
+  \caption[Boundary support from distributed clipping]{Distributed clipping signals are consolidated into candidate boundaries and assigned support from the local change in the smoothed cumulative clipping signal. The sign of this change preserves clipping orientation for subsequent interval pairing; the schematic uses a six-position window for clarity.}\label{fig:met-page-15-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_16_cropped.jpg}}
+  \caption[Breakpoint-associated interval calling]{A signal supported by at least five clips initiates a candidate boundary. An opposite-orientation signal within 10 kb completes a local interval when its support reaches approximately one quarter of the initiating signal; otherwise, the strong isolated boundary partitions the chromosome for LOH evaluation.}\label{fig:met-page-16-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=0.8\textwidth, keepaspectratio]{page_17_cropped.jpg}}
+  \caption[Chromosome-scale LOH Detection]{Method for chromosome-scale LOH detection. The workflow shows that an initial pass may identify fragmented LOH regions interrupted by small CNV or BFB events that locally restore heterozygosity. The final step involves a merging process that filters out these small intervening events to define a single, continuous, large-scale LOH region.}\label{fig:met-page-17-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_24_cropped.jpg}}
+  \caption[Haplotype Phasing Workflow]{Graph-based haplotype phasing workflow. This diagram illustrates how sequencing read data is transformed into a k-variant graph, where nodes are alleles and weighted edges represent their co-occurrence on reads. The algorithm then traverses this graph to reconstruct the most likely haplotypes, including distinguishing between germline (HP1, HP2) and newly evolved somatic (e.g., HP2-1) haplotypes.}\label{fig:met-page-24-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_25_cropped.jpg}}
+  \caption[Haplotype Imbalance Principle]{Principle of tumor DNA fraction prediction using Haplotype Imbalance (HI). The figure shows that as tumor DNA fraction increases from 0.2 to 1.0, the proportion of somatic haplotypes increases. This causes the genome-wide distribution of HI, shown in histograms and box plots, to shift from a balanced state (centered at 0.5) to a highly imbalanced state with higher median values and a peak at 1.0.}\label{fig:met-page-25-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_26_cropped.jpg}}
+  \caption[Tumor DNA Fraction Prediction Model]{Schematic of the tumor DNA fraction prediction model. The model takes two types of genomic features as input: the LOH Ratio (fraction of the genome with LOH) and statistics from the Haplotype Imbalance distribution (represented by the Q1 and Q3 quartiles of a box plot). These features are provided to a Polynomial Regression model, from which the estimated tumor DNA fraction is obtained.}\label{fig:met-page-26-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_32_cropped.jpg}}
+  \caption[Somatic variant calling performance with Simulation-Trained]{Somatic variant calling performance of ClairS-TO-ss with and without LongPhase-TO across eight cancer cell line datasets at tumor DNA fractions from 20\% to 100\%. LongPhase-TO generally improved precision, while recall was reduced to varying degrees.}
+  \label{fig:met-page-32-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_37_cropped.jpg}}
+  \caption[LOH Detection Methodology]{A two-panel plot illustrating the methodology for Loss of Heterozygosity (LOH) detection. (a) The violin plot shows the distribution of Variant Allele Frequencies (VAF) in Non-LOH (blue) and LOH (green) regions, demonstrating that LOH regions lack the characteristic heterozygous peak at VAF=0.5. (b) The box plot shows the distribution of the calculated Heterozygosity Ratio for the two region types, revealing a clear separation that allows for robust classification using a threshold (Hr = 0.09).}\label{fig:app-page-37-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_38_cropped.jpg}}
+  \caption[Evidence Pattern Comparison]{Comparison of True Positive (TP, blue) and False Positive (FP, red) variant calls across predefined evidence patterns. The patterns are grouped into three categories: high-confidence (\(V_H\)), low-confidence (\(V_L\)), and non-somatic (\(V_N\)). \(V_H\) patterns are strongly enriched for TPs with minimal FP contribution, \(V_L\) patterns occur less frequently but remain reliable indicators of true variants, and \(V_N\) patterns are dominated by the DISAGREE' category, which contributes substantially to both TPs and FPs and is therefore ambiguous and unreliable. These distributions provide the rationale for adopting a filtering strategy that prioritizes variants supported by \(V_H\) and \(V_L\) patterns.}\label{fig:app-page-38-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_39_cropped.jpg}}
+  \caption[High-confidence somatic-path support]{Distribution of the mean high-confidence somatic-path proportion, \(S_H\), used during site-level evidence aggregation. True positive candidates (TP, blue) are enriched near 1.0, whereas false positive candidates (FP, red) have lower and more dispersed values. The separation across tumor DNA fractions from 1.0 to 0.2 supports the retained threshold \(S_H>\tau\), where \(\tau=0.8\), for candidates with at least one regression-accepted \(V_H\) triplet.}\label{fig:app-page-39-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_40_cropped.jpg}}
+  \caption[Low-confidence evidence fraction]{Distribution of the site-level low-confidence evidence fraction, \(L/(L+N)\), for validated true positive (TP, blue) and false positive (FP, red) candidates. False positive candidates are concentrated near zero, whereas true positive candidates extend toward higher values. The distributions across tumor DNA fractions from 1.0 to 0.2 support the retained threshold \(L/(L+N)\geq\theta\), where \(\theta=0.2\), when no high-confidence route is satisfied.}\label{fig:app-page-40-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_allelic_coverage.png}}
+  \caption[Allelic methylation coverage features]{Allelic methylation coverage features. Reads spanning a candidate are split by the allele they carry (reference, ``G''; alternate, e.g.\ ``GT''), and at each CpG site within the flanking window the number of methylated reads is counted separately for the two alleles (methylated, red ``M''; unmethylated, cyan ``U''). The per-site reference and alternate methylated-read counts and their absolute difference are averaged over the window to give the mean reference count, the mean alternate count and the mean absolute count difference (MAD). Because the somatic alternate allele is confined to the uniformly methylated tumor fraction, whereas the reference allele mixes tumor- and normal-derived reads, somatic indels exhibit the largest allelic count difference; box plots (HCC1395\_NYGC at 0.6 tumor DNA fraction) contrast somatic, germline and artifact indels for each feature.}\label{fig:met-methylation-allelic}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_joint_haplotype.png}}
+  \caption[Joint haplotype methylation proportion features]{Joint haplotype methylation proportion features. At each CpG site within the flanking window, the reads of each allele are labeled ``pure'' when they share a single methylation state (all methylated, red ``M''; or all unmethylated, cyan ``U'') and ``mixed'' when both states are present. Pairing the reference- and alternate-allele labels assigns each site to one of four joint states, and the fraction of covered CpG sites in each state is recorded; three of the four proportions are retained as features (the fourth is redundant, as they sum to one). In the illustrated window of six covered CpG sites, the reference-mixed/alternate-mixed, reference-pure/alternate-mixed and reference-mixed/alternate-pure fractions are $2/6=0.33$, $1/6=0.17$ and $3/6=0.5$, respectively. The somatic signature of a methylation-pure alternate allele against a methylation-mixed reference allele is captured by an elevated reference-mixed/alternate-pure fraction; box plots (HCC1395\_NYGC at 0.6 tumor DNA fraction) contrast somatic, germline and artifact indels for each feature.}\label{fig:met-methylation-joint}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_cloud_geometry.png}}
+  \caption[Methylation-cloud geometry features]{Methylation-cloud geometry features. At each CpG site within the flanking window, an allele methylation ratio is computed for the reference and alternate alleles, and the per-site (alternate ratio, reference ratio) points form a cloud whose centroid (mean alternate ratio, mean reference ratio) is retained as two features; the kernel-density distributions of these centroids differ between somatic, germline and artifact indels (left). Two further features summarize the cloud geometry: the perpendicular distance of the centroid from the diagonal $y=x$, which quantifies the overall imbalance between reference- and alternate-allele methylation, and the mean absolute per-site difference between the reference and alternate ratios (MAD). Balanced methylation places the centroid near the diagonal, whereas the allele-specific methylation of a somatic variant displaces it; box plots (HCC1395\_NYGC at 0.6 tumor DNA fraction) show that somatic indels have the largest centroid-to-diagonal distance and ratio MAD.}\label{fig:met-methylation-cloud}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_classifier_selection.png}}
+  \caption[Classifier selection for methylation-aware recalibration]{Selection of the classifier for methylation-aware recalibration. Seven candidate classifiers were compared by held-out ROC-AUC on the binary somatic-versus-non-somatic indel task under two cross-validation schemes, each applied both across cell lines and across tumor DNA fractions. Left, leave-one-out cross-validation, in which the model is trained on all groups but one and evaluated on the held-out group; right, leave-four-out cross-validation, in which it is trained on a single group and evaluated on the remaining four. The four tree-ensemble methods (XGBoost, histogram-based gradient boosting, random forests and extremely randomized trees) outperform the three linear methods (logistic regression, a linear support-vector machine and linear discriminant analysis), and XGBoost is consistently the top or tied-top performer. Its held-out ROC-AUC remains high even under the more stringent leave-four-out setting, supporting both the choice of XGBoost and the single-sample training strategy. The box plots convey the quantitative results; the cell-line and tumor-fraction icons are schematic.}\label{fig:met-classifier-selection}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_41_cropped.jpg}}
+  \caption[Tumor DNA Fraction Effect on Allele Frequencies]{Effect of tumor DNA fraction on variant allele frequencies (VAFs). The VAF of a heterozygous germline variant remains stable at approximately 0.5 across DNA fraction levels, whereas the VAF of a heterozygous somatic variant decreases proportionally with decreasing DNA fraction. At high DNA fraction, the distributions of somatic and germline variants overlap, complicating statistical separation.}\label{fig:app-page-41-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[
+    stage/.style={draw, rounded corners=2pt, align=center, minimum height=8mm, text width=35mm, font=\small},
+    decision/.style={draw, diamond, aspect=2.4, align=center, inner sep=1.5pt, font=\small},
+    branch/.style={draw, rounded corners=2pt, align=center, minimum height=10mm, text width=51mm, font=\small},
+    flow/.style={-{Latex[length=2mm]}, thick},
+    node distance=8mm and 14mm
+  ]
+    \node[stage] (recalibration) {Somatic variant\\recalibration};
+    \node[stage, right=of recalibration] (loh) {Arm-level LOH\\detection};
+    \coordinate (preparation) at ($(recalibration)!0.5!(loh)$);
+    \node[stage, below=11mm of preparation] (phasing) {Initial LOH-aware\\somatic phasing};
+    \node[stage, below=of phasing] (estimate) {Tumor DNA fraction\\estimation};
+    \node[decision, below=10mm of estimate] (threshold) {Estimate $>0.9$?};
+    \node[branch, below left=11mm and 3mm of threshold] (retain) {Retain the initial\\phasing result};
+    \node[branch, below right=11mm and 3mm of threshold] (repeat) {Treat variants not marked by normal-panel resources as somatic; repeat phasing once using the existing LOH map};
+
+    \draw[flow] (recalibration) |- (phasing);
+    \draw[flow] (loh) |- (phasing);
+    \draw[flow] (phasing) -- (estimate);
+    \draw[flow] (estimate) -- (threshold);
+    \draw[flow] (threshold) -| node[pos=0.25, above, font=\small] {No} (retain);
+    \draw[flow] (threshold) -| node[pos=0.25, above, font=\small] {Yes} (repeat);
+  \end{tikzpicture}
+  \caption[Conditional second phasing pass]{Conditional second phasing pass for high-DNA-fraction samples. Somatic variant recalibration and arm-level LOH detection are completed before the initial LOH-aware phasing pass. When the resulting tumor DNA fraction estimate exceeds 0.9, variants not marked by the normal-panel resources are treated as somatic and phasing is repeated once using the existing LOH map; otherwise, the initial phasing result is retained. The tumor DNA fraction is not re-estimated.}\label{fig:app-page-42-cropped-jpg}
+\end{figure}
+
+\clearpage
 
 \section{Supplementary Tables}
-...
 
-\section{Supplementary References}
+{\small
+\begin{longtable}{@{}l@{}l@{}l@{}l@{}l@{}l@{}}
+  \caption[Cell line datasets and benchmark sources with coverage]%
+  {Cell line datasets and corresponding benchmark truth sets from multiple sequencing sources (HKU, NYGC, ONT, UCSC, and DeepSomatic), with normal and tumor coverages.}
+  \label{tab:cell-line-datasets-and-benchmark-sources}\\
+  \toprule
+  Dataset & Cancer Type & Source & Benchmark & Normal & Tumor \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Dataset & Cancer Type & Sequencing Source & Benchmark Source & Normal Coverage & Tumor Coverage \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  HCC1395\_HKU   & Breast ductal carcinoma                & HKU  & SEQC2       & 45.70x & 76.27x \\
+  HCC1395\_NYGC  & Breast ductal carcinoma                & NYGC & SEQC2       & 29.14x & 79.52x \\
+  COLO829\_ONT   & Malignant melanoma                     & ONT  & NYGC        & 39.83x & 33.45x \\
+  COLO829\_NYGC  & Malignant melanoma                     & NYGC & NYGC        & 45.85x & 108.49x \\
+  HCC1954\_UCSC  & Breast ductal carcinoma                & UCSC & DeepSomatic & 34.03x & 82.44x \\
+  HCC1937\_UCSC  & Breast ductal carcinoma                & UCSC & DeepSomatic & 25.68x & 158.44x \\
+  H2009\_UCSC    & Non-small-cell lung cancer             & UCSC & DeepSomatic & 30.07x & 106.92x \\
+  H1437\_UCSC    & Non-small-cell lung cancer             & UCSC & DeepSomatic & 49.28x & 79.10x \\
+\end{longtable}
+}
 
-\section{Command lines}
+\begin{table}[htbp]
+  \centering
+  \caption{Comparison of conventional phasing tools with LongPhase-TO.}
+  \label{tab:phasing-performance}
+  \begin{tabular}{@{}llrrrr@{}}
+    \toprule
+    Sample & Phasing tool & Phased ratio & Blocks & Block N50 (bp) & Block sum (bp) \\
+    \midrule
+    COLO829\_ONT & HapCUT2      & 0.531188723 & 3569  & 4645832  & 2523260676 \\
+    COLO829\_ONT & WhatsHap     & 0.530234997 & 3686  & 4635320  & 2518385299 \\
+    COLO829\_ONT & LongPhase    & 0.498077451 & 3477  & 4887010  & 2540883450 \\
+    COLO829\_ONT & LongPhase-TO & 0.594247857 & 1110  & 9852371  & 2835034563 \\
+    \addlinespace
+    COLO829\_NYGC & HapCUT2      & 0.557132505 & 15016 & 584415   & 2187808909 \\
+    COLO829\_NYGC & WhatsHap     & 0.556136688 & 15261 & 575997   & 2182781406 \\
+    COLO829\_NYGC & LongPhase    & 0.521019637 & 15017 & 570504   & 2176223422 \\
+    COLO829\_NYGC & LongPhase-TO & 0.606857364 & 6576  & 1403687  & 2664715137 \\
+    \addlinespace
+    H1437\_UCSC & HapCUT2      & 0.539916273 & 2376  & 7048644  & 2625509787 \\
+    H1437\_UCSC & WhatsHap     & 0.538696787 & 2398  & 7048644  & 2624731180 \\
+    H1437\_UCSC & LongPhase    & 0.501837431 & 2287  & 7729758  & 2654323753 \\
+    H1437\_UCSC & LongPhase-TO & 0.697758143 & 529   & 19323318 & 2864794192 \\
+    \addlinespace
+    H2009\_UCSC & HapCUT2      & 0.557470906 & 2252  & 5825292  & 2677986524 \\
+    H2009\_UCSC & WhatsHap     & 0.556084355 & 2292  & 5723430  & 2676922405 \\
+    H2009\_UCSC & LongPhase    & 0.516697084 & 2204  & 7217802  & 2706782369 \\
+    H2009\_UCSC & LongPhase-TO & 0.682400933 & 638   & 23169348 & 2863280796 \\
+    \addlinespace
+    HCC1395\_HKU & HapCUT2      & 0.601509894 & 4553  & 1678506  & 2536199864 \\
+    HCC1395\_HKU & WhatsHap     & 0.600173280 & 4662  & 1667777  & 2532455755 \\
+    HCC1395\_HKU & LongPhase    & 0.560688427 & 4581  & 1754642  & 2569265774 \\
+    HCC1395\_HKU & LongPhase-TO & 0.575700475 & 893   & 16768123 & 2847723783 \\
+    \addlinespace
+    HCC1395\_NYGC & HapCUT2      & 0.498829689 & 21138 & 275106   & 1972073127 \\
+    HCC1395\_NYGC & WhatsHap     & 0.498078089 & 21510 & 270769   & 1966798050 \\
+    HCC1395\_NYGC & LongPhase    & 0.467598877 & 21057 & 279702   & 1980748528 \\
+    HCC1395\_NYGC & LongPhase-TO & 0.693399557 & 5227  & 13441849 & 2726465382 \\
+    \addlinespace
+    HCC1937\_UCSC & HapCUT2      & 0.401595056 & 4537  & 1447908  & 2430726898 \\
+    HCC1937\_UCSC & WhatsHap     & 0.400806954 & 4650  & 1420186  & 2425582425 \\
+    HCC1937\_UCSC & LongPhase    & 0.375063484 & 4517  & 1513047  & 2454370721 \\
+    HCC1937\_UCSC & LongPhase-TO & 0.713396249 & 1135  & 25207324 & 2830053891 \\
+    \addlinespace
+    HCC1954\_UCSC & HapCUT2      & 0.651938431 & 1969  & 5927639  & 2711566888 \\
+    HCC1954\_UCSC & WhatsHap     & 0.650486924 & 1999  & 5908073  & 2710095182 \\
+    HCC1954\_UCSC & LongPhase    & 0.610394471 & 1923  & 5912510  & 2736740481 \\
+    HCC1954\_UCSC & LongPhase-TO & 0.659481598 & 1115  & 6477286  & 2828110080 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Loss of heterozygosity (LOH) summary metrics across samples and methods.}
+  \label{tab:loh_summary}
+  \begin{tabular}{llrrrr}
+    \toprule
+    Sample & LOH Methods & LOH Burden (\%) & No. Blocks & LOH Sum (bp) & LOH N50 Size (bp) \\
+    \midrule    
+    COLO829\_ONT   & Ascat (T+N)                  & 35.33 & 575  & 1015662001 & 12864314  \\
+    COLO829\_ONT   & Ascat (TO)                   & 39.31 & 290  & 1130080160 & 20362317  \\
+    COLO829\_ONT   & LongPhase-TO (ClairS-TO)      & 26.85 &  90  &  771811167 & 50760310  \\
+    COLO829\_ONT   & LongPhase-TO (DeepSomatic-TO) & 27.10 & 105  &  779127888 & 50760310  \\
+    COLO829\_NYGC  & Ascat (T+N)                  & 29.11 &  45  &  836961836 & 80866668  \\
+    COLO829\_NYGC  & Ascat (TO)                   & 33.24 & 192  &  955772886 & 38166624  \\
+    COLO829\_NYGC  & LongPhase-TO (ClairS-TO)      & 28.11 & 119  &  808144053 & 35105161  \\
+    COLO829\_NYGC  & LongPhase-TO (DeepSomatic-TO) & 29.05 & 159  &  835138542 & 45643569 \\
+    H1437\_UCSC    & Ascat (T+N)                  & 39.51 & 1948 & 1135872591 &  3829891  \\
+    H1437\_UCSC    & Ascat (TO)                   & 44.70 & 531  & 1285175995 & 34097583  \\
+    H1437\_UCSC    & LongPhase-TO (ClairS-TO)      & 34.62 & 128  &  995275823 & 43336933  \\
+    H1437\_UCSC    & LongPhase-TO (DeepSomatic-TO) & 34.79 & 125  & 1000311306 & 34605403  \\
+    H2009\_UCSC    & Ascat (T+N)                  & 43.39 & 1553 & 1247558196 &  4110937  \\
+    H2009\_UCSC    & Ascat (TO)                   & 48.26 & 721  & 1387574137 &  9209663  \\
+    H2009\_UCSC    & LongPhase-TO (ClairS-TO)      & 35.93 & 127  & 1033104502 & 31122631  \\
+    H2009\_UCSC    & LongPhase-TO (DeepSomatic-TO) & 36.09 & 147  & 1037482232 & 34937899  \\
+    HCC1395\_HKU   & Ascat (T+N)                  & 52.01 & 3068 & 1495294320 &  2803775  \\
+    HCC1395\_HKU   & Ascat (TO)                   & 65.72 & 1392 & 1889479858 &  6023307  \\
+    HCC1395\_HKU   & LongPhase-TO (ClairS-TO)      & 50.84 & 198  & 1461681845 & 21772604  \\
+    HCC1395\_HKU   & LongPhase-TO (DeepSomatic-TO) & 51.53 & 202  & 1481487680 & 21597183  \\
+    HCC1395\_NYGC  & Ascat (T+N)                  & 52.69 & 2134 & 1514982034 &  9642863  \\
+    HCC1395\_NYGC  & Ascat (TO)                   & 59.07 & 584  & 1698371776 & 16795656  \\
+    HCC1395\_NYGC  & LongPhase-TO (ClairS-TO)      & 50.74 & 220  & 1458689344 & 26501707  \\
+    HCC1395\_NYGC  & LongPhase-TO (DeepSomatic-TO) & 51.86 & 253  & 1490967218 & 29068243  \\
+    HCC1937\_UCSC  & Ascat (T+N)                  & 60.44 & 4483 & 1737671187 &  2214193  \\
+    HCC1937\_UCSC  & Ascat (TO)                   & 62.07 & 389  & 1784605418 & 20879693  \\
+    HCC1937\_UCSC  & LongPhase-TO (ClairS-TO)      & 55.86 & 169  & 1606116347 & 40921298  \\
+    HCC1937\_UCSC  & LongPhase-TO (DeepSomatic-TO) & 56.05 & 170  & 1611305118 & 43800261  \\
+    HCC1954\_UCSC  & Ascat (T+N)                  & NA & NA & NA & NA \\
+    HCC1954\_UCSC  & Ascat (TO)                   & 58.72 & 1341 & 1688216927 &  2812944  \\
+    HCC1954\_UCSC  & LongPhase-TO (ClairS-TO)      & 9.55 & 147  &  274660981 & 16263599  \\
+    HCC1954\_UCSC  & LongPhase-TO (DeepSomatic-TO) & 10.28 & 165  &  295496102 & 15126962  \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\FloatBarrier
+{\small
+\begin{longtable}{@{}lllccc@{}}
+  \caption{Somatic SNV calling performance across DNA fraction levels for eight tumor cell line datasets.}
+  \label{tab:somatic_purity}\\
+  \toprule
+  Sample & Tumor DNA fraction & Variant caller & Precision & Recall & F1-score \\
+  \midrule
+  \endfirsthead
+  COLO829\_ONT & 1 & ClairS-TO & 0.673962072 & 0.799339427 & 0.731315969 \\
+  COLO829\_ONT & 1 & ClairS-TO+LongPhase-TO & 0.664742443 & 0.803526155 & 0.727575241 \\
+  COLO829\_ONT & 1 & DeepSomatic-TO & 0.500869565 & 0.844044379 & 0.628673891 \\
+  COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.626681089 & 0.808550229 & 0.706092644 \\
+  COLO829\_ONT & 0.8 & ClairS-TO & 0.651248418 & 0.78989603 & 0.713902816 \\
+  COLO829\_ONT & 0.8 & ClairS-TO+LongPhase-TO & 0.853516084 & 0.676412439 & 0.754713553 \\
+  COLO829\_ONT & 0.8 & DeepSomatic-TO & 0.481495653 & 0.848835857 & 0.614449514 \\
+  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.823525815 & 0.626613635 & 0.711700526 \\
+  COLO829\_ONT & 0.6 & ClairS-TO & 0.622648308 & 0.763635941 & 0.685972775 \\
+  COLO829\_ONT & 0.6 & ClairS-TO+LongPhase-TO & 0.836854148 & 0.731607471 & 0.780699686 \\
+  COLO829\_ONT & 0.6 & DeepSomatic-TO & 0.465522781 & 0.842462726 & 0.599678803 \\
+  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.817149861 & 0.713278906 & 0.761689497 \\
+  COLO829\_ONT & 0.4 & ClairS-TO & 0.576010902 & 0.658688624 & 0.614581638 \\
+  COLO829\_ONT & 0.4 & ClairS-TO+LongPhase-TO & 0.803505214 & 0.645151536 & 0.7156735 \\
+  COLO829\_ONT & 0.4 & DeepSomatic-TO & 0.444837038 & 0.796501756 & 0.570857019 \\
+  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.792994405 & 0.682436676 & 0.733573357 \\
+  COLO829\_ONT & 0.2 & ClairS-TO & 0.391519593 & 0.325587886 & 0.35552282 \\
+  COLO829\_ONT & 0.2 & ClairS-TO+LongPhase-TO & 0.657793646 & 0.338543484 & 0.447020885 \\
+  COLO829\_ONT & 0.2 & DeepSomatic-TO & 0.372655309 & 0.604423976 & 0.461051231 \\
+  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.719729685 & 0.507826856 & 0.595488763 \\
+  COLO829\_NYGC & 1 & ClairS-TO & 0.682363679 & 0.817319098 & 0.743769116 \\
+  COLO829\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.676230677 & 0.827227688 & 0.744146632 \\
+  COLO829\_NYGC & 1 & DeepSomatic-TO & 0.543322178 & 0.857186054 & 0.66508455 \\
+  COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.649855305 & 0.830484032 & 0.729149649 \\
+  COLO829\_NYGC & 0.8 & ClairS-TO & 0.659304199 & 0.808852604 & 0.726461802 \\
+  COLO829\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.857685837 & 0.640336799 & 0.733243664 \\
+  COLO829\_NYGC & 0.8 & DeepSomatic-TO & 0.513700242 & 0.862977694 & 0.644031315 \\
+  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.854977368 & 0.566743423 & 0.681642701 \\
+  COLO829\_NYGC & 0.6 & ClairS-TO & 0.631660971 & 0.782476217 & 0.699026504 \\
+  COLO829\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.85018448 & 0.664596562 & 0.746021592 \\
+  COLO829\_NYGC & 0.6 & DeepSomatic-TO & 0.493629331 & 0.853371479 & 0.625462418 \\
+  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.837980144 & 0.614495383 & 0.709044552 \\
+  COLO829\_NYGC & 0.4 & ClairS-TO & 0.587943034 & 0.67985486 & 0.630567271 \\
+  COLO829\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.817664546 & 0.594957319 & 0.688755453 \\
+  COLO829\_NYGC & 0.4 & DeepSomatic-TO & 0.470825031 & 0.813411486 & 0.596423607 \\
+  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.807311476 & 0.597376317 & 0.686656151 \\
+  COLO829\_NYGC & 0.2 & ClairS-TO & 0.405159964 & 0.33933431 & 0.369337097 \\
+  COLO829\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.678764596 & 0.312329914 & 0.427806805 \\
+  COLO829\_NYGC & 0.2 & DeepSomatic-TO & 0.394171371 & 0.620380062 & 0.482057492 \\
+  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.733241506 & 0.445746982 & 0.554441696 \\
+  H1437\_UCSC & 1 & ClairS-TO & 0.770374027 & 0.588233 & 0.667094187 \\
+  H1437\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.752512239 & 0.607433021 & 0.672234091 \\
+  H1437\_UCSC & 1 & DeepSomatic-TO & 0.680080454 & 0.619743393 & 0.648511518 \\
+  H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.725573862 & 0.605665111 & 0.660219213 \\
+  H1437\_UCSC & 0.8 & ClairS-TO & 0.727614595 & 0.558373523 & 0.631857665 \\
+  H1437\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.859307921 & 0.559426469 & 0.677673847 \\
+  H1437\_UCSC & 0.8 & DeepSomatic-TO & 0.623836297 & 0.620211369 & 0.622018552 \\
+  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.843561605 & 0.536586634 & 0.655935166 \\
+  H1437\_UCSC & 0.6 & ClairS-TO & 0.721248352 & 0.533245804 & 0.613159744 \\
+  H1437\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.817541577 & 0.555318679 & 0.661387212 \\
+  H1437\_UCSC & 0.6 & DeepSomatic-TO & 0.603436027 & 0.60726403 & 0.605343976 \\
+  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.828577554 & 0.552614817 & 0.663027458 \\
+  H1437\_UCSC & 0.4 & ClairS-TO & 0.729668645 & 0.482626386 & 0.580976301 \\
+  H1437\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.79077153 & 0.495235743 & 0.609045274 \\
+  H1437\_UCSC & 0.4 & DeepSomatic-TO & 0.584042014 & 0.569578951 & 0.57671982 \\
+  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.815178939 & 0.515215724 & 0.631381076 \\
+  H1437\_UCSC & 0.2 & ClairS-TO & 0.835516284 & 0.277795832 & 0.416959338 \\
+  H1437\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.699052417 & 0.303040545 & 0.422797552 \\
+  H1437\_UCSC & 0.2 & DeepSomatic-TO & 0.514574129 & 0.436023763 & 0.472053536 \\
+  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.769002375 & 0.387185254 & 0.515048548 \\
+  H2009\_UCSC & 1 & ClairS-TO & 0.911892863 & 0.912749381 & 0.912320921 \\
+  H2009\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.903921721 & 0.932940149 & 0.918201721 \\
+  H2009\_UCSC & 1 & DeepSomatic-TO & 0.860717794 & 0.937884083 & 0.897645587 \\
+  H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.883674562 & 0.913259065 & 0.898223276 \\
+  H2009\_UCSC & 0.8 & ClairS-TO & 0.88399872 & 0.905271589 & 0.894508697 \\
+  H2009\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.938477589 & 0.87111548 & 0.903542757 \\
+  H2009\_UCSC & 0.8 & DeepSomatic-TO & 0.823642035 & 0.945958934 & 0.88057314 \\
+  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.922994182 & 0.824726955 & 0.871097986 \\
+  H2009\_UCSC & 0.6 & ClairS-TO & 0.855086426 & 0.885357507 & 0.869958718 \\
+  H2009\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.915187287 & 0.877224407 & 0.895803824 \\
+  H2009\_UCSC & 0.6 & DeepSomatic-TO & 0.807895578 & 0.93829183 & 0.868225045 \\
+  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.910446028 & 0.856087083 & 0.882430201 \\
+  H2009\_UCSC & 0.4 & ClairS-TO & 0.829699042 & 0.782656182 & 0.805491339 \\
+  H2009\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.896598164 & 0.785277414 & 0.837253715 \\
+  H2009\_UCSC & 0.4 & DeepSomatic-TO & 0.797316676 & 0.89872579 & 0.844989526 \\
+  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.902327239 & 0.811358672 & 0.854428487 \\
+  H2009\_UCSC & 0.2 & ClairS-TO & 0.696228119 & 0.376183195 & 0.488449375 \\
+  H2009\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.832483952 & 0.403203728 & 0.543277461 \\
+  H2009\_UCSC & 0.2 & DeepSomatic-TO & 0.719781763 & 0.615734673 & 0.66370518 \\
+  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.8626082 & 0.528964613 & 0.655789203 \\
+  HCC1395\_HKU & 1 & ClairS-TO & 0.70827717 & 0.719319593 & 0.713755675 \\
+  HCC1395\_HKU & 1 & ClairS-TO+LongPhase-TO & 0.699061319 & 0.726848683 & 0.712684248 \\
+  HCC1395\_HKU & 1 & DeepSomatic-TO & 0.566526756 & 0.763023804 & 0.650254926 \\
+  HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.649123586 & 0.741653358 & 0.692310423 \\
+  HCC1395\_HKU & 0.8 & ClairS-TO & 0.639606301 & 0.630947854 & 0.635247575 \\
+  HCC1395\_HKU & 0.8 & ClairS-TO+LongPhase-TO & 0.764478987 & 0.673257789 & 0.715974497 \\
+  HCC1395\_HKU & 0.8 & DeepSomatic-TO & 0.506910791 & 0.75308642 & 0.605949965 \\
+  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.735100094 & 0.652546455 & 0.691367641 \\
+  HCC1395\_HKU & 0.6 & ClairS-TO & 0.642036256 & 0.613227875 & 0.627301489 \\
+  HCC1395\_HKU & 0.6 & ClairS-TO+LongPhase-TO & 0.723658895 & 0.648388978 & 0.6839593 \\
+  HCC1395\_HKU & 0.6 & DeepSomatic-TO & 0.482733297 & 0.733186301 & 0.582165862 \\
+  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.719969844 & 0.653661875 & 0.68521545 \\
+  HCC1395\_HKU & 0.4 & ClairS-TO & 0.568065507 & 0.520571907 & 0.543282713 \\
+  HCC1395\_HKU & 0.4 & ClairS-TO+LongPhase-TO & 0.68078439 & 0.53421046 & 0.598656269 \\
+  HCC1395\_HKU & 0.4 & DeepSomatic-TO & 0.459144171 & 0.673485943 & 0.546033769 \\
+  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.704502219 & 0.591451821 & 0.643046139 \\
+  HCC1395\_HKU & 0.2 & ClairS-TO & 0.331958691 & 0.242832155 & 0.280485484 \\
+  HCC1395\_HKU & 0.2 & ClairS-TO+LongPhase-TO & 0.521459548 & 0.265191269 & 0.35158298 \\
+  HCC1395\_HKU & 0.2 & DeepSomatic-TO & 0.370604385 & 0.465409283 & 0.412631342 \\
+  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.621503039 & 0.391411261 & 0.480323534 \\
+  HCC1395\_NYGC & 1 & ClairS-TO & 0.711753477 & 0.727812001 & 0.719693172 \\
+  HCC1395\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.695210692 & 0.741120998 & 0.717432116 \\
+  HCC1395\_NYGC & 1 & DeepSomatic-TO & 0.604703772 & 0.786067382 & 0.683560209 \\
+  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.671745428 & 0.770071235 & 0.717555629 \\
+  HCC1395\_NYGC & 0.8 & ClairS-TO & 0.647388017 & 0.709686415 & 0.677107268 \\
+  HCC1395\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.815701615 & 0.613177174 & 0.700086831 \\
+  HCC1395\_NYGC & 0.8 & DeepSomatic-TO & 0.53558059 & 0.77253023 & 0.632595022 \\
+  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.809300279 & 0.559434178 & 0.661560369 \\
+  HCC1395\_NYGC & 0.6 & ClairS-TO & 0.587983985 & 0.666387811 & 0.624735604 \\
+  HCC1395\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.778149716 & 0.601085 & 0.678251666 \\
+  HCC1395\_NYGC & 0.6 & DeepSomatic-TO & 0.508114706 & 0.749233148 & 0.605554588 \\
+  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.797478607 & 0.574086749 & 0.667590354 \\
+  HCC1395\_NYGC & 0.4 & ClairS-TO & 0.529076509 & 0.543615484 & 0.536247468 \\
+  HCC1395\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.74340347 & 0.500671787 & 0.598357924 \\
+  HCC1395\_NYGC & 0.4 & DeepSomatic-TO & 0.483706195 & 0.68897508 & 0.568375264 \\
+  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.786313382 & 0.522853449 & 0.628073755 \\
+  HCC1395\_NYGC & 0.2 & ClairS-TO & 0.323684211 & 0.233858088 & 0.271535167 \\
+  HCC1395\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.606335768 & 0.225137526 & 0.328354346 \\
+  HCC1395\_NYGC & 0.2 & DeepSomatic-TO & 0.362241789 & 0.436991406 & 0.396121056 \\
+  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.694080232 & 0.31535985 & 0.433676137 \\
+  HCC1937\_UCSC & 1 & ClairS-TO & 0.483409424 & 0.748390761 & 0.587399079 \\
+  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.462286921 & 0.773570617 & 0.578726217 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO & 0.379003814 & 0.834090622 & 0.521185355 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.43718916 & 0.815473937 & 0.569213488 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO & 0.409328358 & 0.692288275 & 0.514467945 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.666318698 & 0.684778493 & 0.675422489 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO & 0.312132536 & 0.790672725 & 0.44757618 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.627720762 & 0.702511675 & 0.663013699 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO & 0.337783384 & 0.608355421 & 0.434380985 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.596717187 & 0.628612899 & 0.612249915 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO & 0.275430548 & 0.723652657 & 0.398997895 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.587856022 & 0.661681181 & 0.622587732 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO & 0.26780924 & 0.453616055 & 0.336784894 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.523399269 & 0.479237663 & 0.500345907 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO & 0.228380724 & 0.589486306 & 0.329215641 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.519834404 & 0.53092263 & 0.525320012 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO & 0.127687582 & 0.18364256 & 0.150636712 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.342485112 & 0.214123438 & 0.263503281 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO & 0.131216988 & 0.308847659 & 0.184182301 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.354965083 & 0.26303168 & 0.30216036 \\
+  HCC1954\_UCSC & 1 & ClairS-TO & 0.248378212 & 0.79854827 & 0.37890338 \\
+  HCC1954\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.490509454 & 0.649020082 & 0.55874021 \\
+  HCC1954\_UCSC & 1 & DeepSomatic-TO & 0.213943289 & 0.887587709 & 0.344780917 \\
+  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.574262857 & 0.607887733 & 0.590597085 \\
+  HCC1954\_UCSC & 0.8 & ClairS-TO & 0.217882595 & 0.717541737 & 0.334265104 \\
+  HCC1954\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.483454996 & 0.727510283 & 0.580889456 \\
+  HCC1954\_UCSC & 0.8 & DeepSomatic-TO & 0.196427975 & 0.854197919 & 0.319406496 \\
+  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.575072615 & 0.747302202 & 0.64997159 \\
+  HCC1954\_UCSC & 0.6 & ClairS-TO & 0.175452805 & 0.576578756 & 0.269037539 \\
+  HCC1954\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.415738507 & 0.60871038 & 0.494049723 \\
+  HCC1954\_UCSC & 0.6 & DeepSomatic-TO & 0.179273945 & 0.782385676 & 0.291706886 \\
+  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.542252187 & 0.692765546 & 0.608337229 \\
+  HCC1954\_UCSC & 0.4 & ClairS-TO & 0.116869587 & 0.363706751 & 0.176897006 \\
+  HCC1954\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.311695178 & 0.399419308 & 0.350146354 \\
+  HCC1954\_UCSC & 0.4 & DeepSomatic-TO & 0.146901863 & 0.619404791 & 0.237481215 \\
+  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.476804562 & 0.542124365 & 0.507370757 \\
+  HCC1954\_UCSC & 0.2 & ClairS-TO & 0.04818935 & 0.139608033 & 0.071647648 \\
+  HCC1954\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.169266463 & 0.165932737 & 0.167583022 \\
+  HCC1954\_UCSC & 0.2 & DeepSomatic-TO & 0.086615884 & 0.34720542 & 0.138644664 \\
+  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.338396112 & 0.296491653 & 0.316060973 \\
+  \bottomrule
+\end{longtable}
+}
+
+\FloatBarrier
+{\small
+\begin{longtable}{@{}lllccc@{}}
+  \caption{Somatic indel calling performance across DNA fraction levels for eight tumor cell line datasets.}
+  \label{tab:somatic_indel_purity}\\
+  \toprule
+  Sample & Tumor DNA fraction & Variant caller & Precision & Recall & F1-score \\
+  \midrule
+  \endfirsthead
+  \toprule
+  COLO829\_ONT & 1 & ClairS-TO+LongPhase-TO & 0.127038627 & 0.300813008 & 0.178636089 \\
+  COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.165366615 & 0.107723577 & 0.130461538 \\
+  COLO829\_ONT & 1 & DeepSomatic-TO & 0.071609632 & 0.114837398 & 0.088212334 \\
+  COLO829\_ONT & 1 & ClairS-TO & 0.154273801 & 0.225609756 & 0.183243913 \\
+  COLO829\_ONT & 0.8 & ClairS-TO+LongPhase-TO & 0.230869001 & 0.180894309 & 0.202849003 \\
+  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.293040293 & 0.081300813 & 0.127287192 \\
+  COLO829\_ONT & 0.8 & DeepSomatic-TO & 0.079784043 & 0.135162602 & 0.100339495 \\
+  COLO829\_ONT & 0.8 & ClairS-TO & 0.154477612 & 0.210365854 & 0.178141136 \\
+  COLO829\_ONT & 0.6 & ClairS-TO+LongPhase-TO & 0.228571429 & 0.178861789 & 0.200684151 \\
+  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.362318841 & 0.101626016 & 0.158730159 \\
+  COLO829\_ONT & 0.6 & DeepSomatic-TO & 0.074180564 & 0.131097561 & 0.094748439 \\
+  COLO829\_ONT & 0.6 & ClairS-TO & 0.11136537 & 0.148373984 & 0.127233115 \\
+  COLO829\_ONT & 0.4 & ClairS-TO+LongPhase-TO & 0.128514056 & 0.097560976 & 0.110918544 \\
+  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.335849057 & 0.090447154 & 0.142514011 \\
+  COLO829\_ONT & 0.4 & DeepSomatic-TO & 0.055932203 & 0.100609756 & 0.071895425 \\
+  COLO829\_ONT & 0.4 & ClairS-TO & 0.055849057 & 0.075203252 & 0.064097012 \\
+  COLO829\_ONT & 0.2 & ClairS-TO+LongPhase-TO & 0.014925373 & 0.010162602 & 0.012091898 \\
+  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.170506912 & 0.037601626 & 0.061615321 \\
+  COLO829\_ONT & 0.2 & DeepSomatic-TO & 0.024684271 & 0.043699187 & 0.031548056 \\
+  COLO829\_ONT & 0.2 & ClairS-TO & 0.004504505 & 0.006097561 & 0.005181347 \\
+  COLO829\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.141463415 & 0.324186992 & 0.196974375 \\
+  COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.139657444 & 0.107723577 & 0.121629375 \\
+  COLO829\_NYGC & 1 & DeepSomatic-TO & 0.043818466 & 0.113821138 & 0.063276836 \\
+  COLO829\_NYGC & 1 & ClairS-TO & 0.177299703 & 0.242886179 & 0.204974271 \\
+  COLO829\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.21459695 & 0.200203252 & 0.207150368 \\
+  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.280373832 & 0.091463415 & 0.137931034 \\
+  COLO829\_NYGC & 0.8 & DeepSomatic-TO & 0.051550108 & 0.145325203 & 0.076104311 \\
+  COLO829\_NYGC & 0.8 & ClairS-TO & 0.14937454 & 0.206300813 & 0.173282117 \\
+  COLO829\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.189859763 & 0.178861789 & 0.184196756 \\
+  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.299703264 & 0.102642276 & 0.152914459 \\
+  COLO829\_NYGC & 0.6 & DeepSomatic-TO & 0.044776119 & 0.137195122 & 0.067516879 \\
+  COLO829\_NYGC & 0.6 & ClairS-TO & 0.113490364 & 0.161585366 & 0.133333333 \\
+  COLO829\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.106334842 & 0.095528455 & 0.100642398 \\
+  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.263665595 & 0.083333333 & 0.126640927 \\
+  COLO829\_NYGC & 0.4 & DeepSomatic-TO & 0.034737858 & 0.109756098 & 0.052773027 \\
+  COLO829\_NYGC & 0.4 & ClairS-TO & 0.051355207 & 0.073170732 & 0.060352054 \\
+  COLO829\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.01097561 & 0.009146341 & 0.009977827 \\
+  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.11023622 & 0.028455285 & 0.045234249 \\
+  COLO829\_NYGC & 0.2 & DeepSomatic-TO & 0.01268633 & 0.040650407 & 0.019337684 \\
+  COLO829\_NYGC & 0.2 & ClairS-TO & 0.004294918 & 0.006097561 & 0.005039899 \\
+  H1437\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.511500548 & 0.342626559 & 0.410369069 \\
+  H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.442740286 & 0.105893862 & 0.170909809 \\
+  H1437\_UCSC & 1 & DeepSomatic-TO & 0.304259635 & 0.110051357 & 0.161637931 \\
+  H1437\_UCSC & 1 & ClairS-TO & 0.5687251 & 0.279285889 & 0.374610464 \\
+  H1437\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.643128322 & 0.20714111 & 0.313355531 \\
+  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.63697479 & 0.092687699 & 0.161827498 \\
+  H1437\_UCSC & 0.8 & DeepSomatic-TO & 0.319099827 & 0.13524089 & 0.189969083 \\
+  H1437\_UCSC & 0.8 & ClairS-TO & 0.526548673 & 0.23281976 & 0.322876039 \\
+  H1437\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.617647059 & 0.20029347 & 0.302493075 \\
+  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.625 & 0.112496943 & 0.190673575 \\
+  H1437\_UCSC & 0.6 & DeepSomatic-TO & 0.287773625 & 0.13181707 & 0.180811808 \\
+  H1437\_UCSC & 0.6 & ClairS-TO & 0.503988397 & 0.169968207 & 0.254206291 \\
+  H1437\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.381850854 & 0.103937393 & 0.163398693 \\
+  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.557377049 & 0.083149914 & 0.144711641 \\
+  H1437\_UCSC & 0.4 & DeepSomatic-TO & 0.21778278 & 0.094644167 & 0.131946812 \\
+  H1437\_UCSC & 0.4 & ClairS-TO & 0.306501548 & 0.072633896 & 0.117437722 \\
+  H1437\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.054982818 & 0.011738811 & 0.019347037 \\
+  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.237196765 & 0.021521154 & 0.039461883 \\
+  H1437\_UCSC & 0.2 & DeepSomatic-TO & 0.060507482 & 0.022743947 & 0.033060789 \\
+  H1437\_UCSC & 0.2 & ClairS-TO & 0.146226415 & 0.007581316 & 0.014415252 \\
+  H2009\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.721003844 & 0.67122711 & 0.695225638 \\
+  H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.629985229 & 0.179541149 & 0.279443079 \\
+  H2009\_UCSC & 1 & DeepSomatic-TO & 0.476681128 & 0.185013681 & 0.26656558 \\
+  H2009\_UCSC & 1 & ClairS-TO & 0.763826185 & 0.569774784 & 0.652682339 \\
+  H2009\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.808938089 & 0.415280993 & 0.548817803 \\
+  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.767804878 & 0.165649337 & 0.272506925 \\
+  H2009\_UCSC & 0.8 & DeepSomatic-TO & 0.500463822 & 0.227110082 & 0.312436658 \\
+  H2009\_UCSC & 0.8 & ClairS-TO & 0.720779221 & 0.467270048 & 0.566977398 \\
+  H2009\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.756174225 & 0.354451694 & 0.482659788 \\
+  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.765638767 & 0.182908861 & 0.295276928 \\
+  H2009\_UCSC & 0.6 & DeepSomatic-TO & 0.45398773 & 0.218059356 & 0.294611119 \\
+  H2009\_UCSC & 0.6 & ClairS-TO & 0.613452188 & 0.318669754 & 0.419448677 \\
+  H2009\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.575248756 & 0.194695854 & 0.290926246 \\
+  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.687809713 & 0.146074511 & 0.240972222 \\
+  H2009\_UCSC & 0.4 & DeepSomatic-TO & 0.356003752 & 0.159755841 & 0.220543368 \\
+  H2009\_UCSC & 0.4 & ClairS-TO & 0.400332226 & 0.152178489 & 0.22052768 \\
+  H2009\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.135672515 & 0.024415912 & 0.041384231 \\
+  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.318181818 & 0.029467481 & 0.053939511 \\
+  H2009\_UCSC & 0.2 & DeepSomatic-TO & 0.091894977 & 0.033887603 & 0.049515608 \\
+  H2009\_UCSC & 0.2 & ClairS-TO & 0.052514793 & 0.014944222 & 0.023267246 \\
+  HCC1395\_HKU & 1 & ClairS-TO+LongPhase-TO & 0.292761828 & 0.445264453 & 0.353256892 \\
+  HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.499102334 & 0.512915129 & 0.505914468 \\
+  HCC1395\_HKU & 1 & DeepSomatic-TO & 0.375592928 & 0.535670357 & 0.44157161 \\
+  HCC1395\_HKU & 1 & ClairS-TO & 0.37613489 & 0.356703567 & 0.366161616 \\
+  HCC1395\_HKU & 0.8 & ClairS-TO+LongPhase-TO & 0.400763359 & 0.322878229 & 0.357629428 \\
+  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.58123371 & 0.411439114 & 0.481814908 \\
+  HCC1395\_HKU & 0.8 & DeepSomatic-TO & 0.340927583 & 0.515375154 & 0.410381978 \\
+  HCC1395\_HKU & 0.8 & ClairS-TO & 0.325508607 & 0.255842558 & 0.286501377 \\
+  HCC1395\_HKU & 0.6 & ClairS-TO+LongPhase-TO & 0.357597816 & 0.241697417 & 0.288440367 \\
+  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.589595376 & 0.376383764 & 0.459459459 \\
+  HCC1395\_HKU & 0.6 & DeepSomatic-TO & 0.292644135 & 0.452644526 & 0.355469693 \\
+  HCC1395\_HKU & 0.6 & ClairS-TO & 0.294421488 & 0.175276753 & 0.219737857 \\
+  HCC1395\_HKU & 0.4 & ClairS-TO+LongPhase-TO & 0.18220339 & 0.105781058 & 0.13385214 \\
+  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.526699029 & 0.266912669 & 0.354285714 \\
+  HCC1395\_HKU & 0.4 & DeepSomatic-TO & 0.207493956 & 0.316728167 & 0.250730282 \\
+  HCC1395\_HKU & 0.4 & ClairS-TO & 0.108850458 & 0.065805658 & 0.082023764 \\
+  HCC1395\_HKU & 0.2 & ClairS-TO+LongPhase-TO & 0.023446659 & 0.012300123 & 0.016135539 \\
+  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.288747346 & 0.083640836 & 0.129709108 \\
+  HCC1395\_HKU & 0.2 & DeepSomatic-TO & 0.077142857 & 0.099630996 & 0.086956522 \\
+  HCC1395\_HKU & 0.2 & ClairS-TO & 0.006820119 & 0.004920049 & 0.005716327 \\
+  HCC1395\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.342684506 & 0.488314883 & 0.402739031 \\
+  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.587061669 & 0.597170972 & 0.592073171 \\
+  HCC1395\_NYGC & 1 & DeepSomatic-TO & 0.463558171 & 0.629766298 & 0.534028683 \\
+  HCC1395\_NYGC & 1 & ClairS-TO & 0.433510638 & 0.40098401 & 0.416613419 \\
+  HCC1395\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.469125214 & 0.336408364 & 0.391833811 \\
+  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.686313686 & 0.422509225 & 0.523030072 \\
+  HCC1395\_NYGC & 0.8 & DeepSomatic-TO & 0.426110607 & 0.578105781 & 0.490605428 \\
+  HCC1395\_NYGC & 0.8 & ClairS-TO & 0.403177005 & 0.327798278 & 0.361601085 \\
+  HCC1395\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.430366492 & 0.252767528 & 0.318481209 \\
+  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.634320735 & 0.381918819 & 0.476775432 \\
+  HCC1395\_NYGC & 0.6 & DeepSomatic-TO & 0.347694959 & 0.496309963 & 0.408918166 \\
+  HCC1395\_NYGC & 0.6 & ClairS-TO & 0.29874477 & 0.219557196 & 0.253101737 \\
+  HCC1395\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.255659121 & 0.118081181 & 0.16154817 \\
+  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.576763485 & 0.256457565 & 0.3550447 \\
+  HCC1395\_NYGC & 0.4 & DeepSomatic-TO & 0.257794323 & 0.340713407 & 0.293509934 \\
+  HCC1395\_NYGC & 0.4 & ClairS-TO & 0.133865248 & 0.092865929 & 0.109658678 \\
+  HCC1395\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.037558685 & 0.014760148 & 0.021192053 \\
+  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.326259947 & 0.075645756 & 0.122815776 \\
+  HCC1395\_NYGC & 0.2 & DeepSomatic-TO & 0.092469546 & 0.102706027 & 0.097319347 \\
+  HCC1395\_NYGC & 0.2 & ClairS-TO & 0.010544815 & 0.007380074 & 0.008683068 \\
+  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.202677575 & 0.533790402 & 0.293800539 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.29703763 & 0.363369246 & 0.326872247 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO & 0.21919364 & 0.378060725 & 0.277498203 \\
+  HCC1937\_UCSC & 1 & ClairS-TO & 0.271732131 & 0.413320274 & 0.327894328 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.402228977 & 0.388834476 & 0.395418327 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.45631068 & 0.322233105 & 0.377726751 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO & 0.245956497 & 0.431929481 & 0.313432836 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO & 0.285407725 & 0.39079334 & 0.329888384 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.437054632 & 0.36043095 & 0.395061728 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.529655172 & 0.376101861 & 0.439862543 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO & 0.224446786 & 0.417238002 & 0.291880781 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO & 0.240264511 & 0.320274241 & 0.274559194 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.251798561 & 0.205680705 & 0.226415094 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.463054187 & 0.276199804 & 0.34601227 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO & 0.161538462 & 0.308521058 & 0.212049815 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO & 0.117266187 & 0.159647405 & 0.135213604 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.057007126 & 0.047012733 & 0.051529791 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.282420749 & 0.095984329 & 0.143274854 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO & 0.063013699 & 0.112634672 & 0.080815179 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO & 0.01671123 & 0.024485798 & 0.019864919 \\
+  HCC1954\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.303159174 & 0.210993658 & 0.248815757 \\
+  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.397459165 & 0.092600423 & 0.150205761 \\
+  HCC1954\_UCSC & 1 & DeepSomatic-TO & 0.144736842 & 0.134883721 & 0.139636682 \\
+  HCC1954\_UCSC & 1 & ClairS-TO & 0.164968781 & 0.212262156 & 0.185650888 \\
+  HCC1954\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.25616083 & 0.167019027 & 0.202201177 \\
+  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.406 & 0.085835095 & 0.141710297 \\
+  HCC1954\_UCSC & 0.8 & DeepSomatic-TO & 0.112940101 & 0.104439746 & 0.108523726 \\
+  HCC1954\_UCSC & 0.8 & ClairS-TO & 0.100398936 & 0.12769556 & 0.112413921 \\
+  HCC1954\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.139749506 & 0.089640592 & 0.10922205 \\
+  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.329140461 & 0.066384778 & 0.110485574 \\
+  HCC1954\_UCSC & 0.6 & DeepSomatic-TO & 0.07972973 & 0.074841438 & 0.077208288 \\
+  HCC1954\_UCSC & 0.6 & ClairS-TO & 0.051690507 & 0.067230444 & 0.058445139 \\
+  HCC1954\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.041720154 & 0.027484144 & 0.033137905 \\
+  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.177829099 & 0.03255814 & 0.055039314 \\
+  HCC1954\_UCSC & 0.4 & DeepSomatic-TO & 0.039800995 & 0.037209302 & 0.038461538 \\
+  HCC1954\_UCSC & 0.4 & ClairS-TO & 0.013823437 & 0.018604651 & 0.015861572 \\
+  HCC1954\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.005813953 & 0.003805497 & 0.004600051 \\
+  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.048899756 & 0.00845666 & 0.014419611 \\
+  HCC1954\_UCSC & 0.2 & DeepSomatic-TO & 0.009417808 & 0.009302326 & 0.009359711 \\
+  HCC1954\_UCSC & 0.2 & ClairS-TO & 0.001826484 & 0.002536998 & 0.002123894 \\
+  \bottomrule
+\end{longtable}
+}
+
+\begin{small}
+  \begin{longtable}{llcc}
+  \caption{Comparison of tumor DNA fraction for ASCAT and LongPhase-TO.}
+  \label{tab:tumor-purity}\\
+  \toprule
+  Dataset & Software & Expected DNA fraction & Predicted DNA fraction \\
+  \midrule
+  \endfirsthead
+  \toprule
+  COLO829\_ONT & ASCAT (TO) & 1   & 0.84     \\
+  COLO829\_ONT & ASCAT (T+N) & 1   & 0.99     \\
+  COLO829\_ONT & LongPhase-TO (DeepSomatic-TO) & 1   & 0.991956 \\
+  COLO829\_ONT & LongPhase-TO (ClairS-TO)      & 1   & 1        \\
+  COLO829\_ONT & ASCAT (TO) & 0.8 & 0.78     \\
+  COLO829\_ONT & ASCAT (T+N) & 0.8 & 0.76     \\
+  COLO829\_ONT & LongPhase-TO (DeepSomatic-TO) & 0.8 & 0.799741 \\
+  COLO829\_ONT & LongPhase-TO (ClairS-TO)      & 0.8 & 0.829476 \\
+  COLO829\_ONT & ASCAT (TO) & 0.6 & 0.59     \\
+  COLO829\_ONT & ASCAT (T+N) & 0.6 & 0.54     \\
+  COLO829\_ONT & LongPhase-TO (DeepSomatic-TO) & 0.6 & 0.657448 \\
+  COLO829\_ONT & LongPhase-TO (ClairS-TO)      & 0.6 & 0.684499 \\
+  COLO829\_ONT & ASCAT (TO) & 0.4 & 0.74     \\
+  COLO829\_ONT & ASCAT (T+N) & 0.4 & 0.4      \\
+  COLO829\_ONT & LongPhase-TO (DeepSomatic-TO) & 0.4 & 0.394516 \\
+  COLO829\_ONT & LongPhase-TO (ClairS-TO)      & 0.4 & 0.396006 \\
+  COLO829\_ONT & ASCAT (TO) & 0.2 & 1        \\
+  COLO829\_ONT & ASCAT (T+N) & 0.2 & 0.42     \\
+  COLO829\_ONT & LongPhase-TO (DeepSomatic-TO) & 0.2 & 0.196729 \\
+  COLO829\_ONT & LongPhase-TO (ClairS-TO)      & 0.2 & 0.202939 \\
+  COLO829\_NYGC & ASCAT (TO) & 1   & 0.96     \\
+  COLO829\_NYGC & ASCAT (T+N) & 1   & 0.99     \\
+  COLO829\_NYGC & LongPhase-TO (DeepSomatic-TO) & 1   & 0.996004 \\
+  COLO829\_NYGC & LongPhase-TO (ClairS-TO)      & 1   & 0.999091 \\
+  COLO829\_NYGC & ASCAT (TO) & 0.8 & 0.81     \\
+  COLO829\_NYGC & ASCAT (T+N) & 0.8 & 0.78     \\
+  COLO829\_NYGC & LongPhase-TO (DeepSomatic-TO) & 0.8 & 0.797052 \\
+  COLO829\_NYGC & LongPhase-TO (ClairS-TO)      & 0.8 & 0.837876 \\
+  COLO829\_NYGC & ASCAT (TO) & 0.6 & 0.61     \\
+  COLO829\_NYGC & ASCAT (T+N) & 0.6 & 0.56     \\
+  COLO829\_NYGC & LongPhase-TO (DeepSomatic-TO) & 0.6 & 0.663298 \\
+  COLO829\_NYGC & LongPhase-TO (ClairS-TO)      & 0.6 & 0.699824 \\
+  COLO829\_NYGC & ASCAT (TO) & 0.4 & 0.95     \\
+  COLO829\_NYGC & ASCAT (T+N) & 0.4 & 0.38     \\
+  COLO829\_NYGC & LongPhase-TO (DeepSomatic-TO) & 0.4 & 0.41363  \\
+  COLO829\_NYGC & LongPhase-TO (ClairS-TO)      & 0.4 & 0.394405 \\
+  COLO829\_NYGC & ASCAT (TO) & 0.2 & 1        \\
+  COLO829\_NYGC & ASCAT (T+N) & 0.2 & 1        \\
+  COLO829\_NYGC & LongPhase-TO (DeepSomatic-TO) & 0.2 & 0.190046 \\
+  COLO829\_NYGC & LongPhase-TO (ClairS-TO)      & 0.2 & 0.155024 \\
+  H1437\_UCSC & ASCAT (TO) & 1   & 0.94     \\
+  H1437\_UCSC & ASCAT (T+N) & 1   & 1        \\
+  H1437\_UCSC & LongPhase-TO (DeepSomatic-TO) & 1   & 1        \\
+  H1437\_UCSC & LongPhase-TO (ClairS-TO)      & 1   & 1        \\
+  H1437\_UCSC & ASCAT (TO) & 0.8 & 0.81     \\
+  H1437\_UCSC & ASCAT (T+N) & 0.8 & 0.79     \\
+  H1437\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.8 & 0.756746 \\
+  H1437\_UCSC & LongPhase-TO (ClairS-TO)      & 0.8 & 0.800139 \\
+  H1437\_UCSC & ASCAT (TO) & 0.6 & 0.67     \\
+  H1437\_UCSC & ASCAT (T+N) & 0.6 & 0.6      \\
+  H1437\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.6 & 0.593584 \\
+  H1437\_UCSC & LongPhase-TO (ClairS-TO)      & 0.6 & 0.625125 \\
+  H1437\_UCSC & ASCAT (TO) & 0.4 & null     \\
+  H1437\_UCSC & ASCAT (T+N) & 0.4 & 0.41     \\
+  H1437\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.4 & 0.366929 \\
+  H1437\_UCSC & LongPhase-TO (ClairS-TO)      & 0.4 & 0.401244 \\
+  H1437\_UCSC & ASCAT (TO) & 0.2 & 1        \\
+  H1437\_UCSC & ASCAT (T+N) & 0.2 & 1        \\
+  H1437\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.2 & 0.180597 \\
+  H1437\_UCSC & LongPhase-TO (ClairS-TO)      & 0.2 & 0.243993 \\
+  H2009\_UCSC & ASCAT (TO) & 1   & 0.98     \\
+  H2009\_UCSC & ASCAT (T+N) & 1   & 0.99     \\
+  H2009\_UCSC & LongPhase-TO (DeepSomatic-TO) & 1   & 1        \\
+  H2009\_UCSC & LongPhase-TO (ClairS-TO)      & 1   & 1        \\
+  H2009\_UCSC & ASCAT (TO) & 0.8 & 0.86     \\
+  H2009\_UCSC & ASCAT (T+N) & 0.8 & 0.83     \\
+  H2009\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.8 & 0.767361 \\
+  H2009\_UCSC & LongPhase-TO (ClairS-TO)      & 0.8 & 0.805824 \\
+  H2009\_UCSC & ASCAT (TO) & 0.6 & 0.71     \\
+  H2009\_UCSC & ASCAT (T+N) & 0.6 & 0.65     \\
+  H2009\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.6 & 0.594719 \\
+  H2009\_UCSC & LongPhase-TO (ClairS-TO)      & 0.6 & 0.609026 \\
+  H2009\_UCSC & ASCAT (TO) & 0.4 & 0.88     \\
+  H2009\_UCSC & ASCAT (T+N) & 0.4 & 0.45     \\
+  H2009\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.4 & 0.361946 \\
+  H2009\_UCSC & LongPhase-TO (ClairS-TO)      & 0.4 & 0.384681 \\
+  H2009\_UCSC & ASCAT (TO) & 0.2 & 0.97     \\
+  H2009\_UCSC & ASCAT (T+N) & 0.2 & 0.32     \\
+  H2009\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.2 & 0.241487 \\
+  H2009\_UCSC & LongPhase-TO (ClairS-TO)      & 0.2 & 0.260308 \\
+  HCC1395\_HKU & ASCAT (TO) & 1   & 0.92     \\
+  HCC1395\_HKU & ASCAT (T+N) & 1   & 0.99     \\
+  HCC1395\_HKU & LongPhase-TO (DeepSomatic-TO) & 1   & 0.993092 \\
+  HCC1395\_HKU & LongPhase-TO (ClairS-TO)      & 1   & 0.976934 \\
+  HCC1395\_HKU & ASCAT (TO) & 0.8 & 0.8      \\
+  HCC1395\_HKU & ASCAT (T+N) & 0.8 & 0.73     \\
+  HCC1395\_HKU & LongPhase-TO (DeepSomatic-TO) & 0.8 & 0.741453 \\
+  HCC1395\_HKU & LongPhase-TO (ClairS-TO)      & 0.8 & 0.785145 \\
+  HCC1395\_HKU & ASCAT (TO) & 0.6 & 0.68     \\
+  HCC1395\_HKU & ASCAT (T+N) & 0.6 & 0.6      \\
+  HCC1395\_HKU & LongPhase-TO (DeepSomatic-TO) & 0.6 & 0.615349 \\
+  HCC1395\_HKU & LongPhase-TO (ClairS-TO)      & 0.6 & 0.584165 \\
+  HCC1395\_HKU & ASCAT (TO) & 0.4 & 0.95     \\
+  HCC1395\_HKU & ASCAT (T+N) & 0.4 & 0.49     \\
+  HCC1395\_HKU & LongPhase-TO (DeepSomatic-TO) & 0.4 & 0.406379 \\
+  HCC1395\_HKU & LongPhase-TO (ClairS-TO)      & 0.4 & 0.361424 \\
+  HCC1395\_HKU & ASCAT (TO) & 0.2 & 1        \\
+  HCC1395\_HKU & ASCAT (T+N) & 0.2 & 1        \\
+  HCC1395\_HKU & LongPhase-TO (DeepSomatic-TO) & 0.2 & 0.195408 \\
+  HCC1395\_HKU & LongPhase-TO (ClairS-TO)      & 0.2 & 0.273912 \\
+  HCC1395\_NYGC & ASCAT (TO) & 1   & 0.9      \\
+  HCC1395\_NYGC & ASCAT (T+N) & 1   & 0.98     \\
+  HCC1395\_NYGC & LongPhase-TO (DeepSomatic-TO) & 1   & 1        \\
+  HCC1395\_NYGC & LongPhase-TO (ClairS-TO)      & 1   & 0.992825 \\
+  HCC1395\_NYGC & ASCAT (TO) & 0.8 & 0.82     \\
+  HCC1395\_NYGC & ASCAT (T+N) & 0.8 & 0.79     \\
+  HCC1395\_NYGC & LongPhase-TO (DeepSomatic-TO) & 0.8 & 0.703645 \\
+  HCC1395\_NYGC & LongPhase-TO (ClairS-TO)      & 0.8 & 0.735166 \\
+  HCC1395\_NYGC & ASCAT (TO) & 0.6 & 0.69     \\
+  HCC1395\_NYGC & ASCAT (T+N) & 0.6 & 0.65     \\
+  HCC1395\_NYGC & LongPhase-TO (DeepSomatic-TO) & 0.6 & 0.548995 \\
+  HCC1395\_NYGC & LongPhase-TO (ClairS-TO)      & 0.6 & 0.571495 \\
+  HCC1395\_NYGC & ASCAT (TO) & 0.4 & 1        \\
+  HCC1395\_NYGC & ASCAT (T+N) & 0.4 & 0.49     \\
+  HCC1395\_NYGC & LongPhase-TO (DeepSomatic-TO) & 0.4 & 0.366552 \\
+  HCC1395\_NYGC & LongPhase-TO (ClairS-TO)      & 0.4 & 0.334705 \\
+  HCC1395\_NYGC & ASCAT (TO) & 0.2 & 0.9      \\
+  HCC1395\_NYGC & ASCAT (T+N) & 0.2 & 1        \\
+  HCC1395\_NYGC & LongPhase-TO (DeepSomatic-TO) & 0.2 & 0.222031 \\
+  HCC1395\_NYGC & LongPhase-TO (ClairS-TO)      & 0.2 & 0.220741 \\
+  HCC1937\_UCSC & ASCAT (TO) & 1   & 0.92     \\
+  HCC1937\_UCSC & ASCAT (T+N) & 1   & 0.99     \\
+  HCC1937\_UCSC & LongPhase-TO (DeepSomatic-TO) & 1   & 0.976944 \\
+  HCC1937\_UCSC & LongPhase-TO (ClairS-TO)      & 1   & 0.954303 \\
+  HCC1937\_UCSC & ASCAT (TO) & 0.8 & 0.8      \\
+  HCC1937\_UCSC & ASCAT (T+N) & 0.8 & 0.78     \\
+  HCC1937\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.8 & 0.747722 \\
+  HCC1937\_UCSC & LongPhase-TO (ClairS-TO)      & 0.8 & 0.745418 \\
+  HCC1937\_UCSC & ASCAT (TO) & 0.6 & null     \\
+  HCC1937\_UCSC & ASCAT (T+N) & 0.6 & 0.59     \\
+  HCC1937\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.6 & 0.584391 \\
+  HCC1937\_UCSC & LongPhase-TO (ClairS-TO)      & 0.6 & 0.533784 \\
+  HCC1937\_UCSC & ASCAT (TO) & 0.4 & 1        \\
+  HCC1937\_UCSC & ASCAT (T+N) & 0.4 & 1        \\
+  HCC1937\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.4 & 0.40065  \\
+  HCC1937\_UCSC & LongPhase-TO (ClairS-TO)      & 0.4 & 0.350002 \\
+  HCC1937\_UCSC & ASCAT (TO) & 0.2 & 1        \\
+  HCC1937\_UCSC & ASCAT (T+N) & 0.2 & 1        \\
+  HCC1937\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.2 & 0.318493 \\
+  HCC1937\_UCSC & LongPhase-TO (ClairS-TO)      & 0.2 & 0.288033 \\
+  HCC1954\_UCSC & ASCAT (TO) & 1   & 0.69     \\
+  HCC1954\_UCSC & ASCAT (T+N) & 1   & null     \\
+  HCC1954\_UCSC & LongPhase-TO (DeepSomatic-TO) & 1   & 0.701592 \\
+  HCC1954\_UCSC & LongPhase-TO (ClairS-TO)      & 1   & 0.797644 \\
+  HCC1954\_UCSC & ASCAT (TO) & 0.8 & null     \\
+  HCC1954\_UCSC & ASCAT (T+N) & 0.8 & null     \\
+  HCC1954\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.8 & 0.578687 \\
+  HCC1954\_UCSC & LongPhase-TO (ClairS-TO)      & 0.8 & 0.611449 \\
+  HCC1954\_UCSC & ASCAT (TO) & 0.6 & null     \\
+  HCC1954\_UCSC & ASCAT (T+N) & 0.6 & null     \\
+  HCC1954\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.6 & 0.471592 \\
+  HCC1954\_UCSC & LongPhase-TO (ClairS-TO)      & 0.6 & 0.490811 \\
+  HCC1954\_UCSC & ASCAT (TO) & 0.4 & 1        \\
+  HCC1954\_UCSC & ASCAT (T+N) & 0.4 & 1        \\
+  HCC1954\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.4 & 0.350828 \\
+  HCC1954\_UCSC & LongPhase-TO (ClairS-TO)      & 0.4 & 0.508315 \\
+  HCC1954\_UCSC & ASCAT (TO) & 0.2 & 1        \\
+  HCC1954\_UCSC & ASCAT (T+N) & 0.2 & 1        \\
+  HCC1954\_UCSC & LongPhase-TO (DeepSomatic-TO) & 0.2 & 0.372583 \\
+  HCC1954\_UCSC & LongPhase-TO (ClairS-TO)      & 0.2 & 0.839598 \\
+  \bottomrule
+  \end{longtable}
+\end{small}
+
+\begin{longtable}[]{@{}lll@{}}
+  \caption{Cancer cell lines used in this study, with their sequencing data sources and benchmark references.}
+  \label{tab:cell-lines} \\
+  \toprule
+  Cell Line & Material Source & Benchmark Source \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Cell Line & Material Source & Benchmark Source \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  COLO829 & ONT, NYGC & NYGC \\
+  H1437 & UCSC & Google \\
+  H2009 & UCSC & Google \\
+  HCC1395 & HKU, NYGC & SEQC2 \\
+  HCC1937 & UCSC & Google \\
+  HCC1954 & UCSC & Google \\
+\end{longtable}
+
+\begin{longtable}[]{@{}l@{}}
+  \caption{Somatic variant callers used for benchmarking.}
+  \label{tab:callers} \\
+  \toprule
+  Somatic Variant Callers \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Somatic Variant Callers \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  ClairS-TO v0.3.0 (ssrs) \\
+  ClairS-TO v0.3.0 (ss) \\
+  DeepSomatic v1.8.0 (tumor-only) \\
+\end{longtable}
+
+\clearpage
+
+\section{Commandline arguments}
 
 \subsection{Read Alignment}
 \subsubsection{Alignment}
@@ -322,7 +1185,7 @@ At high purity, however, the VAF distributions of somatic and germline variants 
   --output ${OUTPUT}
 \end{verbatim}
 
-\subsection{Purity Estimation}
+\subsection{Tumor DNA Fraction Estimation}
 \textbf{Ascat v3.2.0} (\url{https://github.com/VanLoo-lab/ascat})
 \label{supp:ascat}
 \begin{verbatim}
@@ -334,20 +1197,20 @@ At high purity, however, the VAF distributions of somatic and germline variants 
   setwd("${OUTPUT_PREFIX}")
 
   ascat.prepareHTS(
-    tumourseqfile = "${TUMOR_BAM}",
+    tumorseqfile = "${TUMOR_BAM}",
     normalseqfile = "${NORMAL_BAM}",
-    tumourname = "tumor",
+    tumorname = "tumor",
     normalname = "normal",
     allelecounter_exe = "${ALLELE_COUNTER}",
     skip_allele_counting_normal = FALSE,
-    skip_allele_counting_tumour = FALSE,
+    skip_allele_counting_tumor = FALSE,
     alleles.prefix = "${ALLELES_PREFIX}",
     loci.prefix = "${LOCI_PREFIX}",
     gender = "${gender}",
     genomeVersion = "hg38",
     nthreads = 50,
-    tumourLogR_file = "Tumor_LogR.txt",
-    tumourBAF_file = "Tumor_BAF.txt",
+    tumorLogR_file = "Tumor_LogR.txt",
+    tumorBAF_file = "Tumor_BAF.txt",
     normalLogR_file = "Germline_LogR.txt",
     normalBAF_file = "Germline_BAF.txt",
     loci_binsize = 500,
@@ -395,8 +1258,5 @@ At high purity, however, the VAF distributions of somatic and germline variants 
 \end{verbatim}
 
 
-
-\bibliographystyle{naturemag}
-\bibliography{supp_references}
 
 \end{document}
