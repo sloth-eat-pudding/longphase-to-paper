@@ -117,17 +117,19 @@ The results unequivocally demonstrate that LongPhase-TO functions as a precision
 
 \subsection{Somatic variant recalibration and LOH detection}\label{supplementary-methods-for-somatic-variant-analysis}
 
-The following methods provide additional details on empirical threshold calibration for LOH detection and regression-calibrated triplet-graph recalibration of somatic variant candidates.
+The following methods provide additional details on empirical threshold calibration, directional-clipping interval definition and regression-calibrated triplet-graph recalibration of somatic variant candidates.
 
 \subsubsection{Empirical calibration of LOH detection thresholds}\label{methodology-for-loss-of-heterozygosity-loh-detection}
 
-Loss of Heterozygosity (LOH) is a common genomic event in cancer wherein one parental allele of a chromosome segment is lost. To detect LOH regions, we developed a two-step classification method based on the local density of heterozygous variants. The approach first assigns a genotype to each variant based on its allele frequency and then calculates a Heterozygosity Ratio \(H_r\) for genomic windows to classify them as LOH or Non-LOH (Supplementary Fig.~\ref{fig:app-page-37-cropped-jpg}).
+The two thresholds used for LOH classification were calibrated against the HCC1395 LOH and non-LOH reference intervals published by SEQC2. Variant allele frequency (VAF) distributions within these intervals showed a heterozygous peak near 0.5 in non-LOH regions that was depleted in LOH regions; variants with VAF $\geq0.8$, or marked as homozygous in the input, were therefore counted as homozygous, and all remaining variants were counted as heterozygous (Supplementary Fig.~\ref{fig:app-page-37-cropped-jpg}a). After variants within short CNV/BFB-associated intervals were excluded, the regional heterozygosity ratio was calculated as \(R_{\mathrm{het}}=N_{\mathrm{het}}/(N_{\mathrm{het}}+N_{\mathrm{hom}})\). The resulting distributions separated the SEQC2 reference LOH and non-LOH regions, supporting classification of a region as LOH when \(R_{\mathrm{het}}<0.09\) (Supplementary Fig.~\ref{fig:app-page-37-cropped-jpg}b). Both thresholds were then held fixed and applied unchanged across all sequencing datasets.
 
-The determination of classification thresholds was guided by empirical distributions of the data. As shown in Supplementary Fig.~\ref{fig:app-page-37-cropped-jpg}a, the violin plot illustrates the distribution of Variant Allele Frequencies (VAF) for variants located within predefined LOH (green) and Non-LOH (blue) regions. In Non-LOH regions, the VAF distribution is bimodal, with a prominent peak at 0.5 representing heterozygous variants and a smaller peak near 1.0 corresponding to homozygous variants. By contrast, LOH regions exhibit a unimodal distribution strongly skewed towards 1.0, consistent with the loss of one allele and the concomitant depletion of heterozygous variants. Based on these empirical patterns, a threshold of VAF $\ge$ 0.8 was selected to classify variants as homozygous in subsequent analyses.
+\subsubsection{Directional clipping and genomic-event interval definition}\label{supp:directional-clipping}
 
-Similarly, Supplementary Fig.~\ref{fig:app-page-37-cropped-jpg}b presents a box plot of the Heterozygosity Ratio for regions classified as LOH and Non-LOH. The ratio, defined as the proportion of heterozygous variants within a genomic window, shows a clear separation between the two groups. Non-LOH regions display higher values, with a median around 0.55, whereas LOH regions approach zero. On the basis of this distribution, a threshold of $H_r = 0.09$ was established to distinguish LOH from Non-LOH regions.
+At each ordered clip-bearing position \(i\), LongPhase-TO counts soft- and hard-clipping operations longer than five bases at the left and right alignment ends as \(F_i\) and \(B_i\), respectively, and defines the signed directional signal as \(d_i=F_i-B_i\). Positions with \(F_i\geq5\) or \(B_i\geq5\) are retained as direct clipping signals. To recover boundaries supported by dispersed lower-amplitude clipping, two successive directional rolling means, each spanning 100 clip-bearing positions, are applied to \(d_i\) in each direction; the reverse profile is sign-inverted so that the two clipping orientations can be processed symmetrically. Local peaks with a transformed value of at least 0.25 are retained, and peaks separated by no more than 100 clip-bearing positions are represented by the larger peak. A forward candidate is discarded when a direct signal \(d_j\geq5\) occurs within the following 200 clip-bearing positions; the reciprocal criterion, \(d_j\leq-5\) within the preceding 200 positions, is applied to reverse candidates. This prevents a strong localized breakpoint from being represented again as a distributed-signal candidate.
 
-This quantitative framework, supported by empirical observations of allele frequency and heterozygosity ratio distributions, provides a robust and automated method for identifying LOH events across the genome by leveraging the statistical signature of heterozygote depletion.
+Support for each retained distributed-signal candidate is estimated from the cumulative directional signal, \(C_i=\sum_{k=1}^{i}d_k\). After \(C_i\) is smoothed over 100 clip-bearing positions to obtain \(\widetilde{C}_i\), support at candidate position \(p\) is defined as \(A_p=\widetilde{C}_{p+10}-\widetilde{C}_{p-10}\). The sign of \(A_p\) preserves clipping orientation, and its magnitude is assigned as the amplified clipping support (Supplementary Fig.~\ref{fig:met-page-14-cropped-jpg}).
+
+Direct and amplified signals are scanned in genomic order. A signal with at least five supporting clips initiates a candidate event. An opposite-orientation signal within 10 kb completes an SGE interval when its support is at least \(\lfloor c/4\rfloor\), where \(c\) is the maximum support observed for the initiating orientation. If no qualifying partner is present, the initiating signal is retained as an LGE boundary. The first and last clip-bearing positions are added as terminal LGE boundaries. SGE intervals are excluded from allele-state counting, whereas LGE boundaries partition the chromosome for LOH evaluation. These labels describe operational interval classes and do not assign a molecular CNV or BFB subtype. Supplementary Table~\ref{tab:loh-clipping-parameters} lists the fixed implementation parameters and their roles.
 
 
 \subsubsection{Regression-calibrated triplet-graph recalibration}\label{pattern-based-filtering-for-somatic-variant-calling}
@@ -192,17 +194,21 @@ Together these ten features are supplied to a gradient-boosted decision-tree cla
 \paragraph{Classifier and training-set selection.} The choice of a gradient-boosted tree model was made empirically (Supplementary Fig.~\ref{fig:met-classifier-selection}). Seven candidate classifiers (XGBoost, histogram-based gradient boosting, random forests, extremely randomized trees, logistic regression, a linear support-vector machine and linear discriminant analysis) were compared by held-out ROC-AUC on the binary somatic-versus-non-somatic indel task under two cross-validation schemes, each applied both across cell lines and across tumor DNA fractions: leave-one-out, in which the model was trained on all groups but one and evaluated on the held-out group, and leave-four-out, in which it was trained on a single group and evaluated on the remaining four. The four tree-ensemble methods consistently outperformed the three linear methods, and XGBoost attained the highest or tied-highest held-out ROC-AUC in every scheme (median approximately 0.93 for leave-one-cell-line-out and approximately 0.96 for leave-one-fraction-out), motivating its selection. Under the more stringent leave-four-out setting, in which a single group supplied the training data, the held-out ROC-AUC of XGBoost remained at approximately 0.90 or above, confirming that the single-sample training strategy generalizes robustly across both cell lines and tumor DNA fractions.
 
 
-\subsection{High-DNA-fraction phasing refinement}
-\label{app:purity-aware-workflow}
+\subsection{LOH-aware joint phasing of germline and somatic variants}
+\label{supp:loh-aware-phasing}
 
-The variant allele frequency (VAF) of a heterozygous somatic variant scales with tumor DNA fraction, whereas that of a heterozygous germline variant remains near 0.5. At high tumor DNA fraction, overlap between these distributions reduces the reliability of haplotype-based candidate recalibration (Supplementary Fig.~\ref{fig:app-page-41-cropped-jpg}).
+LongPhase-TO constructs a local allele-linkage graph from the recalibrated variants and the detected LOH segments (Supplementary Figure~\ref{fig:met-page-24-cropped-jpg}). Reference and alternate alleles are represented as separate nodes. For each read, an allele observation is connected to observations at up to the next 35 informative non-homozygous variants; traversal is interrupted across a gap of more than 300 kb between consecutive informative variants. At an LOH transition, the graph additionally retains a limited set of connections between heterozygous variants outside the segment and informative homozygous variants within it. Each ordinary read observation contributes an edge weight of 1. An edge involving an allele observation with base quality below 12 is assigned a weight of 0.1, and observations from alignments marked as unreliable contribute a weight of 0.01.
 
-LongPhase-TO applies candidate recalibration and LOH-aware phasing to all samples and estimates tumor DNA fraction from the initial phasing result. When this estimate exceeds 0.9, all variants not marked by the normal-panel resources are treated as somatic and phasing is repeated once using the existing LOH map (Supplementary Fig.~\ref{fig:app-page-42-cropped-jpg}). Otherwise, the initial phasing result is retained. The tumor DNA fraction is not re-estimated after the additional pass.
+Variants are visited in genomic order. For two non-somatic variants, parallel support is the sum of the reference--reference and alternate--alternate edge weights, whereas crossed support is the sum of the reference--alternate and alternate--reference weights. When either site is somatic, only linkages involving the somatic alternate allele are used to determine its parental haplotype. A pair is not propagated when the ratio of the smaller to the larger of the parallel and crossed supports exceeds 0.7, because the two configurations are insufficiently distinguishable. Accepted pairwise comparisons cast weighted votes for the HP1 or HP2 assignment of downstream variants; strongly concordant comparisons are upweighted, and potentially unreliable indel comparisons are downweighted. If the accumulated HP1 and HP2 support is equal, the current variant starts a new phase block rather than being connected without directional evidence.
+
+The provisional phase is refined through the reads. For each read, allele observations consistent with HP1 and HP2 are counted, with unreliable observations downweighted or omitted. A read is assigned to a haplotype when the larger haplotype count accounts for more than 0.65 of its informative support and the read contributes more than one informative observation. Haplotype-specific allele counts from these assigned reads are then used to retain or revise a variant phase when one configuration accounts for more than 0.75 of the support. At a somatic site, this comparison uses the alternate-allele support in the two read haplotypes and records the supported somatic allele as a descendant of HP1 or HP2.
+
+At each LOH boundary, LongPhase-TO compares read links between variants on opposite sides of the heterozygous-to-homozygous transition. A connection is accepted when one allele configuration accounts for at least 0.8 of the cross-boundary support. Votes from the retained connections identify whether HP1 or HP2 continues through the LOH segment. The other parental haplotype is represented as absent within the segment, whereas somatic alleles remain assigned to descendants of the retained haplotype. Connections at the distal boundary restore the corresponding parental label and phase-set continuity in the following diploid region.
 
 \subsection{Tumor DNA fraction regression from haplotype imbalance and LOH}
 \label{app:dna-fraction-regression}
 
-The tumor DNA fraction is predicted from three genome-wide features: the first and third quartiles of the haplotype-imbalance distribution, \(q_1\) and \(q_3\), and the LOH ratio \(r\) (total LOH length divided by the analyzable genome length). A single complete third-degree (cubic) polynomial in these features, comprising all 20 monomials of total degree at most three, was fitted on seven of the eight cell-line datasets, with HCC1954\_UCSC held out as an independent test set, and then held fixed; the same coefficients are applied whether somatic variants are supplied by ClairS-TO or DeepSomatic-TO. The fitted predictor is
+The tumor DNA fraction is predicted from three genome-wide features. The first and third quartiles of the haplotype-imbalance distribution, \(q_1\) and \(q_3\), capture its lower and upper portions and jointly describe its location and spread. The LOH ratio \(r\), defined as the total detected LOH length divided by the total analyzed chromosome length, provides complementary information on the genome-wide extent of parental haplotype loss. A single complete third-degree (cubic) polynomial in these features, comprising all 20 monomials of total degree at most three, was fitted on seven of the eight cell-line datasets, with HCC1954\_UCSC held out as an independent test set, and then held fixed; the same coefficients are applied whether somatic variants are supplied by ClairS-TO or DeepSomatic-TO. The fitted predictor is
 
 \[
 \begin{aligned}
@@ -217,79 +223,25 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
 
 \clearpage
 \section{Supplementary Figures}
+\FloatBarrier
 
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[width=0.8\textwidth,keepaspectratio]{page_18_cropped.jpg}}
-  \caption[Panel of Normals Filtering]{Filtering somatic variant candidates using a Panel of Normals (PON). This schematic shows that an initial set of variant candidates, containing a mix of somatic (brown), germline (blue), and other variants, is filtered by subtracting all variants found in the PON. This process enriches the final candidate list for true somatic mutations by removing common germline polymorphisms and known artifacts.}\label{fig:met-page-18-cropped-jpg}
-\end{figure}
+% \begin{figure}
+%   \centering
+%   \pandocbounded{\includegraphics[width=0.8\textwidth,keepaspectratio]{page_18_cropped.jpg}}
+%   \caption[Panel of Normals Filtering]{Filtering somatic variant candidates using a Panel of Normals (PON). This schematic shows that an initial set of variant candidates, containing a mix of somatic (brown), germline (blue), and other variants, is filtered by subtracting all variants found in the PON. This process enriches the final candidate list for true somatic mutations by removing common germline polymorphisms and known artifacts.}\label{fig:met-page-18-cropped-jpg}
+% \end{figure}
 
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_19_cropped.jpg}}
-  \caption[Allele concordance filtering]{Filtering clustered artifacts by allele concordance. For each candidate, non-reference mismatches within 100 aligned positions on either side are compared between reference- and alternate-supporting reads. A candidate is removed when at least two mismatches occur in at least 50\% of alternate-supporting reads and at least 60\% of all reads carrying the corresponding mismatch.}\label{fig:met-page-19-cropped-jpg}
-\end{figure}
+% \begin{figure}
+%   \centering
+%   \pandocbounded{\includegraphics[keepaspectratio]{page_19_cropped.jpg}}
+%   \caption[Allele concordance filtering]{Filtering clustered artifacts by allele concordance. For each candidate, non-reference mismatches within 100 aligned positions on either side are compared between reference- and alternate-supporting reads. A candidate is removed when at least two mismatches occur in at least 50\% of alternate-supporting reads and at least 60\% of all reads carrying the corresponding mismatch.}\label{fig:met-page-19-cropped-jpg}
+% \end{figure}
 
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_20_cropped.jpg}}
-  \caption[Graph Models Comparison]{Comparison of graph models for somatic variant recalibration. The figure contrasts the proposed triplet graph, which models haplotypes across three adjacent variant sites, with a simpler pairwise graph that only considers pairs. The triplet graph captures more linkage information, making it more powerful for distinguishing true somatic variants from artifacts, while the pairwise graph is labeled noninformative for this complex task.}\label{fig:met-page-20-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_21_cropped.jpg}}
-  \caption[Combinatorial Haplotype Pattern Classification]{High-confidence patterns ($V_H$) arise from three-haplotype scenarios with two parental germline paths and one somatic-descendant path. The three illustrated low-confidence ($V_L$) topologies correspond to the candidate occupying the middle, left or right node; each is further subdivided by the third-path topology during graph evaluation. Sufficiently supported configurations not accepted as $V_H$ or $V_L$ are classified as non-somatic ($V_N$), whereas configurations with insufficient support do not vote.}\label{fig:met-page-21-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_overview.png}}
-  \caption[Methylation-aware recalibration overview]{Overview of methylation-aware recalibration of somatic variant candidates. When the input alignments carry 5-methylcytosine (5mC) tags, reads spanning each candidate are partitioned by the allele they carry at the candidate locus (reference, ``G''; alternate, e.g.\ ``GT''), and the CpG sites within a symmetric window of $\pm d$ base pairs are analyzed at single-read resolution (methylated, red ``M''; unmethylated, cyan ``U''). Ten features are computed across three complementary views: allelic methylation coverage (per-site methylated-read counts on each allele), joint haplotype methylation proportions (per-site classification of each allele as methylation-pure or methylation-mixed), and methylation-cloud geometry (per-site allele methylation ratios and the geometry of their centroid; kernel-density clouds are shown for somatic, germline and artifact indels in HCC1395\_NYGC at 0.6 tumor DNA fraction). A gradient-boosted decision-tree classifier (XGBoost) uses these features to label each candidate as a somatic variant, germline variant or sequencing artifact, retaining only candidates classified as somatic.}\label{fig:met-methylation-overview}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_14_cropped.jpg}}
-  \caption[Directional clipping signal and distributed boundary detection]{Soft- and hard-clipped alignments with more than five clipped bases are counted separately at the left and right alignment ends. The resulting directional signal is smoothed across 100 clip-bearing positions to consolidate distributed low-amplitude support, while isolated strong signals are retained as direct breakpoint candidates. The schematic uses a six-position window for clarity.
-  }\label{fig:met-page-14-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_15_cropped.jpg}}
-  \caption[Boundary support from distributed clipping]{Distributed clipping signals are consolidated into candidate boundaries and assigned support from the local change in the smoothed cumulative clipping signal. The sign of this change preserves clipping orientation for subsequent interval pairing; the schematic uses a six-position window for clarity.}\label{fig:met-page-15-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_16_cropped.jpg}}
-  \caption[Breakpoint-associated interval calling]{A signal supported by at least five clips initiates a candidate boundary. An opposite-orientation signal within 10 kb completes a local interval when its support reaches approximately one quarter of the initiating signal; otherwise, the strong isolated boundary partitions the chromosome for LOH evaluation.}\label{fig:met-page-16-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[width=0.8\textwidth, keepaspectratio]{page_17_cropped.jpg}}
-  \caption[Chromosome-scale LOH Detection]{Method for chromosome-scale LOH detection. The workflow shows that an initial pass may identify fragmented LOH regions interrupted by small CNV or BFB events that locally restore heterozygosity. The final step involves a merging process that filters out these small intervening events to define a single, continuous, large-scale LOH region.}\label{fig:met-page-17-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_24_cropped.jpg}}
-  \caption[Haplotype Phasing Workflow]{Graph-based haplotype phasing workflow. This diagram illustrates how sequencing read data is transformed into a k-variant graph, where nodes are alleles and weighted edges represent their co-occurrence on reads. The algorithm then traverses this graph to reconstruct the most likely haplotypes, including distinguishing between germline (HP1, HP2) and newly evolved somatic (e.g., HP2-1) haplotypes.}\label{fig:met-page-24-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_25_cropped.jpg}}
-  \caption[Haplotype Imbalance Principle]{Principle of tumor DNA fraction prediction using Haplotype Imbalance (HI). The figure shows that as tumor DNA fraction increases from 0.2 to 1.0, the proportion of somatic haplotypes increases. This causes the genome-wide distribution of HI, shown in histograms and box plots, to shift from a balanced state (centered at 0.5) to a highly imbalanced state with higher median values and a peak at 1.0.}\label{fig:met-page-25-cropped-jpg}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_26_cropped.jpg}}
-  \caption[Tumor DNA Fraction Prediction Model]{Schematic of the tumor DNA fraction prediction model. The model takes two types of genomic features as input: the LOH Ratio (fraction of the genome with LOH) and statistics from the Haplotype Imbalance distribution (represented by the Q1 and Q3 quartiles of a box plot). These features are provided to a Polynomial Regression model, from which the estimated tumor DNA fraction is obtained.}\label{fig:met-page-26-cropped-jpg}
-\end{figure}
+% \begin{figure}
+%   \centering
+%   \pandocbounded{\includegraphics[keepaspectratio]{page_20_cropped.jpg}}
+%   \caption[Graph Models Comparison]{Comparison of graph models for somatic variant recalibration. The figure contrasts the proposed triplet graph, which models haplotypes across three adjacent variant sites, with a simpler pairwise graph that only considers pairs. The triplet graph captures more linkage information, making it more powerful for distinguishing true somatic variants from artifacts, while the pairwise graph is labeled noninformative for this complex task.}\label{fig:met-page-20-cropped-jpg}
+% \end{figure}
 
 \begin{figure}
   \centering
@@ -300,8 +252,20 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
 
 \begin{figure}
   \centering
-  \pandocbounded{\includegraphics[keepaspectratio]{page_37_cropped.jpg}}
-  \caption[LOH Detection Methodology]{A two-panel plot illustrating the methodology for Loss of Heterozygosity (LOH) detection. (a) The violin plot shows the distribution of Variant Allele Frequencies (VAF) in Non-LOH (blue) and LOH (green) regions, demonstrating that LOH regions lack the characteristic heterozygous peak at VAF=0.5. (b) The box plot shows the distribution of the calculated Heterozygosity Ratio for the two region types, revealing a clear separation that allows for robust classification using a threshold (Hr = 0.09).}\label{fig:app-page-37-cropped-jpg}
+  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_recalibration_snv.png}}
+  \caption[Methylation-aware recalibration improves somatic SNV calling]{Methylation-aware recalibration improves somatic SNV calling beyond haplotype-aware recalibration alone. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO SNV calling are shown for the five tumor cell line datasets with 5-methylcytosine (5mC) tags available (H1437\_UCSC, H2009\_UCSC, HCC1395\_NYGC, HCC1937\_UCSC and HCC1954\_UCSC) across DNA fractions from 20\% to 100\%, comparing each caller alone, the caller after haplotype-aware (triplet-graph) recalibration, and the caller after the additional methylation-aware recalibration step. Averaged over the five datasets and both callers, the methylation-aware step raised mean SNV precision by 0.05 (0.68 to 0.72) at a mean recall cost of 0.01, giving a mean F1 gain of 0.01. Precision improved in 31 of the 50 caller-dataset-fraction combinations and declined in 2, with the largest gains in HCC1937\_UCSC (0.08) and HCC1954\_UCSC (0.07), the two datasets with the lowest haplotype-aware accuracy.}\label{fig:met-methylation-recalibration-snv}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_recalibration_indel.png}}
+  \caption[Methylation-aware recalibration improves somatic indel precision]{Methylation-aware recalibration improves the precision of somatic indel calling beyond haplotype-aware recalibration alone. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO indel calling are shown for the five tumor cell line datasets with 5-methylcytosine (5mC) tags available (H1437\_UCSC, H2009\_UCSC, HCC1395\_NYGC, HCC1937\_UCSC and HCC1954\_UCSC) across DNA fractions from 20\% to 100\%, comparing each caller alone, the caller after haplotype-aware (triplet-graph) recalibration, and the caller after the additional methylation-aware recalibration step. Averaged over the five datasets and both callers, the methylation-aware step raised mean indel precision by 0.09 (0.40 to 0.49) at a mean recall cost of 0.01, leaving mean F1 essentially unchanged. Precision improved in 31 of the 50 caller-dataset-fraction combinations and declined in 7, with the largest gains in HCC1937\_UCSC (0.14) and HCC1395\_NYGC (0.09).}\label{fig:met-methylation-recalibration-indel}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_21_cropped.jpg}}
+  \caption[Triplet-graph pattern classification]{Triplet-graph construction and pattern classification. (a) A somatic allele arises on one parental haplotype and is inherited through clonal evolution. (b) Reads spanning three adjacent variant positions define a triplet graph containing up to eight reference/alternate haplotype paths; the examples contrast the consistent haplotype linkage of a somatic variant with the discordant linkage of a sequencing error. (c) The 12 high-confidence ($V_H$) configurations comprise four evolutionary configurations for each candidate position (middle, left and right columns), each containing two parental germline paths and one somatic-descendant path. (d) The nine lower-confidence ($V_L$) configurations comprise three candidate positions crossed with three permitted weak third paths: RRR and two paths that bypass the candidate alternate allele. (e) Sufficiently supported topologies classified as neither $V_H$ nor $V_L$ contribute a $V_N$ vote; triplets with insufficient support do not vote.}\label{fig:met-page-21-cropped-jpg}
 \end{figure}
 
 \begin{figure}
@@ -320,6 +284,12 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
   \centering
   \pandocbounded{\includegraphics[keepaspectratio]{page_40_cropped.jpg}}
   \caption[Low-confidence evidence fraction]{Distribution of the site-level low-confidence evidence fraction, \(L/(L+N)\), for validated true positive (TP, blue) and false positive (FP, red) candidates. False positive candidates are concentrated near zero, whereas true positive candidates extend toward higher values. The distributions across tumor DNA fractions from 1.0 to 0.2 support the retained threshold \(L/(L+N)\geq\theta\), where \(\theta=0.2\), when no high-confidence route is satisfied.}\label{fig:app-page-40-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_overview.png}}
+  \caption[Methylation-aware recalibration overview]{Overview of methylation-aware recalibration of somatic variant candidates. When the input alignments carry 5-methylcytosine (5mC) tags, reads spanning each candidate are partitioned by the allele they carry at the candidate locus (reference, ``G''; alternate, e.g.\ ``GT''), and the CpG sites within a symmetric window of $\pm d$ base pairs are analyzed at single-read resolution (methylated, red ``M''; unmethylated, cyan ``U''). Ten features are computed across three complementary views: allelic methylation coverage (per-site methylated-read counts on each allele), joint haplotype methylation proportions (per-site classification of each allele as methylation-pure or methylation-mixed), and methylation-cloud geometry (per-site allele methylation ratios and the geometry of their centroid; kernel-density clouds are shown for somatic, germline and artifact indels in HCC1395\_NYGC at 0.6 tumor DNA fraction). A gradient-boosted decision-tree classifier (XGBoost) uses these features to label each candidate as a somatic variant, germline variant or sequencing artifact, retaining only candidates classified as somatic.}\label{fig:met-methylation-overview}
 \end{figure}
 
 \begin{figure}
@@ -344,6 +314,46 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
   \centering
   \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_classifier_selection.png}}
   \caption[Classifier selection for methylation-aware recalibration]{Selection of the classifier for methylation-aware recalibration. Seven candidate classifiers were compared by held-out ROC-AUC on the binary somatic-versus-non-somatic indel task under two cross-validation schemes, each applied both across cell lines and across tumor DNA fractions. Left, leave-one-out cross-validation, in which the model is trained on all groups but one and evaluated on the held-out group; right, leave-four-out cross-validation, in which it is trained on a single group and evaluated on the remaining four. The four tree-ensemble methods (XGBoost, histogram-based gradient boosting, random forests and extremely randomized trees) outperform the three linear methods (logistic regression, a linear support-vector machine and linear discriminant analysis), and XGBoost is consistently the top or tied-top performer. Its held-out ROC-AUC remains high even under the more stringent leave-four-out setting, supporting both the choice of XGBoost and the single-sample training strategy. The box plots convey the quantitative results; the cell-line and tumor-fraction icons are schematic.}\label{fig:met-classifier-selection}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[width=0.8\textwidth, keepaspectratio]{page_17_cropped.jpg}}
+  \caption[Chromosome-scale LOH detection]{Chromosome-scale LOH detection after exclusion of short CNV/BFB-associated intervals. Candidate LOH boundaries define the region evaluated. Small CNV or BFB events embedded within a broader LOH tract can locally increase heterozygosity and split an initial LOH call. Omitting variants within these short intervals before calculating the regional heterozygosity ratio allows the flanking heterozygosity-depleted segments to be classified as one continuous arm-level LOH event.}\label{fig:met-page-17-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_14_cropped.jpg}}
+  \caption[Directional clipping and genomic-event interval definition]{Directional clipping and genomic-event interval definition. Soft- and hard-clipping operations longer than five bases are counted at the left and right alignment ends as $F_i$ and $B_i$, respectively, and their difference defines the signed directional signal, $d_i=F_i-B_i$. Strong localized signals are retained without smoothing, whereas directional rolling profiles consolidate dispersed lower-amplitude support. For each resulting candidate at position $p$, support is estimated from the change in the smoothed cumulative clipping signal across the candidate, $A_p=\widetilde{C}_{p+10}-\widetilde{C}_{p-10}$; its sign preserves clipping orientation. Nearby signals of opposite orientation are paired to delimit short intervals associated with local CNV or BFB events (SGE), whereas unpaired signals are retained as candidate boundaries of broader LOH regions (LGE). The schematic uses a six-position rolling window for clarity; full definitions and fixed implementation parameters are provided in Supplementary Methods (Section~\ref{supp:directional-clipping}) and Supplementary Table~\ref{tab:loh-clipping-parameters}. SGE and LGE are operational labels and do not assign a molecular event subtype.
+  }\label{fig:met-page-14-cropped-jpg}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_37_cropped.jpg}}
+  \caption[Empirical calibration of LOH classification thresholds]{Empirical calibration of LOH classification thresholds using the HCC1395 LOH and non-LOH reference intervals published by SEQC2. (a) Variant allele frequency (VAF) distributions for variants in non-LOH (blue) and LOH (green) regions. The depletion of the heterozygous VAF peak in LOH regions supports classifying variants with VAF $\geq0.8$ as homozygous. (b) Distributions of the regional heterozygosity ratio, $R_{\mathrm{het}}=N_{\mathrm{het}}/(N_{\mathrm{het}}+N_{\mathrm{hom}})$, after exclusion of short CNV/BFB-associated intervals. The separation between non-LOH and LOH regions supports classifying regions with $R_{\mathrm{het}}<0.09$ as LOH. Both thresholds were fixed and applied unchanged across all sequencing datasets.}\label{fig:app-page-37-cropped-jpg}
+\end{figure}
+
+% The former distributed-clipping and breakpoint-interval figures were merged
+% into the directional-clipping figure above. Their source blocks are retained
+% below as comments.
+% \begin{figure}
+%   \centering
+%   \pandocbounded{\includegraphics[keepaspectratio]{page_15_cropped.jpg}}
+%   \caption[Boundary support from distributed clipping]{Support for each retained distributed-signal candidate is estimated from the difference between the smoothed cumulative clipping signal 10 clip-bearing positions downstream and upstream of the candidate. Positive and negative differences preserve the two clipping orientations for subsequent interval classification. The implementation smooths over 100 positions, whereas the schematic uses a six-position window for clarity.}\label{fig:met-page-15-cropped-jpg}
+% \end{figure}
+%
+% \begin{figure}
+%   \centering
+%   \pandocbounded{\includegraphics[keepaspectratio]{page_16_cropped.jpg}}
+%   \caption[Breakpoint-associated interval calling]{A directional signal supported by at least five clips initiates a candidate event. An opposite-orientation signal within 10 kb completes a small-genomic-event (SGE) interval when its support reaches the integer one-quarter threshold relative to the maximum initiating-orientation support; otherwise, the initiating signal is retained as a large-genomic-event (LGE) boundary that partitions the chromosome for LOH evaluation. SGE and LGE are operational classes and do not assign a molecular event subtype.}\label{fig:met-page-16-cropped-jpg}
+% \end{figure}
+
+\begin{figure}
+  \centering
+  \pandocbounded{\includegraphics[keepaspectratio]{page_24_cropped.jpg}}
+  \caption[Joint germline and somatic phasing across LOH]{Joint germline and somatic phasing across LOH. Read-level allele observations are converted into a local allele-linkage graph in which nodes represent reference or alternate alleles and weighted edges represent their co-occurrence on reads. Parallel and crossed linkage evidence is combined across neighboring variants to assign alleles to the parental haplotypes HP1 and HP2. A somatic alternate allele is assigned to its supporting parental haplotype and represented as a derived somatic haplotype, such as HP2-1. At an LOH boundary, read connections between flanking heterozygous variants and homozygous variants within the LOH segment identify the retained parental haplotype; the lost path is shown in grey, whereas the retained parental and somatic paths continue through the LOH region. The schematic uses $k=2$ for clarity; implementation details are provided in Supplementary Methods (Section~\ref{supp:loh-aware-phasing}).}\label{fig:met-page-24-cropped-jpg}
 \end{figure}
 
 \begin{figure}
@@ -379,6 +389,20 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
   \end{tikzpicture}
   \caption[Conditional second phasing pass]{Conditional second phasing pass for high-DNA-fraction samples. Somatic variant recalibration and arm-level LOH detection are completed before the initial LOH-aware phasing pass. When the resulting tumor DNA fraction estimate exceeds 0.9, variants not marked by the normal-panel resources are treated as somatic and phasing is repeated once using the existing LOH map; otherwise, the initial phasing result is retained. The tumor DNA fraction is not re-estimated.}\label{fig:app-page-42-cropped-jpg}
 \end{figure}
+
+% The former haplotype-imbalance and tumor-DNA-fraction model schematics are
+% commented out because their content is already presented in Figure 4(a,b).
+% \begin{figure}
+%   \centering
+%   \pandocbounded{\includegraphics[keepaspectratio]{page_25_cropped.jpg}}
+%   \caption[Haplotype Imbalance Principle]{Principle of tumor DNA fraction prediction using Haplotype Imbalance (HI). The figure shows that as tumor DNA fraction increases from 0.2 to 1.0, the proportion of somatic haplotypes increases. This causes the genome-wide distribution of HI, shown in histograms and box plots, to shift from a balanced state (centered at 0.5) to a highly imbalanced state with higher median values and a peak at 1.0.}\label{fig:met-page-25-cropped-jpg}
+% \end{figure}
+%
+% \begin{figure}
+%   \centering
+%   \pandocbounded{\includegraphics[keepaspectratio]{page_26_cropped.jpg}}
+%   \caption[Tumor DNA Fraction Prediction Model]{Schematic of the tumor DNA fraction prediction model. The model takes two types of genomic features as input: the LOH Ratio (fraction of the genome with LOH) and statistics from the Haplotype Imbalance distribution (represented by the Q1 and Q3 quartiles of a box plot). These features are provided to a Polynomial Regression model, from which the estimated tumor DNA fraction is obtained.}\label{fig:met-page-26-cropped-jpg}
+% \end{figure}
 
 \clearpage
 
@@ -515,165 +539,165 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
   \midrule
   \endfirsthead
   COLO829\_ONT & 1 & ClairS-TO & 0.673962072 & 0.799339427 & 0.731315969 \\
-  COLO829\_ONT & 1 & ClairS-TO+LongPhase-TO & 0.664742443 & 0.803526155 & 0.727575241 \\
+  COLO829\_ONT & 1 & ClairS-TO+LongPhase-TO & 0.665861699 & 0.808085037 & 0.730111696 \\
   COLO829\_ONT & 1 & DeepSomatic-TO & 0.500869565 & 0.844044379 & 0.628673891 \\
-  COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.626681089 & 0.808550229 & 0.706092644 \\
+  COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.627790048 & 0.81317889 & 0.708558805 \\
   COLO829\_ONT & 0.8 & ClairS-TO & 0.651248418 & 0.78989603 & 0.713902816 \\
-  COLO829\_ONT & 0.8 & ClairS-TO+LongPhase-TO & 0.853516084 & 0.676412439 & 0.754713553 \\
+  COLO829\_ONT & 0.8 & ClairS-TO+LongPhase-TO & 0.857464122 & 0.6740167 & 0.754753347 \\
   COLO829\_ONT & 0.8 & DeepSomatic-TO & 0.481495653 & 0.848835857 & 0.614449514 \\
-  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.823525815 & 0.626613635 & 0.711700526 \\
+  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.825370974 & 0.636522225 & 0.718748769 \\
   COLO829\_ONT & 0.6 & ClairS-TO & 0.622648308 & 0.763635941 & 0.685972775 \\
-  COLO829\_ONT & 0.6 & ClairS-TO+LongPhase-TO & 0.836854148 & 0.731607471 & 0.780699686 \\
+  COLO829\_ONT & 0.6 & ClairS-TO+LongPhase-TO & 0.847617537 & 0.746005164 & 0.793571853 \\
   COLO829\_ONT & 0.6 & DeepSomatic-TO & 0.465522781 & 0.842462726 & 0.599678803 \\
-  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.817149861 & 0.713278906 & 0.761689497 \\
+  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.825087751 & 0.749052171 & 0.78523359 \\
   COLO829\_ONT & 0.4 & ClairS-TO & 0.576010902 & 0.658688624 & 0.614581638 \\
-  COLO829\_ONT & 0.4 & ClairS-TO+LongPhase-TO & 0.803505214 & 0.645151536 & 0.7156735 \\
+  COLO829\_ONT & 0.4 & ClairS-TO+LongPhase-TO & 0.814281213 & 0.66124718 & 0.729828255 \\
   COLO829\_ONT & 0.4 & DeepSomatic-TO & 0.444837038 & 0.796501756 & 0.570857019 \\
-  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.792994405 & 0.682436676 & 0.733573357 \\
+  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.799356417 & 0.722233852 & 0.758840636 \\
   COLO829\_ONT & 0.2 & ClairS-TO & 0.391519593 & 0.325587886 & 0.35552282 \\
-  COLO829\_ONT & 0.2 & ClairS-TO+LongPhase-TO & 0.657793646 & 0.338543484 & 0.447020885 \\
+  COLO829\_ONT & 0.2 & ClairS-TO+LongPhase-TO & 0.668379888 & 0.347847324 & 0.457563334 \\
   COLO829\_ONT & 0.2 & DeepSomatic-TO & 0.372655309 & 0.604423976 & 0.461051231 \\
-  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.719729685 & 0.507826856 & 0.595488763 \\
+  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.726576237 & 0.538227153 & 0.618377627 \\
   COLO829\_NYGC & 1 & ClairS-TO & 0.682363679 & 0.817319098 & 0.743769116 \\
-  COLO829\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.676230677 & 0.827227688 & 0.744146632 \\
+  COLO829\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.677215429 & 0.832228502 & 0.746762395 \\
   COLO829\_NYGC & 1 & DeepSomatic-TO & 0.543322178 & 0.857186054 & 0.66508455 \\
-  COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.649855305 & 0.830484032 & 0.729149649 \\
+  COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.650934334 & 0.835345289 & 0.731699366 \\
   COLO829\_NYGC & 0.8 & ClairS-TO & 0.659304199 & 0.808852604 & 0.726461802 \\
-  COLO829\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.857685837 & 0.640336799 & 0.733243664 \\
+  COLO829\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.862768723 & 0.632893727 & 0.730165971 \\
   COLO829\_NYGC & 0.8 & DeepSomatic-TO & 0.513700242 & 0.862977694 & 0.644031315 \\
-  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.854977368 & 0.566743423 & 0.681642701 \\
+  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.859800829 & 0.564301165 & 0.681393063 \\
   COLO829\_NYGC & 0.6 & ClairS-TO & 0.631660971 & 0.782476217 & 0.699026504 \\
-  COLO829\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.85018448 & 0.664596562 & 0.746021592 \\
+  COLO829\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.858805504 & 0.677947573 & 0.757734103 \\
   COLO829\_NYGC & 0.6 & DeepSomatic-TO & 0.493629331 & 0.853371479 & 0.625462418 \\
-  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.837980144 & 0.614495383 & 0.709044552 \\
+  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.846182415 & 0.635940735 & 0.726150005 \\
   COLO829\_NYGC & 0.4 & ClairS-TO & 0.587943034 & 0.67985486 & 0.630567271 \\
-  COLO829\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.817664546 & 0.594957319 & 0.688755453 \\
+  COLO829\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.826218551 & 0.609541088 & 0.701529895 \\
   COLO829\_NYGC & 0.4 & DeepSomatic-TO & 0.470825031 & 0.813411486 & 0.596423607 \\
-  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.807311476 & 0.597376317 & 0.686656151 \\
+  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.814681364 & 0.620566139 & 0.704496845 \\
   COLO829\_NYGC & 0.2 & ClairS-TO & 0.405159964 & 0.33933431 & 0.369337097 \\
-  COLO829\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.678764596 & 0.312329914 & 0.427806805 \\
+  COLO829\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.690862639 & 0.320773149 & 0.438122468 \\
   COLO829\_NYGC & 0.2 & DeepSomatic-TO & 0.394171371 & 0.620380062 & 0.482057492 \\
-  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.733241506 & 0.445746982 & 0.554441696 \\
+  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.740530092 & 0.4633545 & 0.570034624 \\
   H1437\_UCSC & 1 & ClairS-TO & 0.770374027 & 0.588233 & 0.667094187 \\
-  H1437\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.752512239 & 0.607433021 & 0.672234091 \\
+  H1437\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.753371498 & 0.610721853 & 0.674587904 \\
   H1437\_UCSC & 1 & DeepSomatic-TO & 0.680080454 & 0.619743393 & 0.648511518 \\
-  H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.725573862 & 0.605665111 & 0.660219213 \\
+  H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.726440562 & 0.608654959 & 0.662352084 \\
   H1437\_UCSC & 0.8 & ClairS-TO & 0.727614595 & 0.558373523 & 0.631857665 \\
-  H1437\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.859307921 & 0.559426469 & 0.677673847 \\
+  H1437\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.870736499 & 0.541591379 & 0.667810058 \\
   H1437\_UCSC & 0.8 & DeepSomatic-TO & 0.623836297 & 0.620211369 & 0.622018552 \\
-  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.843561605 & 0.536586634 & 0.655935166 \\
+  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.847417115 & 0.534610735 & 0.655613831 \\
   H1437\_UCSC & 0.6 & ClairS-TO & 0.721248352 & 0.533245804 & 0.613159744 \\
-  H1437\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.817541577 & 0.555318679 & 0.661387212 \\
+  H1437\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.831305618 & 0.562247325 & 0.670802444 \\
   H1437\_UCSC & 0.6 & DeepSomatic-TO & 0.603436027 & 0.60726403 & 0.605343976 \\
-  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.828577554 & 0.552614817 & 0.663027458 \\
+  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.836919699 & 0.574856682 & 0.681565279 \\
   H1437\_UCSC & 0.4 & ClairS-TO & 0.729668645 & 0.482626386 & 0.580976301 \\
-  H1437\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.79077153 & 0.495235743 & 0.609045274 \\
+  H1437\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.804884132 & 0.503425325 & 0.619423874 \\
   H1437\_UCSC & 0.4 & DeepSomatic-TO & 0.584042014 & 0.569578951 & 0.57671982 \\
-  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.815178939 & 0.515215724 & 0.631381076 \\
+  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.825228447 & 0.540018459 & 0.652832235 \\
   H1437\_UCSC & 0.2 & ClairS-TO & 0.835516284 & 0.277795832 & 0.416959338 \\
-  H1437\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.699052417 & 0.303040545 & 0.422797552 \\
+  H1437\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.71841406 & 0.309267227 & 0.432394609 \\
   H1437\_UCSC & 0.2 & DeepSomatic-TO & 0.514574129 & 0.436023763 & 0.472053536 \\
-  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.769002375 & 0.387185254 & 0.515048548 \\
+  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.783560068 & 0.407308227 & 0.535996237 \\
   H2009\_UCSC & 1 & ClairS-TO & 0.911892863 & 0.912749381 & 0.912320921 \\
-  H2009\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.903921721 & 0.932940149 & 0.918201721 \\
+  H2009\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.904199235 & 0.936617155 & 0.920122745 \\
   H2009\_UCSC & 1 & DeepSomatic-TO & 0.860717794 & 0.937884083 & 0.897645587 \\
-  H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.883674562 & 0.913259065 & 0.898223276 \\
+  H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.88398865 & 0.916389981 & 0.899897753 \\
   H2009\_UCSC & 0.8 & ClairS-TO & 0.88399872 & 0.905271589 & 0.894508697 \\
-  H2009\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.938477589 & 0.87111548 & 0.903542757 \\
+  H2009\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.941998981 & 0.84812145 & 0.892598652 \\
   H2009\_UCSC & 0.8 & DeepSomatic-TO & 0.823642035 & 0.945958934 & 0.88057314 \\
-  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.922994182 & 0.824726955 & 0.871097986 \\
+  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.92298418 & 0.824959953 & 0.871223481 \\
   H2009\_UCSC & 0.6 & ClairS-TO & 0.855086426 & 0.885357507 & 0.869958718 \\
-  H2009\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.915187287 & 0.877224407 & 0.895803824 \\
+  H2009\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.920169208 & 0.88853211 & 0.904073967 \\
   H2009\_UCSC & 0.6 & DeepSomatic-TO & 0.807895578 & 0.93829183 & 0.868225045 \\
-  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.910446028 & 0.856087083 & 0.882430201 \\
+  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.912354441 & 0.888233581 & 0.900132448 \\
   H2009\_UCSC & 0.4 & ClairS-TO & 0.829699042 & 0.782656182 & 0.805491339 \\
-  H2009\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.896598164 & 0.785277414 & 0.837253715 \\
+  H2009\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.902522926 & 0.80042231 & 0.848411881 \\
   H2009\_UCSC & 0.4 & DeepSomatic-TO & 0.797316676 & 0.89872579 & 0.844989526 \\
-  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.902327239 & 0.811358672 & 0.854428487 \\
+  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.904724869 & 0.846985583 & 0.874903635 \\
   H2009\_UCSC & 0.2 & ClairS-TO & 0.696228119 & 0.376183195 & 0.488449375 \\
-  H2009\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.832483952 & 0.403203728 & 0.543277461 \\
+  H2009\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.836822353 & 0.415632736 & 0.555406365 \\
   H2009\_UCSC & 0.2 & DeepSomatic-TO & 0.719781763 & 0.615734673 & 0.66370518 \\
-  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.8626082 & 0.528964613 & 0.655789203 \\
+  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.864901384 & 0.554616281 & 0.675847016 \\
   HCC1395\_HKU & 1 & ClairS-TO & 0.70827717 & 0.719319593 & 0.713755675 \\
-  HCC1395\_HKU & 1 & ClairS-TO+LongPhase-TO & 0.699061319 & 0.726848683 & 0.712684248 \\
+  HCC1395\_HKU & 1 & ClairS-TO+LongPhase-TO & 0.699328434 & 0.728597865 & 0.71366317 \\
   HCC1395\_HKU & 1 & DeepSomatic-TO & 0.566526756 & 0.763023804 & 0.650254926 \\
-  HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.649123586 & 0.741653358 & 0.692310423 \\
+  HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.649565834 & 0.74337719 & 0.693312527 \\
   HCC1395\_HKU & 0.8 & ClairS-TO & 0.639606301 & 0.630947854 & 0.635247575 \\
-  HCC1395\_HKU & 0.8 & ClairS-TO+LongPhase-TO & 0.764478987 & 0.673257789 & 0.715974497 \\
+  HCC1395\_HKU & 0.8 & ClairS-TO+LongPhase-TO & 0.788812579 & 0.663852764 & 0.720958084 \\
   HCC1395\_HKU & 0.8 & DeepSomatic-TO & 0.506910791 & 0.75308642 & 0.605949965 \\
-  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.735100094 & 0.652546455 & 0.691367641 \\
+  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.75137865 & 0.656272974 & 0.700612982 \\
   HCC1395\_HKU & 0.6 & ClairS-TO & 0.642036256 & 0.613227875 & 0.627301489 \\
-  HCC1395\_HKU & 0.6 & ClairS-TO+LongPhase-TO & 0.723658895 & 0.648388978 & 0.6839593 \\
+  HCC1395\_HKU & 0.6 & ClairS-TO+LongPhase-TO & 0.746931177 & 0.650949375 & 0.695645107 \\
   HCC1395\_HKU & 0.6 & DeepSomatic-TO & 0.482733297 & 0.733186301 & 0.582165862 \\
-  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.719969844 & 0.653661875 & 0.68521545 \\
+  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.738150933 & 0.671964915 & 0.703504651 \\
   HCC1395\_HKU & 0.4 & ClairS-TO & 0.568065507 & 0.520571907 & 0.543282713 \\
-  HCC1395\_HKU & 0.4 & ClairS-TO+LongPhase-TO & 0.68078439 & 0.53421046 & 0.598656269 \\
+  HCC1395\_HKU & 0.4 & ClairS-TO+LongPhase-TO & 0.702243102 & 0.538089082 & 0.60930346 \\
   HCC1395\_HKU & 0.4 & DeepSomatic-TO & 0.459144171 & 0.673485943 & 0.546033769 \\
-  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.704502219 & 0.591451821 & 0.643046139 \\
+  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.723110138 & 0.61132659 & 0.662536403 \\
   HCC1395\_HKU & 0.2 & ClairS-TO & 0.331958691 & 0.242832155 & 0.280485484 \\
-  HCC1395\_HKU & 0.2 & ClairS-TO+LongPhase-TO & 0.521459548 & 0.265191269 & 0.35158298 \\
+  HCC1395\_HKU & 0.2 & ClairS-TO+LongPhase-TO & 0.543700808 & 0.26792912 & 0.358964779 \\
   HCC1395\_HKU & 0.2 & DeepSomatic-TO & 0.370604385 & 0.465409283 & 0.412631342 \\
-  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.621503039 & 0.391411261 & 0.480323534 \\
+  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.641750519 & 0.407432758 & 0.498426137 \\
   HCC1395\_NYGC & 1 & ClairS-TO & 0.711753477 & 0.727812001 & 0.719693172 \\
-  HCC1395\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.695210692 & 0.741120998 & 0.717432116 \\
+  HCC1395\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.695474716 & 0.742971582 & 0.718438986 \\
   HCC1395\_NYGC & 1 & DeepSomatic-TO & 0.604703772 & 0.786067382 & 0.683560209 \\
-  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.671745428 & 0.770071235 & 0.717555629 \\
+  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.6721174 & 0.772099272 & 0.718647507 \\
   HCC1395\_NYGC & 0.8 & ClairS-TO & 0.647388017 & 0.709686415 & 0.677107268 \\
-  HCC1395\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.815701615 & 0.613177174 & 0.700086831 \\
+  HCC1395\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.829801919 & 0.609577408 & 0.702842528 \\
   HCC1395\_NYGC & 0.8 & DeepSomatic-TO & 0.53558059 & 0.77253023 & 0.632595022 \\
-  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.809300279 & 0.559434178 & 0.661560369 \\
+  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.818647541 & 0.56714072 & 0.670071134 \\
   HCC1395\_NYGC & 0.6 & ClairS-TO & 0.587983985 & 0.666387811 & 0.624735604 \\
-  HCC1395\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.778149716 & 0.601085 & 0.678251666 \\
+  HCC1395\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.793959687 & 0.607118412 & 0.688080907 \\
   HCC1395\_NYGC & 0.6 & DeepSomatic-TO & 0.508114706 & 0.749233148 & 0.605554588 \\
-  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.797478607 & 0.574086749 & 0.667590354 \\
+  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.808108388 & 0.592719345 & 0.683854928 \\
   HCC1395\_NYGC & 0.4 & ClairS-TO & 0.529076509 & 0.543615484 & 0.536247468 \\
-  HCC1395\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.74340347 & 0.500671787 & 0.598357924 \\
+  HCC1395\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.756100325 & 0.507440363 & 0.60730268 \\
   HCC1395\_NYGC & 0.4 & DeepSomatic-TO & 0.483706195 & 0.68897508 & 0.568375264 \\
-  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.786313382 & 0.522853449 & 0.628073755 \\
+  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.794473488 & 0.539356605 & 0.642517402 \\
   HCC1395\_NYGC & 0.2 & ClairS-TO & 0.323684211 & 0.233858088 & 0.271535167 \\
-  HCC1395\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.606335768 & 0.225137526 & 0.328354346 \\
+  HCC1395\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.610195606 & 0.230917434 & 0.335043678 \\
   HCC1395\_NYGC & 0.2 & DeepSomatic-TO & 0.362241789 & 0.436991406 & 0.396121056 \\
-  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.694080232 & 0.31535985 & 0.433676137 \\
+  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.693713174 & 0.325322585 & 0.442929624 \\
   HCC1937\_UCSC & 1 & ClairS-TO & 0.483409424 & 0.748390761 & 0.587399079 \\
-  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.462286921 & 0.773570617 & 0.578726217 \\
+  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.462190573 & 0.774138584 & 0.578809541 \\
   HCC1937\_UCSC & 1 & DeepSomatic-TO & 0.379003814 & 0.834090622 & 0.521185355 \\
-  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.43718916 & 0.815473937 & 0.569213488 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.437212605 & 0.816041903 & 0.56937167 \\
   HCC1937\_UCSC & 0.8 & ClairS-TO & 0.409328358 & 0.692288275 & 0.514467945 \\
-  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.666318698 & 0.684778493 & 0.675422489 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.685280786 & 0.686924145 & 0.686101481 \\
   HCC1937\_UCSC & 0.8 & DeepSomatic-TO & 0.312132536 & 0.790672725 & 0.44757618 \\
-  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.627720762 & 0.702511675 & 0.663013699 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.636159964 & 0.716773949 & 0.674065282 \\
   HCC1937\_UCSC & 0.6 & ClairS-TO & 0.337783384 & 0.608355421 & 0.434380985 \\
-  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.596717187 & 0.628612899 & 0.612249915 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.619593346 & 0.634608103 & 0.627010849 \\
   HCC1937\_UCSC & 0.6 & DeepSomatic-TO & 0.275430548 & 0.723652657 & 0.398997895 \\
-  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.587856022 & 0.661681181 & 0.622587732 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.60394993 & 0.68509403 & 0.641968008 \\
   HCC1937\_UCSC & 0.4 & ClairS-TO & 0.26780924 & 0.453616055 & 0.336784894 \\
-  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.523399269 & 0.479237663 & 0.500345907 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.537678634 & 0.486747444 & 0.510946971 \\
   HCC1937\_UCSC & 0.4 & DeepSomatic-TO & 0.228380724 & 0.589486306 & 0.329215641 \\
-  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.519834404 & 0.53092263 & 0.525320012 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.52949013 & 0.551811183 & 0.540420272 \\
   HCC1937\_UCSC & 0.2 & ClairS-TO & 0.127687582 & 0.18364256 & 0.150636712 \\
-  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.342485112 & 0.214123438 & 0.263503281 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.347891116 & 0.220181749 & 0.269681159 \\
   HCC1937\_UCSC & 0.2 & DeepSomatic-TO & 0.131216988 & 0.308847659 & 0.184182301 \\
-  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.354965083 & 0.26303168 & 0.30216036 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.360059269 & 0.276031806 & 0.312495535 \\
   HCC1954\_UCSC & 1 & ClairS-TO & 0.248378212 & 0.79854827 & 0.37890338 \\
-  HCC1954\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.490509454 & 0.649020082 & 0.55874021 \\
+  HCC1954\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.253995375 & 0.834454391 & 0.389448485 \\
   HCC1954\_UCSC & 1 & DeepSomatic-TO & 0.213943289 & 0.887587709 & 0.344780917 \\
-  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.574262857 & 0.607887733 & 0.590597085 \\
+  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.260499219 & 0.87166707 & 0.401122332 \\
   HCC1954\_UCSC & 0.8 & ClairS-TO & 0.217882595 & 0.717541737 & 0.334265104 \\
-  HCC1954\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.483454996 & 0.727510283 & 0.580889456 \\
+  HCC1954\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.521381636 & 0.733365594 & 0.609466742 \\
   HCC1954\_UCSC & 0.8 & DeepSomatic-TO & 0.196427975 & 0.854197919 & 0.319406496 \\
-  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.575072615 & 0.747302202 & 0.64997159 \\
+  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.615793529 & 0.773578514 & 0.685726542 \\
   HCC1954\_UCSC & 0.6 & ClairS-TO & 0.175452805 & 0.576578756 & 0.269037539 \\
-  HCC1954\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.415738507 & 0.60871038 & 0.494049723 \\
+  HCC1954\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.448301329 & 0.616840068 & 0.519236644 \\
   HCC1954\_UCSC & 0.6 & DeepSomatic-TO & 0.179273945 & 0.782385676 & 0.291706886 \\
-  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.542252187 & 0.692765546 & 0.608337229 \\
+  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.578810668 & 0.72252601 & 0.642732614 \\
   HCC1954\_UCSC & 0.4 & ClairS-TO & 0.116869587 & 0.363706751 & 0.176897006 \\
-  HCC1954\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.311695178 & 0.399419308 & 0.350146354 \\
+  HCC1954\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.340292699 & 0.406194048 & 0.370334422 \\
   HCC1954\_UCSC & 0.4 & DeepSomatic-TO & 0.146901863 & 0.619404791 & 0.237481215 \\
-  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.476804562 & 0.542124365 & 0.507370757 \\
+  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.514260525 & 0.564529398 & 0.53822376 \\
   HCC1954\_UCSC & 0.2 & ClairS-TO & 0.04818935 & 0.139608033 & 0.071647648 \\
-  HCC1954\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.169266463 & 0.165932737 & 0.167583022 \\
+  HCC1954\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.179879942 & 0.168207113 & 0.173847808 \\
   HCC1954\_UCSC & 0.2 & DeepSomatic-TO & 0.086615884 & 0.34720542 & 0.138644664 \\
-  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.338396112 & 0.296491653 & 0.316060973 \\
+  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.3576385 & 0.309266876 & 0.331698456 \\
   \bottomrule
 \end{longtable}
 }
@@ -692,165 +716,479 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
   COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.165366615 & 0.107723577 & 0.130461538 \\
   COLO829\_ONT & 1 & DeepSomatic-TO & 0.071609632 & 0.114837398 & 0.088212334 \\
   COLO829\_ONT & 1 & ClairS-TO & 0.154273801 & 0.225609756 & 0.183243913 \\
-  COLO829\_ONT & 0.8 & ClairS-TO+LongPhase-TO & 0.230869001 & 0.180894309 & 0.202849003 \\
-  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.293040293 & 0.081300813 & 0.127287192 \\
+  COLO829\_ONT & 0.8 & ClairS-TO+LongPhase-TO & 0.224759615 & 0.19004065 & 0.205947137 \\
+  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.282312925 & 0.084349593 & 0.129890454 \\
   COLO829\_ONT & 0.8 & DeepSomatic-TO & 0.079784043 & 0.135162602 & 0.100339495 \\
   COLO829\_ONT & 0.8 & ClairS-TO & 0.154477612 & 0.210365854 & 0.178141136 \\
-  COLO829\_ONT & 0.6 & ClairS-TO+LongPhase-TO & 0.228571429 & 0.178861789 & 0.200684151 \\
-  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.362318841 & 0.101626016 & 0.158730159 \\
+  COLO829\_ONT & 0.6 & ClairS-TO+LongPhase-TO & 0.222222222 & 0.180894309 & 0.199439776 \\
+  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.356164384 & 0.105691057 & 0.163009404 \\
   COLO829\_ONT & 0.6 & DeepSomatic-TO & 0.074180564 & 0.131097561 & 0.094748439 \\
   COLO829\_ONT & 0.6 & ClairS-TO & 0.11136537 & 0.148373984 & 0.127233115 \\
-  COLO829\_ONT & 0.4 & ClairS-TO+LongPhase-TO & 0.128514056 & 0.097560976 & 0.110918544 \\
-  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.335849057 & 0.090447154 & 0.142514011 \\
+  COLO829\_ONT & 0.4 & ClairS-TO+LongPhase-TO & 0.124518614 & 0.098577236 & 0.110039705 \\
+  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.310344828 & 0.091463415 & 0.141287284 \\
   COLO829\_ONT & 0.4 & DeepSomatic-TO & 0.055932203 & 0.100609756 & 0.071895425 \\
   COLO829\_ONT & 0.4 & ClairS-TO & 0.055849057 & 0.075203252 & 0.064097012 \\
-  COLO829\_ONT & 0.2 & ClairS-TO+LongPhase-TO & 0.014925373 & 0.010162602 & 0.012091898 \\
-  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.170506912 & 0.037601626 & 0.061615321 \\
+  COLO829\_ONT & 0.2 & ClairS-TO+LongPhase-TO & 0.015536723 & 0.011178862 & 0.013002364 \\
+  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.173913043 & 0.040650407 & 0.065897858 \\
   COLO829\_ONT & 0.2 & DeepSomatic-TO & 0.024684271 & 0.043699187 & 0.031548056 \\
   COLO829\_ONT & 0.2 & ClairS-TO & 0.004504505 & 0.006097561 & 0.005181347 \\
   COLO829\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.141463415 & 0.324186992 & 0.196974375 \\
   COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.139657444 & 0.107723577 & 0.121629375 \\
   COLO829\_NYGC & 1 & DeepSomatic-TO & 0.043818466 & 0.113821138 & 0.063276836 \\
   COLO829\_NYGC & 1 & ClairS-TO & 0.177299703 & 0.242886179 & 0.204974271 \\
-  COLO829\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.21459695 & 0.200203252 & 0.207150368 \\
-  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.280373832 & 0.091463415 & 0.137931034 \\
+  COLO829\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.212721585 & 0.207317073 & 0.20998456 \\
+  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.269230769 & 0.092479675 & 0.137670197 \\
   COLO829\_NYGC & 0.8 & DeepSomatic-TO & 0.051550108 & 0.145325203 & 0.076104311 \\
   COLO829\_NYGC & 0.8 & ClairS-TO & 0.14937454 & 0.206300813 & 0.173282117 \\
-  COLO829\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.189859763 & 0.178861789 & 0.184196756 \\
-  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.299703264 & 0.102642276 & 0.152914459 \\
+  COLO829\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.18967334 & 0.182926829 & 0.186239007 \\
+  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.287671233 & 0.106707317 & 0.155670867 \\
   COLO829\_NYGC & 0.6 & DeepSomatic-TO & 0.044776119 & 0.137195122 & 0.067516879 \\
   COLO829\_NYGC & 0.6 & ClairS-TO & 0.113490364 & 0.161585366 & 0.133333333 \\
-  COLO829\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.106334842 & 0.095528455 & 0.100642398 \\
-  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.263665595 & 0.083333333 & 0.126640927 \\
+  COLO829\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.104347826 & 0.097560976 & 0.100840336 \\
+  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.259259259 & 0.085365854 & 0.128440367 \\
   COLO829\_NYGC & 0.4 & DeepSomatic-TO & 0.034737858 & 0.109756098 & 0.052773027 \\
   COLO829\_NYGC & 0.4 & ClairS-TO & 0.051355207 & 0.073170732 & 0.060352054 \\
-  COLO829\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.01097561 & 0.009146341 & 0.009977827 \\
-  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.11023622 & 0.028455285 & 0.045234249 \\
+  COLO829\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.010752688 & 0.009146341 & 0.009884679 \\
+  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.106382979 & 0.030487805 & 0.047393365 \\
   COLO829\_NYGC & 0.2 & DeepSomatic-TO & 0.01268633 & 0.040650407 & 0.019337684 \\
   COLO829\_NYGC & 0.2 & ClairS-TO & 0.004294918 & 0.006097561 & 0.005039899 \\
-  H1437\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.511500548 & 0.342626559 & 0.410369069 \\
+  H1437\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.511127326 & 0.342626559 & 0.410248902 \\
   H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.442740286 & 0.105893862 & 0.170909809 \\
   H1437\_UCSC & 1 & DeepSomatic-TO & 0.304259635 & 0.110051357 & 0.161637931 \\
   H1437\_UCSC & 1 & ClairS-TO & 0.5687251 & 0.279285889 & 0.374610464 \\
-  H1437\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.643128322 & 0.20714111 & 0.313355531 \\
-  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.63697479 & 0.092687699 & 0.161827498 \\
+  H1437\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.627561837 & 0.217168012 & 0.322674419 \\
+  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.635332253 & 0.09586696 & 0.166595835 \\
   H1437\_UCSC & 0.8 & DeepSomatic-TO & 0.319099827 & 0.13524089 & 0.189969083 \\
   H1437\_UCSC & 0.8 & ClairS-TO & 0.526548673 & 0.23281976 & 0.322876039 \\
-  H1437\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.617647059 & 0.20029347 & 0.302493075 \\
-  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.625 & 0.112496943 & 0.190673575 \\
+  H1437\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.600722022 & 0.203472732 & 0.303982463 \\
+  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.623036649 & 0.11640988 & 0.196167319 \\
   H1437\_UCSC & 0.6 & DeepSomatic-TO & 0.287773625 & 0.13181707 & 0.180811808 \\
   H1437\_UCSC & 0.6 & ClairS-TO & 0.503988397 & 0.169968207 & 0.254206291 \\
-  H1437\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.381850854 & 0.103937393 & 0.163398693 \\
-  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.557377049 & 0.083149914 & 0.144711641 \\
+  H1437\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.368873603 & 0.104915627 & 0.163366337 \\
+  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.552147239 & 0.088041086 & 0.151866695 \\
   H1437\_UCSC & 0.4 & DeepSomatic-TO & 0.21778278 & 0.094644167 & 0.131946812 \\
   H1437\_UCSC & 0.4 & ClairS-TO & 0.306501548 & 0.072633896 & 0.117437722 \\
-  H1437\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.054982818 & 0.011738811 & 0.019347037 \\
-  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.237196765 & 0.021521154 & 0.039461883 \\
+  H1437\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.052516411 & 0.011738811 & 0.019188487 \\
+  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.230366492 & 0.021521154 & 0.039364795 \\
   H1437\_UCSC & 0.2 & DeepSomatic-TO & 0.060507482 & 0.022743947 & 0.033060789 \\
   H1437\_UCSC & 0.2 & ClairS-TO & 0.146226415 & 0.007581316 & 0.014415252 \\
-  H2009\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.721003844 & 0.67122711 & 0.695225638 \\
+  H2009\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.721030043 & 0.671858556 & 0.695576378 \\
   H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.629985229 & 0.179541149 & 0.279443079 \\
   H2009\_UCSC & 1 & DeepSomatic-TO & 0.476681128 & 0.185013681 & 0.26656558 \\
   H2009\_UCSC & 1 & ClairS-TO & 0.763826185 & 0.569774784 & 0.652682339 \\
-  H2009\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.808938089 & 0.415280993 & 0.548817803 \\
-  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.767804878 & 0.165649337 & 0.272506925 \\
+  H2009\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.805687204 & 0.429383288 & 0.560208705 \\
+  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.776937618 & 0.173016207 & 0.283009124 \\
   H2009\_UCSC & 0.8 & DeepSomatic-TO & 0.500463822 & 0.227110082 & 0.312436658 \\
   H2009\_UCSC & 0.8 & ClairS-TO & 0.720779221 & 0.467270048 & 0.566977398 \\
-  H2009\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.756174225 & 0.354451694 & 0.482659788 \\
-  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.765638767 & 0.182908861 & 0.295276928 \\
+  H2009\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.752951465 & 0.362450011 & 0.489343564 \\
+  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.765151515 & 0.191328141 & 0.30611214 \\
   H2009\_UCSC & 0.6 & DeepSomatic-TO & 0.45398773 & 0.218059356 & 0.294611119 \\
   H2009\_UCSC & 0.6 & ClairS-TO & 0.613452188 & 0.318669754 & 0.419448677 \\
-  H2009\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.575248756 & 0.194695854 & 0.290926246 \\
-  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.687809713 & 0.146074511 & 0.240972222 \\
+  H2009\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.570731707 & 0.197011156 & 0.292911907 \\
+  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.68115942 & 0.148389813 & 0.24369167 \\
   H2009\_UCSC & 0.4 & DeepSomatic-TO & 0.356003752 & 0.159755841 & 0.220543368 \\
   H2009\_UCSC & 0.4 & ClairS-TO & 0.400332226 & 0.152178489 & 0.22052768 \\
-  H2009\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.135672515 & 0.024415912 & 0.041384231 \\
-  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.318181818 & 0.029467481 & 0.053939511 \\
+  H2009\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.129608939 & 0.024415912 & 0.041091038 \\
+  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.310782241 & 0.030940855 & 0.056278714 \\
   H2009\_UCSC & 0.2 & DeepSomatic-TO & 0.091894977 & 0.033887603 & 0.049515608 \\
   H2009\_UCSC & 0.2 & ClairS-TO & 0.052514793 & 0.014944222 & 0.023267246 \\
-  HCC1395\_HKU & 1 & ClairS-TO+LongPhase-TO & 0.292761828 & 0.445264453 & 0.353256892 \\
+  HCC1395\_HKU & 1 & ClairS-TO+LongPhase-TO & 0.292525253 & 0.445264453 & 0.353084614 \\
   HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.499102334 & 0.512915129 & 0.505914468 \\
   HCC1395\_HKU & 1 & DeepSomatic-TO & 0.375592928 & 0.535670357 & 0.44157161 \\
   HCC1395\_HKU & 1 & ClairS-TO & 0.37613489 & 0.356703567 & 0.366161616 \\
-  HCC1395\_HKU & 0.8 & ClairS-TO+LongPhase-TO & 0.400763359 & 0.322878229 & 0.357629428 \\
-  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.58123371 & 0.411439114 & 0.481814908 \\
+  HCC1395\_HKU & 0.8 & ClairS-TO+LongPhase-TO & 0.397473997 & 0.32902829 & 0.360026918 \\
+  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.581849025 & 0.421894219 & 0.48912656 \\
   HCC1395\_HKU & 0.8 & DeepSomatic-TO & 0.340927583 & 0.515375154 & 0.410381978 \\
   HCC1395\_HKU & 0.8 & ClairS-TO & 0.325508607 & 0.255842558 & 0.286501377 \\
-  HCC1395\_HKU & 0.6 & ClairS-TO+LongPhase-TO & 0.357597816 & 0.241697417 & 0.288440367 \\
-  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.589595376 & 0.376383764 & 0.459459459 \\
+  HCC1395\_HKU & 0.6 & ClairS-TO+LongPhase-TO & 0.215696466 & 0.255227552 & 0.233802817 \\
+  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.58411215 & 0.384378844 & 0.463649852 \\
   HCC1395\_HKU & 0.6 & DeepSomatic-TO & 0.292644135 & 0.452644526 & 0.355469693 \\
   HCC1395\_HKU & 0.6 & ClairS-TO & 0.294421488 & 0.175276753 & 0.219737857 \\
-  HCC1395\_HKU & 0.4 & ClairS-TO+LongPhase-TO & 0.18220339 & 0.105781058 & 0.13385214 \\
-  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.526699029 & 0.266912669 & 0.354285714 \\
+  HCC1395\_HKU & 0.4 & ClairS-TO+LongPhase-TO & 0.178644764 & 0.10701107 & 0.133846154 \\
+  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.520184544 & 0.277367774 & 0.361813077 \\
   HCC1395\_HKU & 0.4 & DeepSomatic-TO & 0.207493956 & 0.316728167 & 0.250730282 \\
   HCC1395\_HKU & 0.4 & ClairS-TO & 0.108850458 & 0.065805658 & 0.082023764 \\
-  HCC1395\_HKU & 0.2 & ClairS-TO+LongPhase-TO & 0.023446659 & 0.012300123 & 0.016135539 \\
-  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.288747346 & 0.083640836 & 0.129709108 \\
+  HCC1395\_HKU & 0.2 & ClairS-TO+LongPhase-TO & 0.022650057 & 0.012300123 & 0.015942607 \\
+  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.283367556 & 0.084870849 & 0.130619972 \\
   HCC1395\_HKU & 0.2 & DeepSomatic-TO & 0.077142857 & 0.099630996 & 0.086956522 \\
   HCC1395\_HKU & 0.2 & ClairS-TO & 0.006820119 & 0.004920049 & 0.005716327 \\
-  HCC1395\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.342684506 & 0.488314883 & 0.402739031 \\
-  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.587061669 & 0.597170972 & 0.592073171 \\
+  HCC1395\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.342388961 & 0.488314883 & 0.402534854 \\
+  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.587311178 & 0.597785978 & 0.592502286 \\
   HCC1395\_NYGC & 1 & DeepSomatic-TO & 0.463558171 & 0.629766298 & 0.534028683 \\
   HCC1395\_NYGC & 1 & ClairS-TO & 0.433510638 & 0.40098401 & 0.416613419 \\
-  HCC1395\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.469125214 & 0.336408364 & 0.391833811 \\
-  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.686313686 & 0.422509225 & 0.523030072 \\
+  HCC1395\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.467000835 & 0.343788438 & 0.396032589 \\
+  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.684615385 & 0.437884379 & 0.534133533 \\
   HCC1395\_NYGC & 0.8 & DeepSomatic-TO & 0.426110607 & 0.578105781 & 0.490605428 \\
   HCC1395\_NYGC & 0.8 & ClairS-TO & 0.403177005 & 0.327798278 & 0.361601085 \\
-  HCC1395\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.430366492 & 0.252767528 & 0.318481209 \\
-  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.634320735 & 0.381918819 & 0.476775432 \\
+  HCC1395\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.427835052 & 0.255227552 & 0.31972265 \\
+  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.630952381 & 0.391143911 & 0.482915718 \\
   HCC1395\_NYGC & 0.6 & DeepSomatic-TO & 0.347694959 & 0.496309963 & 0.408918166 \\
   HCC1395\_NYGC & 0.6 & ClairS-TO & 0.29874477 & 0.219557196 & 0.253101737 \\
-  HCC1395\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.255659121 & 0.118081181 & 0.16154817 \\
-  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.576763485 & 0.256457565 & 0.3550447 \\
+  HCC1395\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.250642674 & 0.119926199 & 0.162229617 \\
+  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.571805007 & 0.266912669 & 0.3639413 \\
   HCC1395\_NYGC & 0.4 & DeepSomatic-TO & 0.257794323 & 0.340713407 & 0.293509934 \\
   HCC1395\_NYGC & 0.4 & ClairS-TO & 0.133865248 & 0.092865929 & 0.109658678 \\
-  HCC1395\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.037558685 & 0.014760148 & 0.021192053 \\
-  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.326259947 & 0.075645756 & 0.122815776 \\
+  HCC1395\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.035139092 & 0.014760148 & 0.02078822 \\
+  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.315136476 & 0.078105781 & 0.12518482 \\
   HCC1395\_NYGC & 0.2 & DeepSomatic-TO & 0.092469546 & 0.102706027 & 0.097319347 \\
   HCC1395\_NYGC & 0.2 & ClairS-TO & 0.010544815 & 0.007380074 & 0.008683068 \\
-  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.202677575 & 0.533790402 & 0.293800539 \\
-  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.29703763 & 0.363369246 & 0.326872247 \\
+  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.202898551 & 0.534769833 & 0.294181034 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.2968 & 0.363369246 & 0.326728314 \\
   HCC1937\_UCSC & 1 & DeepSomatic-TO & 0.21919364 & 0.378060725 & 0.277498203 \\
   HCC1937\_UCSC & 1 & ClairS-TO & 0.271732131 & 0.413320274 & 0.327894328 \\
-  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.402228977 & 0.388834476 & 0.395418327 \\
-  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.45631068 & 0.322233105 & 0.377726751 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.394406943 & 0.400587659 & 0.397473275 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.457446809 & 0.336924584 & 0.388042865 \\
   HCC1937\_UCSC & 0.8 & DeepSomatic-TO & 0.245956497 & 0.431929481 & 0.313432836 \\
   HCC1937\_UCSC & 0.8 & ClairS-TO & 0.285407725 & 0.39079334 & 0.329888384 \\
-  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.437054632 & 0.36043095 & 0.395061728 \\
-  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.529655172 & 0.376101861 & 0.439862543 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.423900789 & 0.368266405 & 0.394129979 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.524064171 & 0.383937316 & 0.443188242 \\
   HCC1937\_UCSC & 0.6 & DeepSomatic-TO & 0.224446786 & 0.417238002 & 0.291880781 \\
   HCC1937\_UCSC & 0.6 & ClairS-TO & 0.240264511 & 0.320274241 & 0.274559194 \\
-  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.251798561 & 0.205680705 & 0.226415094 \\
-  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.463054187 & 0.276199804 & 0.34601227 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.2470726 & 0.206660137 & 0.225066667 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.458267717 & 0.285014691 & 0.351449275 \\
   HCC1937\_UCSC & 0.4 & DeepSomatic-TO & 0.161538462 & 0.308521058 & 0.212049815 \\
   HCC1937\_UCSC & 0.4 & ClairS-TO & 0.117266187 & 0.159647405 & 0.135213604 \\
-  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.057007126 & 0.047012733 & 0.051529791 \\
-  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.282420749 & 0.095984329 & 0.143274854 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.054237288 & 0.047012733 & 0.050367261 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.262162162 & 0.095004897 & 0.139468009 \\
   HCC1937\_UCSC & 0.2 & DeepSomatic-TO & 0.063013699 & 0.112634672 & 0.080815179 \\
   HCC1937\_UCSC & 0.2 & ClairS-TO & 0.01671123 & 0.024485798 & 0.019864919 \\
-  HCC1954\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.303159174 & 0.210993658 & 0.248815757 \\
-  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.397459165 & 0.092600423 & 0.150205761 \\
+  HCC1954\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.168539326 & 0.291754757 & 0.213655365 \\
+  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.215589888 & 0.129809725 & 0.162048034 \\
   HCC1954\_UCSC & 1 & DeepSomatic-TO & 0.144736842 & 0.134883721 & 0.139636682 \\
   HCC1954\_UCSC & 1 & ClairS-TO & 0.164968781 & 0.212262156 & 0.185650888 \\
-  HCC1954\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.25616083 & 0.167019027 & 0.202201177 \\
-  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.406 & 0.085835095 & 0.141710297 \\
+  HCC1954\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.248618785 & 0.171247357 & 0.202804206 \\
+  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.389396709 & 0.090063425 & 0.146291209 \\
   HCC1954\_UCSC & 0.8 & DeepSomatic-TO & 0.112940101 & 0.104439746 & 0.108523726 \\
   HCC1954\_UCSC & 0.8 & ClairS-TO & 0.100398936 & 0.12769556 & 0.112413921 \\
-  HCC1954\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.139749506 & 0.089640592 & 0.10922205 \\
-  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.329140461 & 0.066384778 & 0.110485574 \\
+  HCC1954\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.133709981 & 0.090063425 & 0.107630116 \\
+  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.30754352 & 0.067230444 & 0.110340042 \\
   HCC1954\_UCSC & 0.6 & DeepSomatic-TO & 0.07972973 & 0.074841438 & 0.077208288 \\
   HCC1954\_UCSC & 0.6 & ClairS-TO & 0.051690507 & 0.067230444 & 0.058445139 \\
-  HCC1954\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.041720154 & 0.027484144 & 0.033137905 \\
-  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.177829099 & 0.03255814 & 0.055039314 \\
+  HCC1954\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.040194884 & 0.027906977 & 0.032942351 \\
+  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.167381974 & 0.032980973 & 0.055104203 \\
   HCC1954\_UCSC & 0.4 & DeepSomatic-TO & 0.039800995 & 0.037209302 & 0.038461538 \\
   HCC1954\_UCSC & 0.4 & ClairS-TO & 0.013823437 & 0.018604651 & 0.015861572 \\
-  HCC1954\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.005813953 & 0.003805497 & 0.004600051 \\
-  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.048899756 & 0.00845666 & 0.014419611 \\
+  HCC1954\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.005481121 & 0.003805497 & 0.004492139 \\
+  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.045248869 & 0.00845666 & 0.014250089 \\
   HCC1954\_UCSC & 0.2 & DeepSomatic-TO & 0.009417808 & 0.009302326 & 0.009359711 \\
   HCC1954\_UCSC & 0.2 & ClairS-TO & 0.001826484 & 0.002536998 & 0.002123894 \\
   \bottomrule
 \end{longtable}
 }
+
+\FloatBarrier
+{\small
+\begin{longtable}{@{}llllccc@{}}
+  \caption{Incremental effect of methylation-aware recalibration on somatic SNV and indel calling, for the five datasets with 5-methylcytosine calls available.}
+  \label{tab:methylation_recalibration}\\
+  \toprule
+  Sample & Variant type & Tumor DNA fraction & Variant caller & Precision & Recall & F1-score \\
+  \midrule
+  \endfirsthead
+  H1437\_UCSC & SNV & 1 & ClairS-TO & 0.770374027 & 0.588233 & 0.667094187 \\
+  H1437\_UCSC & SNV & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.753371498 & 0.610721853 & 0.674587904 \\
+  H1437\_UCSC & SNV & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.753371498 & 0.610721853 & 0.674587904 \\
+  H1437\_UCSC & SNV & 1 & DeepSomatic-TO & 0.680080454 & 0.619743393 & 0.648511518 \\
+  H1437\_UCSC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.726440562 & 0.608654959 & 0.662352084 \\
+  H1437\_UCSC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.726440562 & 0.608654959 & 0.662352084 \\
+  H1437\_UCSC & SNV & 0.8 & ClairS-TO & 0.727614595 & 0.558373523 & 0.631857665 \\
+  H1437\_UCSC & SNV & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.870736499 & 0.541591379 & 0.667810058 \\
+  H1437\_UCSC & SNV & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.870920471 & 0.540811419 & 0.667270803 \\
+  H1437\_UCSC & SNV & 0.8 & DeepSomatic-TO & 0.623836297 & 0.620211369 & 0.622018552 \\
+  H1437\_UCSC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.847417115 & 0.534610735 & 0.655613831 \\
+  H1437\_UCSC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.847570913 & 0.534090761 & 0.655268656 \\
+  H1437\_UCSC & SNV & 0.6 & ClairS-TO & 0.721248352 & 0.533245804 & 0.613159744 \\
+  H1437\_UCSC & SNV & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.831305618 & 0.562247325 & 0.670802444 \\
+  H1437\_UCSC & SNV & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.856351354 & 0.522391358 & 0.648925348 \\
+  H1437\_UCSC & SNV & 0.6 & DeepSomatic-TO & 0.603436027 & 0.60726403 & 0.605343976 \\
+  H1437\_UCSC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.836919699 & 0.574856682 & 0.681565279 \\
+  H1437\_UCSC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.847031494 & 0.535611684 & 0.656250249 \\
+  H1437\_UCSC & SNV & 0.4 & ClairS-TO & 0.729668645 & 0.482626386 & 0.580976301 \\
+  H1437\_UCSC & SNV & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.804884132 & 0.503425325 & 0.619423874 \\
+  H1437\_UCSC & SNV & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.844492728 & 0.495144748 & 0.624267604 \\
+  H1437\_UCSC & SNV & 0.4 & DeepSomatic-TO & 0.584042014 & 0.569578951 & 0.57671982 \\
+  H1437\_UCSC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.825228447 & 0.540018459 & 0.652832235 \\
+  H1437\_UCSC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.847305947 & 0.531698883 & 0.653386581 \\
+  H1437\_UCSC & SNV & 0.2 & ClairS-TO & 0.835516284 & 0.277795832 & 0.416959338 \\
+  H1437\_UCSC & SNV & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.71841406 & 0.309267227 & 0.432394609 \\
+  H1437\_UCSC & SNV & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.789797889 & 0.308344274 & 0.443530292 \\
+  H1437\_UCSC & SNV & 0.2 & DeepSomatic-TO & 0.514574129 & 0.436023763 & 0.472053536 \\
+  H1437\_UCSC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.783560068 & 0.407308227 & 0.535996237 \\
+  H1437\_UCSC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.82310736 & 0.405631313 & 0.54344854 \\
+  H2009\_UCSC & SNV & 1 & ClairS-TO & 0.911892863 & 0.912749381 & 0.912320921 \\
+  H2009\_UCSC & SNV & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.904199235 & 0.936617155 & 0.920122745 \\
+  H2009\_UCSC & SNV & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.904199235 & 0.936617155 & 0.920122745 \\
+  H2009\_UCSC & SNV & 1 & DeepSomatic-TO & 0.860717794 & 0.937884083 & 0.897645587 \\
+  H2009\_UCSC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.88398865 & 0.916389981 & 0.899897753 \\
+  H2009\_UCSC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.88398865 & 0.916389981 & 0.899897753 \\
+  H2009\_UCSC & SNV & 0.8 & ClairS-TO & 0.88399872 & 0.905271589 & 0.894508697 \\
+  H2009\_UCSC & SNV & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.941998981 & 0.84812145 & 0.892598652 \\
+  H2009\_UCSC & SNV & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.942065369 & 0.847021989 & 0.892019139 \\
+  H2009\_UCSC & SNV & 0.8 & DeepSomatic-TO & 0.823642035 & 0.945958934 & 0.88057314 \\
+  H2009\_UCSC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.92298418 & 0.824959953 & 0.871223481 \\
+  H2009\_UCSC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.922981559 & 0.82396971 & 0.87066979 \\
+  H2009\_UCSC & SNV & 0.6 & ClairS-TO & 0.855086426 & 0.885357507 & 0.869958718 \\
+  H2009\_UCSC & SNV & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.920169208 & 0.88853211 & 0.904073967 \\
+  H2009\_UCSC & SNV & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.93853477 & 0.855635649 & 0.895170044 \\
+  H2009\_UCSC & SNV & 0.6 & DeepSomatic-TO & 0.807895578 & 0.93829183 & 0.868225045 \\
+  H2009\_UCSC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.912354441 & 0.888233581 & 0.900132448 \\
+  H2009\_UCSC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.926156535 & 0.856691423 & 0.890070694 \\
+  H2009\_UCSC & SNV & 0.4 & ClairS-TO & 0.829699042 & 0.782656182 & 0.805491339 \\
+  H2009\_UCSC & SNV & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.902522926 & 0.80042231 & 0.848411881 \\
+  H2009\_UCSC & SNV & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.924508299 & 0.793694481 & 0.854121694 \\
+  H2009\_UCSC & SNV & 0.4 & DeepSomatic-TO & 0.797316676 & 0.89872579 & 0.844989526 \\
+  H2009\_UCSC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.904724869 & 0.846985583 & 0.874903635 \\
+  H2009\_UCSC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.920999082 & 0.840359691 & 0.878833451 \\
+  H2009\_UCSC & SNV & 0.2 & ClairS-TO & 0.696228119 & 0.376183195 & 0.488449375 \\
+  H2009\_UCSC & SNV & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.836822353 & 0.415632736 & 0.555406365 \\
+  H2009\_UCSC & SNV & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.890466563 & 0.413703218 & 0.564940069 \\
+  H2009\_UCSC & SNV & 0.2 & DeepSomatic-TO & 0.719781763 & 0.615734673 & 0.66370518 \\
+  H2009\_UCSC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.864901384 & 0.554616281 & 0.675847016 \\
+  H2009\_UCSC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.899028366 & 0.551769332 & 0.683839355 \\
+  HCC1395\_NYGC & SNV & 1 & ClairS-TO & 0.711753477 & 0.727812001 & 0.719693172 \\
+  HCC1395\_NYGC & SNV & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.695474716 & 0.742971582 & 0.718438986 \\
+  HCC1395\_NYGC & SNV & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.695474716 & 0.742971582 & 0.718438986 \\
+  HCC1395\_NYGC & SNV & 1 & DeepSomatic-TO & 0.604703772 & 0.786067382 & 0.683560209 \\
+  HCC1395\_NYGC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.6721174 & 0.772099272 & 0.718647507 \\
+  HCC1395\_NYGC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.6721174 & 0.772099272 & 0.718647507 \\
+  HCC1395\_NYGC & SNV & 0.8 & ClairS-TO & 0.647388017 & 0.709686415 & 0.677107268 \\
+  HCC1395\_NYGC & SNV & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.829801919 & 0.609577408 & 0.702842528 \\
+  HCC1395\_NYGC & SNV & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.830624346 & 0.603696099 & 0.699208714 \\
+  HCC1395\_NYGC & SNV & 0.8 & DeepSomatic-TO & 0.53558059 & 0.77253023 & 0.632595022 \\
+  HCC1395\_NYGC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.818647541 & 0.56714072 & 0.670071134 \\
+  HCC1395\_NYGC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.819918445 & 0.565797146 & 0.669556609 \\
+  HCC1395\_NYGC & SNV & 0.6 & ClairS-TO & 0.587983985 & 0.666387811 & 0.624735604 \\
+  HCC1395\_NYGC & SNV & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.793959687 & 0.607118412 & 0.688080907 \\
+  HCC1395\_NYGC & SNV & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.865981381 & 0.565949248 & 0.684532479 \\
+  HCC1395\_NYGC & SNV & 0.6 & DeepSomatic-TO & 0.508114706 & 0.749233148 & 0.605554588 \\
+  HCC1395\_NYGC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.808108388 & 0.592719345 & 0.683854928 \\
+  HCC1395\_NYGC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.847939843 & 0.554566887 & 0.670569843 \\
+  HCC1395\_NYGC & SNV & 0.4 & ClairS-TO & 0.529076509 & 0.543615484 & 0.536247468 \\
+  HCC1395\_NYGC & SNV & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.756100325 & 0.507440363 & 0.60730268 \\
+  HCC1395\_NYGC & SNV & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.853723289 & 0.497274824 & 0.628476227 \\
+  HCC1395\_NYGC & SNV & 0.4 & DeepSomatic-TO & 0.483706195 & 0.68897508 & 0.568375264 \\
+  HCC1395\_NYGC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.794473488 & 0.539356605 & 0.642517402 \\
+  HCC1395\_NYGC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.851568228 & 0.529976931 & 0.653343125 \\
+  HCC1395\_NYGC & SNV & 0.2 & ClairS-TO & 0.323684211 & 0.233858088 & 0.271535167 \\
+  HCC1395\_NYGC & SNV & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.610195606 & 0.230917434 & 0.335043678 \\
+  HCC1395\_NYGC & SNV & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.80408418 & 0.22858519 & 0.355974023 \\
+  HCC1395\_NYGC & SNV & 0.2 & DeepSomatic-TO & 0.362241789 & 0.436991406 & 0.396121056 \\
+  HCC1395\_NYGC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.693713174 & 0.325322585 & 0.442929624 \\
+  HCC1395\_NYGC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.798755578 & 0.322179126 & 0.459156761 \\
+  HCC1937\_UCSC & SNV & 1 & ClairS-TO & 0.483409424 & 0.748390761 & 0.587399079 \\
+  HCC1937\_UCSC & SNV & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.462190573 & 0.774138584 & 0.578809541 \\
+  HCC1937\_UCSC & SNV & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.462190573 & 0.774138584 & 0.578809541 \\
+  HCC1937\_UCSC & SNV & 1 & DeepSomatic-TO & 0.379003814 & 0.834090622 & 0.521185355 \\
+  HCC1937\_UCSC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.437212605 & 0.816041903 & 0.56937167 \\
+  HCC1937\_UCSC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.437212605 & 0.816041903 & 0.56937167 \\
+  HCC1937\_UCSC & SNV & 0.8 & ClairS-TO & 0.409328358 & 0.692288275 & 0.514467945 \\
+  HCC1937\_UCSC & SNV & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.685280786 & 0.686924145 & 0.686101481 \\
+  HCC1937\_UCSC & SNV & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.685583698 & 0.681560015 & 0.683565936 \\
+  HCC1937\_UCSC & SNV & 0.8 & DeepSomatic-TO & 0.312132536 & 0.790672725 & 0.44757618 \\
+  HCC1937\_UCSC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.636159964 & 0.716773949 & 0.674065282 \\
+  HCC1937\_UCSC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.636414723 & 0.714691405 & 0.673285574 \\
+  HCC1937\_UCSC & SNV & 0.6 & ClairS-TO & 0.337783384 & 0.608355421 & 0.434380985 \\
+  HCC1937\_UCSC & SNV & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.619593346 & 0.634608103 & 0.627010849 \\
+  HCC1937\_UCSC & SNV & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.727088529 & 0.588792124 & 0.65067299 \\
+  HCC1937\_UCSC & SNV & 0.6 & DeepSomatic-TO & 0.275430548 & 0.723652657 & 0.398997895 \\
+  HCC1937\_UCSC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.60394993 & 0.68509403 & 0.641968008 \\
+  HCC1937\_UCSC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.658489097 & 0.64028777 & 0.649260895 \\
+  HCC1937\_UCSC & SNV & 0.4 & ClairS-TO & 0.26780924 & 0.453616055 & 0.336784894 \\
+  HCC1937\_UCSC & SNV & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.537678634 & 0.486747444 & 0.510946971 \\
+  HCC1937\_UCSC & SNV & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.706394249 & 0.471286129 & 0.565372095 \\
+  HCC1937\_UCSC & SNV & 0.4 & DeepSomatic-TO & 0.228380724 & 0.589486306 & 0.329215641 \\
+  HCC1937\_UCSC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.52949013 & 0.551811183 & 0.540420272 \\
+  HCC1937\_UCSC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.622810232 & 0.536223653 & 0.576282682 \\
+  HCC1937\_UCSC & SNV & 0.2 & ClairS-TO & 0.127687582 & 0.18364256 & 0.150636712 \\
+  HCC1937\_UCSC & SNV & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.347891116 & 0.220181749 & 0.269681159 \\
+  HCC1937\_UCSC & SNV & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.618908025 & 0.213176827 & 0.317123545 \\
+  HCC1937\_UCSC & SNV & 0.2 & DeepSomatic-TO & 0.131216988 & 0.308847659 & 0.184182301 \\
+  HCC1937\_UCSC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.360059269 & 0.276031806 & 0.312495535 \\
+  HCC1937\_UCSC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.501837146 & 0.267196769 & 0.348721328 \\
+  HCC1954\_UCSC & SNV & 1 & ClairS-TO & 0.248378212 & 0.79854827 & 0.37890338 \\
+  HCC1954\_UCSC & SNV & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.253995375 & 0.834454391 & 0.389448485 \\
+  HCC1954\_UCSC & SNV & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.247579885 & 0.839099927 & 0.38234678 \\
+  HCC1954\_UCSC & SNV & 1 & DeepSomatic-TO & 0.213943289 & 0.887587709 & 0.344780917 \\
+  HCC1954\_UCSC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.260499219 & 0.87166707 & 0.401122332 \\
+  HCC1954\_UCSC & SNV & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.253341162 & 0.876941689 & 0.393114743 \\
+  HCC1954\_UCSC & SNV & 0.8 & ClairS-TO & 0.217882595 & 0.717541737 & 0.334265104 \\
+  HCC1954\_UCSC & SNV & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.521381636 & 0.733365594 & 0.609466742 \\
+  HCC1954\_UCSC & SNV & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.521369882 & 0.730800871 & 0.608571256 \\
+  HCC1954\_UCSC & SNV & 0.8 & DeepSomatic-TO & 0.196427975 & 0.854197919 & 0.319406496 \\
+  HCC1954\_UCSC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.615793529 & 0.773578514 & 0.685726542 \\
+  HCC1954\_UCSC & SNV & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.615936439 & 0.772804258 & 0.685510699 \\
+  HCC1954\_UCSC & SNV & 0.6 & ClairS-TO & 0.175452805 & 0.576578756 & 0.269037539 \\
+  HCC1954\_UCSC & SNV & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.448301329 & 0.616840068 & 0.519236644 \\
+  HCC1954\_UCSC & SNV & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.567618875 & 0.607694169 & 0.586973288 \\
+  HCC1954\_UCSC & SNV & 0.6 & DeepSomatic-TO & 0.179273945 & 0.782385676 & 0.291706886 \\
+  HCC1954\_UCSC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.578810668 & 0.72252601 & 0.642732614 \\
+  HCC1954\_UCSC & SNV & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.661369248 & 0.712896201 & 0.686166744 \\
+  HCC1954\_UCSC & SNV & 0.4 & ClairS-TO & 0.116869587 & 0.363706751 & 0.176897006 \\
+  HCC1954\_UCSC & SNV & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.340292699 & 0.406194048 & 0.370334422 \\
+  HCC1954\_UCSC & SNV & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.467046789 & 0.404306799 & 0.433418063 \\
+  HCC1954\_UCSC & SNV & 0.4 & DeepSomatic-TO & 0.146901863 & 0.619404791 & 0.237481215 \\
+  HCC1954\_UCSC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.514260525 & 0.564529398 & 0.53822376 \\
+  HCC1954\_UCSC & SNV & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.613949802 & 0.562255021 & 0.586966406 \\
+  HCC1954\_UCSC & SNV & 0.2 & ClairS-TO & 0.04818935 & 0.139608033 & 0.071647648 \\
+  HCC1954\_UCSC & SNV & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.179879942 & 0.168207113 & 0.173847808 \\
+  HCC1954\_UCSC & SNV & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.302995795 & 0.167384466 & 0.215641657 \\
+  HCC1954\_UCSC & SNV & 0.2 & DeepSomatic-TO & 0.086615884 & 0.34720542 & 0.138644664 \\
+  HCC1954\_UCSC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.3576385 & 0.309266876 & 0.331698456 \\
+  HCC1954\_UCSC & SNV & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.482387698 & 0.308153883 & 0.376070395 \\
+  H1437\_UCSC & Indel & 1 & ClairS-TO & 0.5687251 & 0.279285889 & 0.374610464 \\
+  H1437\_UCSC & Indel & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.511127326 & 0.342626559 & 0.410248902 \\
+  H1437\_UCSC & Indel & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.508957655 & 0.305698215 & 0.38197097 \\
+  H1437\_UCSC & Indel & 1 & DeepSomatic-TO & 0.304259635 & 0.110051357 & 0.161637931 \\
+  H1437\_UCSC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.442740286 & 0.105893862 & 0.170909809 \\
+  H1437\_UCSC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.428724544 & 0.097823429 & 0.159299084 \\
+  H1437\_UCSC & Indel & 0.8 & ClairS-TO & 0.526548673 & 0.23281976 & 0.322876039 \\
+  H1437\_UCSC & Indel & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.627561837 & 0.217168012 & 0.322674419 \\
+  H1437\_UCSC & Indel & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.627561837 & 0.217168012 & 0.322674419 \\
+  H1437\_UCSC & Indel & 0.8 & DeepSomatic-TO & 0.319099827 & 0.13524089 & 0.189969083 \\
+  H1437\_UCSC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.635332253 & 0.09586696 & 0.166595835 \\
+  H1437\_UCSC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.635332253 & 0.09586696 & 0.166595835 \\
+  H1437\_UCSC & Indel & 0.6 & ClairS-TO & 0.503988397 & 0.169968207 & 0.254206291 \\
+  H1437\_UCSC & Indel & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.600722022 & 0.203472732 & 0.303982463 \\
+  H1437\_UCSC & Indel & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.752145923 & 0.171435559 & 0.279227246 \\
+  H1437\_UCSC & Indel & 0.6 & DeepSomatic-TO & 0.287773625 & 0.13181707 & 0.180811808 \\
+  H1437\_UCSC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.623036649 & 0.11640988 & 0.196167319 \\
+  H1437\_UCSC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.68261563 & 0.104671069 & 0.181509754 \\
+  H1437\_UCSC & Indel & 0.4 & ClairS-TO & 0.306501548 & 0.072633896 & 0.117437722 \\
+  H1437\_UCSC & Indel & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.368873603 & 0.104915627 & 0.163366337 \\
+  H1437\_UCSC & Indel & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.539597315 & 0.098312546 & 0.166321887 \\
+  H1437\_UCSC & Indel & 0.4 & DeepSomatic-TO & 0.21778278 & 0.094644167 & 0.131946812 \\
+  H1437\_UCSC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.552147239 & 0.088041086 & 0.151866695 \\
+  H1437\_UCSC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.633027523 & 0.084372707 & 0.148899439 \\
+  H1437\_UCSC & Indel & 0.2 & ClairS-TO & 0.146226415 & 0.007581316 & 0.014415252 \\
+  H1437\_UCSC & Indel & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.052516411 & 0.011738811 & 0.019188487 \\
+  H1437\_UCSC & Indel & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.115763547 & 0.011494253 & 0.020912125 \\
+  H1437\_UCSC & Indel & 0.2 & DeepSomatic-TO & 0.060507482 & 0.022743947 & 0.033060789 \\
+  H1437\_UCSC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.230366492 & 0.021521154 & 0.039364795 \\
+  H1437\_UCSC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.348 & 0.021276596 & 0.040101406 \\
+  H2009\_UCSC & Indel & 1 & ClairS-TO & 0.763826185 & 0.569774784 & 0.652682339 \\
+  H2009\_UCSC & Indel & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.721030043 & 0.671858556 & 0.695576378 \\
+  H2009\_UCSC & Indel & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.719882468 & 0.618817091 & 0.665534805 \\
+  H2009\_UCSC & Indel & 1 & DeepSomatic-TO & 0.476681128 & 0.185013681 & 0.26656558 \\
+  H2009\_UCSC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.629985229 & 0.179541149 & 0.279443079 \\
+  H2009\_UCSC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.625866051 & 0.171121869 & 0.268760331 \\
+  H2009\_UCSC & Indel & 0.8 & ClairS-TO & 0.720779221 & 0.467270048 & 0.566977398 \\
+  H2009\_UCSC & Indel & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.805687204 & 0.429383288 & 0.560208705 \\
+  H2009\_UCSC & Indel & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.805687204 & 0.429383288 & 0.560208705 \\
+  H2009\_UCSC & Indel & 0.8 & DeepSomatic-TO & 0.500463822 & 0.227110082 & 0.312436658 \\
+  H2009\_UCSC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.776937618 & 0.173016207 & 0.283009124 \\
+  H2009\_UCSC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.776937618 & 0.173016207 & 0.283009124 \\
+  H2009\_UCSC & Indel & 0.6 & ClairS-TO & 0.613452188 & 0.318669754 & 0.419448677 \\
+  H2009\_UCSC & Indel & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.752951465 & 0.362450011 & 0.489343564 \\
+  H2009\_UCSC & Indel & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.87373168 & 0.326247106 & 0.475095785 \\
+  H2009\_UCSC & Indel & 0.6 & DeepSomatic-TO & 0.45398773 & 0.218059356 & 0.294611119 \\
+  H2009\_UCSC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.765151515 & 0.191328141 & 0.30611214 \\
+  H2009\_UCSC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.823874755 & 0.177225847 & 0.291702754 \\
+  H2009\_UCSC & Indel & 0.4 & ClairS-TO & 0.400332226 & 0.152178489 & 0.22052768 \\
+  H2009\_UCSC & Indel & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.570731707 & 0.197011156 & 0.292911907 \\
+  H2009\_UCSC & Indel & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.733982157 & 0.190486213 & 0.302473262 \\
+  H2009\_UCSC & Indel & 0.4 & DeepSomatic-TO & 0.356003752 & 0.159755841 & 0.220543368 \\
+  H2009\_UCSC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.68115942 & 0.148389813 & 0.24369167 \\
+  H2009\_UCSC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.76169265 & 0.143969691 & 0.242166755 \\
+  H2009\_UCSC & Indel & 0.2 & ClairS-TO & 0.052514793 & 0.014944222 & 0.023267246 \\
+  H2009\_UCSC & Indel & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.129608939 & 0.024415912 & 0.041091038 \\
+  H2009\_UCSC & Indel & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.28030303 & 0.023363502 & 0.043131922 \\
+  H2009\_UCSC & Indel & 0.2 & DeepSomatic-TO & 0.091894977 & 0.033887603 & 0.049515608 \\
+  H2009\_UCSC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.310782241 & 0.030940855 & 0.056278714 \\
+  H2009\_UCSC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.483221477 & 0.030309409 & 0.057040998 \\
+  HCC1395\_NYGC & Indel & 1 & ClairS-TO & 0.433510638 & 0.40098401 & 0.416613419 \\
+  HCC1395\_NYGC & Indel & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.342388961 & 0.488314883 & 0.402534854 \\
+  HCC1395\_NYGC & Indel & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.349640934 & 0.479089791 & 0.404255319 \\
+  HCC1395\_NYGC & Indel & 1 & DeepSomatic-TO & 0.463558171 & 0.629766298 & 0.534028683 \\
+  HCC1395\_NYGC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.587311178 & 0.597785978 & 0.592502286 \\
+  HCC1395\_NYGC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.585021486 & 0.586100861 & 0.585560676 \\
+  HCC1395\_NYGC & Indel & 0.8 & ClairS-TO & 0.403177005 & 0.327798278 & 0.361601085 \\
+  HCC1395\_NYGC & Indel & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.467000835 & 0.343788438 & 0.396032589 \\
+  HCC1395\_NYGC & Indel & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.467000835 & 0.343788438 & 0.396032589 \\
+  HCC1395\_NYGC & Indel & 0.8 & DeepSomatic-TO & 0.426110607 & 0.578105781 & 0.490605428 \\
+  HCC1395\_NYGC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.684615385 & 0.437884379 & 0.534133533 \\
+  HCC1395\_NYGC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.684615385 & 0.437884379 & 0.534133533 \\
+  HCC1395\_NYGC & Indel & 0.6 & ClairS-TO & 0.29874477 & 0.219557196 & 0.253101737 \\
+  HCC1395\_NYGC & Indel & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.427835052 & 0.255227552 & 0.31972265 \\
+  HCC1395\_NYGC & Indel & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.676311031 & 0.2300123 & 0.343276732 \\
+  HCC1395\_NYGC & Indel & 0.6 & DeepSomatic-TO & 0.347694959 & 0.496309963 & 0.408918166 \\
+  HCC1395\_NYGC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.630952381 & 0.391143911 & 0.482915718 \\
+  HCC1395\_NYGC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.697149644 & 0.36100861 & 0.475688817 \\
+  HCC1395\_NYGC & Indel & 0.4 & ClairS-TO & 0.133865248 & 0.092865929 & 0.109658678 \\
+  HCC1395\_NYGC & Indel & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.250642674 & 0.119926199 & 0.162229617 \\
+  HCC1395\_NYGC & Indel & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.484455959 & 0.11500615 & 0.185884692 \\
+  HCC1395\_NYGC & Indel & 0.4 & DeepSomatic-TO & 0.257794323 & 0.340713407 & 0.293509934 \\
+  HCC1395\_NYGC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.571805007 & 0.266912669 & 0.3639413 \\
+  HCC1395\_NYGC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.658692185 & 0.25399754 & 0.366622281 \\
+  HCC1395\_NYGC & Indel & 0.2 & ClairS-TO & 0.010544815 & 0.007380074 & 0.008683068 \\
+  HCC1395\_NYGC & Indel & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.035139092 & 0.014760148 & 0.02078822 \\
+  HCC1395\_NYGC & Indel & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.120253165 & 0.011685117 & 0.021300448 \\
+  HCC1395\_NYGC & Indel & 0.2 & DeepSomatic-TO & 0.092469546 & 0.102706027 & 0.097319347 \\
+  HCC1395\_NYGC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.315136476 & 0.078105781 & 0.12518482 \\
+  HCC1395\_NYGC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.530805687 & 0.068880689 & 0.121937942 \\
+  HCC1937\_UCSC & Indel & 1 & ClairS-TO & 0.271732131 & 0.413320274 & 0.327894328 \\
+  HCC1937\_UCSC & Indel & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.202898551 & 0.534769833 & 0.294181034 \\
+  HCC1937\_UCSC & Indel & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.195786865 & 0.464250735 & 0.275421267 \\
+  HCC1937\_UCSC & Indel & 1 & DeepSomatic-TO & 0.21919364 & 0.378060725 & 0.277498203 \\
+  HCC1937\_UCSC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.2968 & 0.363369246 & 0.326728314 \\
+  HCC1937\_UCSC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.29280397 & 0.346718903 & 0.317488789 \\
+  HCC1937\_UCSC & Indel & 0.8 & ClairS-TO & 0.285407725 & 0.39079334 & 0.329888384 \\
+  HCC1937\_UCSC & Indel & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.394406943 & 0.400587659 & 0.397473275 \\
+  HCC1937\_UCSC & Indel & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.394406943 & 0.400587659 & 0.397473275 \\
+  HCC1937\_UCSC & Indel & 0.8 & DeepSomatic-TO & 0.245956497 & 0.431929481 & 0.313432836 \\
+  HCC1937\_UCSC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.457446809 & 0.336924584 & 0.388042865 \\
+  HCC1937\_UCSC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.457446809 & 0.336924584 & 0.388042865 \\
+  HCC1937\_UCSC & Indel & 0.6 & ClairS-TO & 0.240264511 & 0.320274241 & 0.274559194 \\
+  HCC1937\_UCSC & Indel & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.423900789 & 0.368266405 & 0.394129979 \\
+  HCC1937\_UCSC & Indel & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.705607477 & 0.295788443 & 0.416839199 \\
+  HCC1937\_UCSC & Indel & 0.6 & DeepSomatic-TO & 0.224446786 & 0.417238002 & 0.291880781 \\
+  HCC1937\_UCSC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.524064171 & 0.383937316 & 0.443188242 \\
+  HCC1937\_UCSC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.657032755 & 0.333986288 & 0.442857143 \\
+  HCC1937\_UCSC & Indel & 0.4 & ClairS-TO & 0.117266187 & 0.159647405 & 0.135213604 \\
+  HCC1937\_UCSC & Indel & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.2470726 & 0.206660137 & 0.225066667 \\
+  HCC1937\_UCSC & Indel & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.566765579 & 0.187071499 & 0.281296024 \\
+  HCC1937\_UCSC & Indel & 0.4 & DeepSomatic-TO & 0.161538462 & 0.308521058 & 0.212049815 \\
+  HCC1937\_UCSC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.458267717 & 0.285014691 & 0.351449275 \\
+  HCC1937\_UCSC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.621004566 & 0.266405485 & 0.372858122 \\
+  HCC1937\_UCSC & Indel & 0.2 & ClairS-TO & 0.01671123 & 0.024485798 & 0.019864919 \\
+  HCC1937\_UCSC & Indel & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.054237288 & 0.047012733 & 0.050367261 \\
+  HCC1937\_UCSC & Indel & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.28 & 0.041136141 & 0.071733561 \\
+  HCC1937\_UCSC & Indel & 0.2 & DeepSomatic-TO & 0.063013699 & 0.112634672 & 0.080815179 \\
+  HCC1937\_UCSC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.262162162 & 0.095004897 & 0.139468009 \\
+  HCC1937\_UCSC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.534591195 & 0.083251714 & 0.144067797 \\
+  HCC1954\_UCSC & Indel & 1 & ClairS-TO & 0.164968781 & 0.212262156 & 0.185650888 \\
+  HCC1954\_UCSC & Indel & 1 & ClairS-TO+LongPhase-TO (haplotype) & 0.168539326 & 0.291754757 & 0.213655365 \\
+  HCC1954\_UCSC & Indel & 1 & ClairS-TO+LongPhase-TO (methylation) & 0.168539326 & 0.291754757 & 0.213655365 \\
+  HCC1954\_UCSC & Indel & 1 & DeepSomatic-TO & 0.144736842 & 0.134883721 & 0.139636682 \\
+  HCC1954\_UCSC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.215589888 & 0.129809725 & 0.162048034 \\
+  HCC1954\_UCSC & Indel & 1 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.215589888 & 0.129809725 & 0.162048034 \\
+  HCC1954\_UCSC & Indel & 0.8 & ClairS-TO & 0.100398936 & 0.12769556 & 0.112413921 \\
+  HCC1954\_UCSC & Indel & 0.8 & ClairS-TO+LongPhase-TO (haplotype) & 0.248618785 & 0.171247357 & 0.202804206 \\
+  HCC1954\_UCSC & Indel & 0.8 & ClairS-TO+LongPhase-TO (methylation) & 0.248618785 & 0.171247357 & 0.202804206 \\
+  HCC1954\_UCSC & Indel & 0.8 & DeepSomatic-TO & 0.112940101 & 0.104439746 & 0.108523726 \\
+  HCC1954\_UCSC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.389396709 & 0.090063425 & 0.146291209 \\
+  HCC1954\_UCSC & Indel & 0.8 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.389396709 & 0.090063425 & 0.146291209 \\
+  HCC1954\_UCSC & Indel & 0.6 & ClairS-TO & 0.051690507 & 0.067230444 & 0.058445139 \\
+  HCC1954\_UCSC & Indel & 0.6 & ClairS-TO+LongPhase-TO (haplotype) & 0.133709981 & 0.090063425 & 0.107630116 \\
+  HCC1954\_UCSC & Indel & 0.6 & ClairS-TO+LongPhase-TO (methylation) & 0.30420712 & 0.0794926 & 0.126047603 \\
+  HCC1954\_UCSC & Indel & 0.6 & DeepSomatic-TO & 0.07972973 & 0.074841438 & 0.077208288 \\
+  HCC1954\_UCSC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.30754352 & 0.067230444 & 0.110340042 \\
+  HCC1954\_UCSC & Indel & 0.6 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.457680251 & 0.061733615 & 0.108792846 \\
+  HCC1954\_UCSC & Indel & 0.4 & ClairS-TO & 0.013823437 & 0.018604651 & 0.015861572 \\
+  HCC1954\_UCSC & Indel & 0.4 & ClairS-TO+LongPhase-TO (haplotype) & 0.040194884 & 0.027906977 & 0.032942351 \\
+  HCC1954\_UCSC & Indel & 0.4 & ClairS-TO+LongPhase-TO (methylation) & 0.113835377 & 0.027484144 & 0.044277929 \\
+  HCC1954\_UCSC & Indel & 0.4 & DeepSomatic-TO & 0.039800995 & 0.037209302 & 0.038461538 \\
+  HCC1954\_UCSC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.167381974 & 0.032980973 & 0.055104203 \\
+  HCC1954\_UCSC & Indel & 0.4 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.310483871 & 0.03255814 & 0.058936089 \\
+  HCC1954\_UCSC & Indel & 0.2 & ClairS-TO & 0.001826484 & 0.002536998 & 0.002123894 \\
+  HCC1954\_UCSC & Indel & 0.2 & ClairS-TO+LongPhase-TO (haplotype) & 0.005481121 & 0.003805497 & 0.004492139 \\
+  HCC1954\_UCSC & Indel & 0.2 & ClairS-TO+LongPhase-TO (methylation) & 0.019271949 & 0.003805497 & 0.006355932 \\
+  HCC1954\_UCSC & Indel & 0.2 & DeepSomatic-TO & 0.009417808 & 0.009302326 & 0.009359711 \\
+  HCC1954\_UCSC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (haplotype) & 0.045248869 & 0.00845666 & 0.014250089 \\
+  HCC1954\_UCSC & Indel & 0.2 & DeepSomatic-TO+LongPhase-TO (methylation) & 0.108695652 & 0.00845666 & 0.015692428 \\
+  \bottomrule
+\end{longtable}
+}
+
 
 \begin{small}
   \begin{longtable}{llcc}
@@ -1025,26 +1363,32 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\).
   \end{longtable}
 \end{small}
 
-\begin{longtable}[]{@{}lll@{}}
-  \caption{Cancer cell lines used in this study, with their sequencing data sources and benchmark references.}
-  \label{tab:cell-lines} \\
-  \toprule
-  Cell Line & Material Source & Benchmark Source \\
-  \midrule
-  \endfirsthead
-  \toprule
-  Cell Line & Material Source & Benchmark Source \\
-  \midrule
-  \endhead
-  \bottomrule
-  \endlastfoot
-  COLO829 & ONT, NYGC & NYGC \\
-  H1437 & UCSC & Google \\
-  H2009 & UCSC & Google \\
-  HCC1395 & HKU, NYGC & SEQC2 \\
-  HCC1937 & UCSC & Google \\
-  HCC1954 & UCSC & Google \\
-\end{longtable}
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Fixed parameters for directional clipping and LOH classification. Distances expressed in positions refer to the ordered series of clip-bearing genomic positions, not base pairs.}
+  \label{tab:loh-clipping-parameters}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}X@{}}
+    \toprule
+    Parameter & Value & Function \\
+    \midrule
+    Minimum clipping length & \(>5\) bases & Exclude very short clipping operations. \\
+    Directional rolling window & 100 clip-bearing positions & Consolidate dispersed directional clipping support. \\
+    Directional rolling passes & 2 & Generate the second-pass profile used to localize lower-amplitude candidate peaks. \\
+    Transformed peak threshold & \(\geq0.25\) & Retain distributed-signal candidates. \\
+    Peak consolidation distance & 100 clip-bearing positions & Represent nearby candidates by the larger peak. \\
+    Direct-signal exclusion span & 200 clip-bearing positions & Avoid duplicating a direct breakpoint as a distributed-signal candidate. \\
+    Direct signal/event initiation & \(\geq5\) clips & Retain a direct signal and initiate interval pairing. \\
+    Cumulative-profile smoothing window & 100 clip-bearing positions & Reduce local variation before estimating candidate support. \\
+    Candidate-support offset & \(\pm10\) clip-bearing positions & Measure the local change in the smoothed cumulative profile. \\
+    Maximum SGE pairing span & 10 kb & Restrict paired opposite-orientation signals to localized events. \\
+    Opposite-orientation support & \(\geq\lfloor c/4\rfloor\) & Complete an SGE interval relative to initiating-orientation support \(c\). \\
+    Terminal LGE boundaries & First and last clip-bearing positions & Bound evaluation at the ends of each analyzed chromosome. \\
+    Homozygous-variant threshold & VAF \(\geq0.8\) or input homozygous flag & Classify variants for regional allele-state counting. \\
+    LOH threshold & \(R_{\mathrm{het}}<0.09\) & Classify an LGE-bounded region as LOH. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 \begin{longtable}[]{@{}l@{}}
   \caption{Somatic variant callers used for benchmarking.}
