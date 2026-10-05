@@ -537,7 +537,7 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
   \begin{tabular}{llrrrr}
     \toprule
     Sample & LOH Methods & LOH Burden (\%) & No. Blocks & LOH Sum (bp) & LOH N50 Size (bp) \\
-    \midrule    
+    \midrule
     COLO829\_ONT   & ASCAT (T+N)                  & 35.33 & 575  & 1015662001 & 12864314  \\
     COLO829\_ONT   & ASCAT (TO)                   & 39.31 & 290  & 1130080160 & 20362317  \\
     COLO829\_ONT   & LongPhase-TO (ClairS-TO)      & 26.85 &  90  &  771811167 & 50760310  \\
@@ -1380,7 +1380,7 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
   PURPLE (TO) & 0.07 & [0.06, 0.08] & 0.87 & 0.71 & $+$0.17 & 21/30 & 23/30 & 0 \\
   LongPhase-TO (ClairS-TO) & 0.08 & [0.04, 0.09] & 0.89 & 0.93 & 0.00 & 18/30 & 24/30 & 0 \\
   LongPhase-TO (DeepSomatic-TO) & 0.06 & [0.03, 0.06] & 0.94 & 0.93 & 0.00 & 21/30 & 25/30 & 0 \\
-    
+
 \end{longtable}
 }
 
@@ -1416,7 +1416,7 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
   PURPLE (TO) & 0.11 & 0.05 & 0.00 & 0.00 & 0.16 & 0.07 \\
   LongPhase-TO (ClairS-TO) & 0.13 & 0.05 & 0.08 & 0.07 & 0.06 & 0.08 \\
   LongPhase-TO (DeepSomatic-TO) & 0.04 & 0.03 & 0.05 & 0.08 & 0.09 & 0.06 \\
-    
+
 \end{longtable}
 }
 
@@ -1868,12 +1868,13 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
 \end{verbatim}
 
 \subsection{Variant Calling}
-\subsubsection{ClairS-TO v0.3.0} (\url{https://github.com/HKU-BAL/ClairS-TO})
+\subsubsection{ClairS-TO}
+version: v0.3.0 (\url{https://github.com/HKU-BAL/ClairS-TO})
 \label{supp:clairsto}
 \begin{verbatim}
   # nanopore MODEL = ont_r10_dorado_sup_5khz_ssrs (default) or ont_r10_dorado_sup_5khz_ss
   # PacBio HiFi MODEL = hifi_revio_ssrs (default) or hifi_revio_ss
-  docker run -i --rm \
+  docker run -it --rm \
     -v ${INPUT_DIR}:${INPUT_DIR} \
     -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
     -u $(id -u):$(id -g) \
@@ -1886,10 +1887,11 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
     --output_dir ${OUTPUT_DIR}
 \end{verbatim}
 
-\textbf{DeepSomatic v1.8.0} (\url{https://github.com/google/deepsomatic})
+\subsubsection{DeepSomatic}
+version: v1.8.0 (\url{https://github.com/google/deepsomatic})
 \label{supp:deepsomatic}
 \begin{verbatim}
-  docker run -i --rm --gpus all \
+  docker run -it --rm --gpus all \
     -v ${INPUT_DIR}:${INPUT_DIR} \
     -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
     -u $(id -u):$(id -g) \
@@ -1908,7 +1910,8 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
 \end{verbatim}
 
 \subsection{Phasing}
-\textbf{LongPhase-TO v1.0.0} (\url{https://github.com/CCU-Bioinformatics-Lab/longphase-to})
+\subsubsection{LongPhase-TO}
+version: v1.0.0 (\url{https://github.com/CCU-Bioinformatics-Lab/longphase-to})
 \label{supp:longphaseto}
 \begin{verbatim}
   # CALLER = clairs_to_ss, clairs_to_ssrs or deepsomatic_to
@@ -1928,7 +1931,8 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
 
 \noindent LongPhase-TO provides a \texttt{--pb} preset for PacBio HiFi input. In the cross-platform analysis (Supplementary Figs.~\ref{fig:pacbio-snv-recalibration},~\ref{fig:pacbio-indel-recalibration} and~\ref{fig:pacbio-tdf}), the PacBio HiFi datasets were nevertheless processed with \texttt{--ont}, so that the nanopore-trained triplet-graph models were applied under exactly the settings in which they were fitted. ClairS-TO and DeepSomatic-TO were run with their PacBio HiFi models on the same data, so both the somatic recalibration and the tumor DNA fraction regression were evaluated off their training platform. This isolates the transfer of the trained models from any effect of the platform preset, and the resulting accuracy is therefore a lower bound on what \texttt{--pb} would provide.
 
-\textbf{LongPhase v1.7.3} (\url{https://github.com/twolinin/longphase})
+\subsubsection{LongPhase}
+version: v1.7.3 (\url{https://github.com/twolinin/longphase})
 \label{supp:longphase}
 \begin{verbatim}
   longphase phase \
@@ -1940,7 +1944,8 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
   -o ${OUTPUT}
 \end{verbatim}
 
-\textbf{WhatsHap v2.1} (\url{https://github.com/whatshap/whatshap})
+\subsubsection{WhatsHap}
+version: v2.1 (\url{https://github.com/whatshap/whatshap})
 \label{supp:whatshap}
 \begin{verbatim}
   whatshap phase \
@@ -1951,7 +1956,8 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
   ${TUMOR_BAM}
 \end{verbatim}
 
-\textbf{HapCUT2 v1.3.4} (\url{https://github.com/vibansal/HapCUT2})
+\subsubsection{HapCUT2}
+version: v1.3.4 (\url{https://github.com/vibansal/HapCUT2})
 \label{supp:hapcut2}
 \begin{verbatim}
   HapCUT2/build/extractHAIRS \
@@ -1968,7 +1974,8 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
 \end{verbatim}
 
 \subsection{Tumor DNA Fraction Estimation}
-\textbf{ASCAT v3.2.0} (\url{https://github.com/VanLoo-lab/ascat})
+\subsubsection{ASCAT}
+version: v3.2.0 (\url{https://github.com/VanLoo-lab/ascat})
 \label{supp:ascat}
 \begin{verbatim}
   R_SCRIPT=$(mktemp --suffix=.R)
@@ -1985,14 +1992,14 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
     normalname = "normal",
     allelecounter_exe = "${ALLELE_COUNTER}",
     skip_allele_counting_normal = FALSE,
-    skip_allele_counting_tumor = FALSE,
+    skip_allele_counting_tumour = FALSE,
     alleles.prefix = "${ALLELES_PREFIX}",
     loci.prefix = "${LOCI_PREFIX}",
-    gender = "${gender}",
+    gender = "${GENDER}",
     genomeVersion = "hg38",
-    nthreads = 50,
-    tumorLogR_file = "Tumor_LogR.txt",
-    tumorBAF_file = "Tumor_BAF.txt",
+    nthreads = "${THREADS}",
+    tumourLogR_file = "Tumor_LogR.txt",
+    tumourBAF_file = "Tumor_BAF.txt",
     normalLogR_file = "Germline_LogR.txt",
     normalBAF_file = "Germline_BAF.txt",
     loci_binsize = 500,
@@ -2004,7 +2011,7 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
     Tumor_BAF_file = "Tumor_BAF.txt",
     Germline_LogR_file = "Germline_LogR.txt",
     Germline_BAF_file = "Germline_BAF.txt",
-    gender = "${gender}",
+    gender = "${GENDER}",
     genomeVersion = "hg38"
   )
 
@@ -2013,6 +2020,54 @@ and the reported tumor DNA fraction is \(f\) clamped to the interval \([0,1]\). 
   ascat.bc = ascat.aspcf(ascat.bc)
   ascat.plotSegmentedData(ascat.bc)
   ascat.output = ascat.runAscat(ascat.bc, write_segments = TRUE)
+  QC = ascat.metrics(ascat.bc,ascat.output)
+  save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
+  EOF
+
+  # run R script
+  Rscript $R_SCRIPT
+\end{verbatim}
+
+\subsubsection{ASCAT-TO}
+version: v3.2.0 (\url{https://github.com/VanLoo-lab/ascat})
+\label{supp:ascat-to}
+\begin{verbatim}
+  R_SCRIPT=$(mktemp --suffix=.R)
+
+  cat <<EOF > $R_SCRIPT
+  library(ASCAT)
+
+  setwd("${OUTPUT_PREFIX}")
+
+  ascat.prepareHTS(
+    tumourseqfile = "${TUMOR_BAM}",
+    tumourname = "tumor",
+    allelecounter_exe = "${ALLELE_COUNTER}",
+    alleles.prefix = "${ALLELES_PREFIX}",
+    loci.prefix = "${LOCI_PREFIX}",
+    gender = "${GENDER}",
+    genomeVersion = "hg38",
+    nthreads = "${THREADS}",
+    tumourLogR_file = "Tumor_LogR.txt",
+    tumourBAF_file = "Tumor_BAF.txt",
+    loci_binsize = 500,
+    min_base_qual= 10,
+    additional_allelecounter_flags="-f 0")
+
+  ascat.bc = ascat.loadData(
+    Tumor_LogR_file = "Tumor_LogR.txt",
+    Tumor_BAF_file = "Tumor_BAF.txt",
+    gender = "${GENDER}",
+    genomeVersion = "hg38"
+  )
+
+  ascat.plotRawData(ascat.bc, img.prefix = "Before_correction_")
+  gg = ascat.predictGermlineGenotypes(ascat.bc, platform = "WGS_hg38_50X")
+  ascat.bc = ascat.aspcf(ascat.bc, ascat.gg=gg)
+  ascat.plotSegmentedData(ascat.bc)
+  ascat.output = ascat.runAscat(ascat.bc, write_segments = TRUE)
+  QC = ascat.metrics(ascat.bc,ascat.output)
+  save(ascat.bc, ascat.output, QC, file = 'ASCAT_objects.Rdata')
   EOF
 
   # run R script
@@ -2062,10 +2117,11 @@ All three tools were run in tumor-only mode, which each of them selects by the a
 
 
 \subsection{Benchmarking}
-\textbf{Som.py} (\url{https://github.com/Illumina/hap.py})
+\subsubsection{Som.py}
+(\url{https://github.com/Illumina/hap.py})
 \label{supp:sompy}
-\begin{verbatim}  
-  docker run -i --rm \
+\begin{verbatim}
+  docker run -it --rm \
     -v ${INPUT_DIR}:${INPUT_DIR} \
     -v ${OUTPUT_DIR}:${OUTPUT_DIR} \
     -e HGREF=${REF} \
