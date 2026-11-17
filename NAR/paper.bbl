@@ -1,0 +1,274 @@
+\begin{thebibliography}{10}
+
+\bibitem{vogelstein2013}
+Vogelstein, B., Papadopoulos, N., Velculescu, V., Zhou, S., Diaz, L.~J., and
+  Kinzler, K. (2013)
+Cancer genome landscapes..
+{\em Science,} {\bf 339}(6127), 1546–1558.
+
+\bibitem{stratton2009}
+Stratton, M., Campbell, P., and Futreal, P. (2009)
+The cancer genome..
+{\em Nature,} {\bf 458}(7239), 719–724.
+
+\bibitem{vogelstein2004}
+Vogelstein, B. and Kinzler, K. (2004)
+Cancer genes and the pathways they control..
+{\em Nature Medicine,} {\bf 10}(8), 789–799.
+
+\bibitem{garg2021}
+Garg, S. (2021)
+Computational methods for chromosome-scale haplotype reconstruction..
+{\em Genome Biology,} {\bf 22}(1), 101.
+
+\bibitem{glusman2014}
+Glusman, G., Cox, H.~C., and Roach, J.~C. (2014)
+Whole-genome haplotyping approaches and genomic medicine..
+{\em Genome Medicine,} {\bf 6}(9), 73.
+
+\bibitem{warburton2023}
+Warburton, P. and Sebra, R. (2023)
+Long-Read DNA Sequencing: Recent Advances and Remaining Challenges..
+{\em Annual Review of Genomics and Human Genetics,} {\bf 24}, 109–132.
+
+\bibitem{maestri2020}
+Maestri, S., Maturo, M., Cosentino, E., Marcolungo, L., Iadarola, B.,
+  Fortunati, E., Rossato, M., and Delledonne, M. (2020)
+A Long-Read Sequencing Approach for Direct Haplotype Phasing in Clinical
+  Settings..
+{\em International Journal of Molecular Sciences,} {\bf 21}(23), 9177.
+
+\bibitem{martin2016}
+Martin, M., Patterson, M., Garg, S., O~Fischer, S., Pisanti, N., Klau, G.~W.,
+  Sch{\"o}enhuth, A., and Marschall, T. (2016)
+WhatsHap: fast and accurate read-based phasing.
+{\em bioRxiv,} p. 085050.
+
+\bibitem{edge2017}
+Edge, P., Bafna, V., and Bansal, V. (2017)
+HapCUT2: robust and accurate haplotype assembly for diverse sequencing
+  technologies.
+{\em Genome Research,} {\bf 27}(5), 801--812.
+
+\bibitem{lin2022}
+Lin, J.-H., Chen, L.-C., Yu, S.-C., and Huang, Y.-T. (2022)
+LongPhase: an ultra-fast chromosome-scale phasing algorithm for small and large
+  variants.
+{\em Bioinformatics,} {\bf 38}(7), 1816--1822.
+
+\bibitem{nowell1976}
+Nowell, P. (1976)
+The clonal evolution of tumor cell populations..
+{\em Science,} {\bf 194}(4260), 23–28.
+
+\bibitem{poplin2018}
+Poplin, R., Chang, P., Alexander, D., Schwartz, S., Colthurst, T., et al.
+  (2018)
+A universal SNP and small-indel variant caller using deep neural networks..
+{\em Nature Biotechnology,} {\bf 36}(10), 983–987.
+
+\bibitem{kolesnikov2023}
+Kolesnikov, A., Cook, D., Nattestad, M., Brambrink, L., McNulty, B., Gorzynski,
+  J., Goenka, S., Ashley, E.~A., Jain, M., Miga, K.~H., Paten, B., Chang,
+  P.-C., Carroll, A., and Shafin, K. (2024)
+Local read haplotagging enables accurate long-read small variant calling.
+{\em Nature Communications,} {\bf 15}(1), 5907.
+
+\bibitem{zheng2022}
+Zheng, Z., Li, S., Su, J., Leung, A., Lam, T., and Luo, R. (2022)
+Symphonizing pileup and full-alignment for deep learning-based long-read
+  variant calling..
+{\em Nature Computational Science,} {\bf 2}(12), 797–803.
+
+\bibitem{park2024}
+Park, J., Cook, D.~E., Chang, P.-C., Kolesnikov, A., Brambrink, L., Mier,
+  J.~C., Gardner, J., McNulty, B., Sacco, S., Keskus, A.~G., Bryant, A., Ahmad,
+  T., Shetty, J., Zhao, Y., Tran, B., Narzisi, G., Helland, A., Yoo, B.,
+  Pushel, I., Lansdon, L.~A., Bi, C., Walter, A., Gibson, M., Pastinen, T.,
+  Reiman, R., Mankame, S., Ranallo-Benavidez, T.~R., Brown, C., Robine, N.,
+  Barthel, F.~P., Farooqi, M.~S., Miga, K.~H., Carroll, A., Kolmogorov, M.,
+  Paten, B., and Shafin, K. (2025)
+Accurate somatic small variant discovery for multiple sequencing technologies
+  with {DeepSomatic}.
+{\em Nature Biotechnology,}.
+
+\bibitem{zheng2023}
+Zheng, Z., Chen, L., Su, J., Yu, X., He, M., Lee, Y.-L., Lam, T.-W., and Luo,
+  R. (2026)
+{ClairS}: a deep-learning method for long-read tumor--normal pair somatic small
+  variant calling.
+{\em Nature Methods,}.
+
+\bibitem{keskus2025}
+Keskus, A.~G., Bryant, A., Ahmad, T., Yoo, B., Aganezov, S., Goretsky, A.,
+  Donmez, A., Lansdon, L.~A., Rodriguez, I., Park, J., Liu, Y., Cui, X.,
+  Gardner, J., McNulty, B., Sacco, S., Shetty, J., Zhao, Y., Tran, B., Narzisi,
+  G., Helland, A., Cook, D.~E., Chang, P.-C., Kolesnikov, A., Carroll, A.,
+  Molloy, E.~K., Bi, C., Walter, A., Gibson, M., Pushel, I., Guest, E.,
+  Pastinen, T., Shafin, K., Miga, K.~H., Malikic, S., Day, C.-P., Robine, N.,
+  Sahinalp, C., Dean, M., Farooqi, M.~S., Paten, B., and Kolmogorov, M. (2026)
+{Severus} detects somatic structural variation and complex rearrangements in
+  cancer genomes using long-read sequencing.
+{\em Nature Biotechnology,} {\bf 44}(2), 247--257.
+
+\bibitem{cibulskis2013}
+Cibulskis, K., Lawrence, M.~S., Carter, S.~L., Sivachenko, A., Jaffe, D.,
+  Sougnez, C., Gabriel, S., Meyerson, M., Lander, E.~S., and Getz, G. (2013)
+Sensitive detection of somatic point mutations in impure and heterogeneous
+  cancer samples..
+{\em Nature Biotechnology,} {\bf 31}(3), 213–219.
+
+\bibitem{koboldt2012}
+Koboldt, D.~C., Zhang, Q., Larson, D.~E., Shen, D., McLellan, M.~D., Lin, L.,
+  Miller, C.~A., Mardis, E.~R., Ding, L., and Wilson, R.~K. (2012)
+VarScan 2: somatic mutation and copy number alteration discovery in cancer by
+  exome sequencing..
+{\em Genome Research,} {\bf 22}(3), 568–576.
+
+\bibitem{larson2012}
+Larson, D.~E., Harris, C.~C., Chen, K., Koboldt, D.~C., Abbott, T.~E., Dooling,
+  D.~J., Ley, T.~J., Mardis, E.~R., Wilson, R.~K., and Ding, L. (2012)
+SomaticSniper: identification of somatic point mutations in whole genome
+  sequencing data..
+{\em Bioinformatics,} {\bf 28}(3), 311–317.
+
+\bibitem{sun2018}
+Sun, J., He, Y., Sanford, E., Montesion, M., Frampton, G., et al. (2018)
+A computational approach to distinguish somatic vs. germline origin of genomic
+  alterations from deep sequencing of cancer specimens without a matched
+  normal..
+{\em PLoS Computational Biology,} {\bf 14}(2), e1005965.
+
+\bibitem{hiltemann2015}
+Hiltemann, S., Jenster, G., Trapman, J., van, d. S.~P., and Stubbs, A. (2015)
+Discriminating somatic and germline mutations in tumor DNA samples without
+  matching normals..
+{\em Genome Research,} {\bf 25}(9), 1382–1390.
+
+\bibitem{huang2018}
+Huang, K.-L., Mashl, R.~J., Wu, Y., Ritter, D.~I., Wang, J., et al. (2018)
+Pathogenic Germline Variants in 10,389 Adult Cancers..
+{\em Cell,} {\bf 173}(2), 355–370.e14.
+
+\bibitem{chen2025}
+Chen, L., Zheng, Z., Su, J., Yu, X., Wong, A. O.~K., Zhang, J., Lee, Y.-L., and
+  Luo, R. (2025)
+{ClairS-TO}: a deep-learning method for long-read tumor-only somatic small
+  variant calling.
+{\em Nature Communications,} {\bf 16}(1), 9630.
+
+\bibitem{nichols2020}
+Nichols, C.~A., Gibson, W.~J., Brown, M.~S., Kosmicki, J.~A., Busanovich,
+  J.~P., et al. (2020)
+Loss of heterozygosity of essential genes represents a widespread class of
+  potential cancer vulnerabilities..
+{\em Nature Communications,} {\bf 11}(1), 2517.
+
+\bibitem{regan2024}
+Regan, S.~B., Medhi, D., Xu, Y., White, T.~B., Jiang, Y.-Z., Kim, J.~E., Wang,
+  S.-C., Deng, Q., Jia, S., Baasan, D., Connelly, J.~P., Chang, T.-C.,
+  Pruett-Miller, S.~M., and Jasin, M. (2025)
+Megabase-scale loss of heterozygosity provoked by {CRISPR-Cas9} {DNA}
+  double-strand breaks.
+{\em Molecular Cell,} {\bf 85}(22), 4119--4137.e10.
+
+\bibitem{hwang2021}
+Hwang, M., Mog, B., Douglass, J., Pearlman, A., Hsiue, E., et al. (2021)
+Targeting loss of heterozygosity for cancer-specific immunotherapy..
+{\em Proceedings of the National Academy of Sciences,} {\bf 118}(12),
+  e2022410118.
+
+\bibitem{yadav2015}
+Yadav, V. and De, S. (2015)
+An assessment of computational methods for estimating purity and clonality
+  using genomic data derived from heterogeneous tumor tissue samples..
+{\em Briefings in Bioinformatics,} {\bf 16}(2), 232–241.
+
+\bibitem{zheng2017}
+Zheng, X., Zhang, N., Wu, H., and Wu, H. (2017)
+Estimating and accounting for tumor purity in the analysis of DNA methylation
+  data from cancer studies..
+{\em Genome Biology,} {\bf 18}(1), 17.
+
+\bibitem{rhee2018}
+Rhee, J., Jung, Y., Kim, K., Yoo, J., Kim, J., Lee, Y., Ko, Y., Lee, H., Cho,
+  B., and Kim, T. (2018)
+Impact of Tumor Purity on Immune Gene Expression and Clustering Analyses across
+  Multiple Cancer Types..
+{\em Cancer Immunology Research,} {\bf 6}(1), 87–97.
+
+\bibitem{foltz2024}
+Foltz, S.~M., Li, Y., Yao, L., Terekhanova, N.~V., Weerasinghe, A., et al.
+  (2024)
+Somatic mutation phasing and haplotype extension using linked-reads in multiple
+  myeloma..
+{\em bioRxiv,} p. 2024.
+
+\bibitem{elrick2025}
+Elrick, H., Sauer, C.~M., Espejo Valle-Incl{\'a}n, J., et al. (2025)
+{SAVANA}: reliable analysis of somatic structural variants and copy number
+  aberrations using long-read sequencing.
+{\em Nature Methods,} {\bf 22}(7), 1436--1446.
+
+\bibitem{ahmad2025}
+Ahmad, T., Keskus, A.~G., Aganezov, S., Goretsky, A., Rodriguez, I., Yoo, B.,
+  Lansdon, L.~A., Repnikova, E.~A., Zhang, L., Liu, Y., Donmez, A., Bryant, A.,
+  Tulsyan, S., Park, J., Gardner, J., McNulty, B., Sacco, S., Shetty, J., Zhao,
+  Y., Tran, B., Malikic, S., Day, C.-P., Miga, K., Paten, B., Sahinalp, C.,
+  Farooqi, M.~S., Dean, M., and Kolmogorov, M. (2025)
+{Wakhan}: reconstruction of chromosome-scale copy number profiles of tumor
+  genomes with long-read sequencing.
+{\em medRxiv,}.
+
+\bibitem{paulin2026}
+Paulin, L.~F., Shi, M., Fu, Y., Zheng, X., Au-Yeung, G., Bowtell, D., Chen, J.,
+  Liang, Y., Hammer, C., and Sedlazeck, F.~J. (2026)
+Comprehensive detection of genetic and epigenetic alterations in cancer using
+  long reads with {TumorLens}.
+{\em medRxiv,}.
+
+\bibitem{vanloo2010}
+Van~Loo, P., Nordgard, S.~H., Lingj{\ae}rde, O.~C., Russnes, H.~G., Rye, I.~H.,
+  Sun, W., Weigman, V.~J., Marynen, P., Zetterberg, A., Naume, B., Perou,
+  C.~M., B{\o}rresen-Dale, A.-L., and Kristensen, V.~N. (2010)
+Allele-specific copy number analysis of tumors.
+{\em Proceedings of the National Academy of Sciences,} {\bf 107}(39),
+  16910--16915.
+
+\bibitem{priestley2019}
+Priestley, P., Baber, J., Lolkema, M.~P., Steeghs, N., de~Bruijn, E., Shale,
+  C., Duyvesteyn, K., Haidari, S., van Hoeck, A., Onstenk, W., et al. (2019)
+Pan-cancer whole-genome analyses of metastatic solid tumours.
+{\em Nature,} {\bf 575}(7781), 210--216.
+
+\bibitem{fang2021}
+Fang, L.~T., Zhu, B., Zhao, Y., Chen, W., Yang, Z., Kerrigan, L., Langenbach,
+  K., de~Mars, M., Lu, C., Idler, K., et al. (2021)
+Establishing community reference samples, data and call sets for benchmarking
+  cancer mutation detection using whole-genome sequencing.
+{\em Nature Biotechnology,} {\bf 39}(9), 1151--1160.
+
+\bibitem{arora2019}
+Arora, K., Shah, M., Johnson, M., Sanghvi, R., Shelton, J., Nagulapalli, K.,
+  Oschwald, D.~M., Zody, M.~C., Germer, S., Jobanputra, V., et al. (2019)
+Deep whole-genome sequencing of 3 cancer cell lines on 2 sequencing platforms.
+{\em Scientific Reports,} {\bf 9}, 19123.
+
+\bibitem{recillastarga2022}
+Recillas-Targa, F. (2022)
+Cancer Epigenetics: An Overview..
+{\em Archives of Medical Research,} {\bf 53}(8), 732--740.
+
+\bibitem{zhang2015}
+Zhang, N., Wu, H., Zhang, W., Wang, J., Wu, H., and Zheng, X. (2015)
+Predicting tumor purity from methylation microarray data..
+{\em Bioinformatics,} {\bf 31}(21), 3401--3405.
+
+\bibitem{nikzainal2012}
+Nik-Zainal, S., Van~Loo, P., Wedge, D.~C., Alexandrov, L.~B., Greenman, C.~D.,
+  Lau, K.~W., Raine, K., Jones, D., Marshall, J., Ramakrishna, M., et al.
+  (2012)
+The life history of 21 breast cancers.
+{\em Cell,} {\bf 149}(5), 994--1007.
+
+\end{thebibliography}

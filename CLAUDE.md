@@ -10,7 +10,15 @@ Incorporating Loss of Heterozygosity in Tumor-Only Long-Read Sequencing"* (the L
 method). The paper is written for a Springer Nature journal and uses the official
 `sn-jnl` document class with the `sn-nature` option.
 
-**`paper.tex` is the target deliverable** (the journal submission). All manuscript work happens
+**Active target (from 2026-11-16): `NAR/`** — the Nucleic Acids Research version (OUP
+`oup-authoring-template`, `nar.bst`, section order Introduction → Materials and methods → Results →
+Discussion → Data availability → Supplementary data → Author contributions → Conflict of interest;
+abstract ≤200 words, no citations; supplement labels "Supplementary Figure S1"/"Supplementary Table S1").
+This version takes the revised method and the `Revision_2026-11/` results. Build it inside `NAR/` in the
+same order (Supplementary first, then paper). The root `paper.tex` (sn-jnl, Nature format) is the frozen
+pre-revision version; do not port new changes back to it.
+
+**Root `paper.tex`** was the Nature-format deliverable. Its manuscript work happened
 here plus its `supplementary.tex`. `thesis.tex` is a legacy backup — do not edit it or keep it in
 sync with `paper.tex`.
 
@@ -100,6 +108,19 @@ The eight benchmark datasets are consistent across scripts: `COLO829_ONT`, `COLO
   **label identifiers** `tab:somatic_purity`, `tab:somatic_indel_purity`, `tab:tumor-purity`, and
   `app:purity-aware-workflow` still contain "purity" on purpose — they are internal keys referenced
   across both files; **do not rename them**. Only display text says "DNA fraction".
+  **NAR version (decided 2026-11-16):** LongPhase-TO now fits purity and ploidy internally (C++
+  AMBER/COBALT/PURPLE with phasing-informed changes), but it **reports tumor DNA fraction and ploidy**.
+  "Purity" stays an internal fit parameter: it may appear in Methods equations as the fitted
+  parameter (the conversion to DNA fraction), never as a reported LongPhase-TO output.
+  The ONT indel raw-caller rows keep the published values (author decision, 2026-11-16).
+  **LOH coverage fraction λ = 0.8 for all samples** (author decision, 2026-11-17): the release default
+  (commit 401d586). The `Revision_2026-11/` cell-line TSVs were made at λ = 0.9 (a032938); replace their
+  numbers with the λ = 0.8 export when the student delivers it. HG008 figures and Fig 4(c) use HG008 at 0.8.
+  **NAR Figure 3 (author decision, 2026-11-17):** F1 of each dataset, grouped by platform ((a) nanopore SNV + indel, (b) PacBio HiFi SNV + indel)
+  (`NAR/figures/fig3_recalibration.py`); precision/recall grids in the Supplement. Style "gray before, color
+  after": caller alone = gray dashed, open circle (ClairS-TO) / open square (DeepSomatic-TO); with LongPhase-TO =
+  solid navy `#3B4992` (ClairS-TO) / red `#EE0000` (DeepSomatic-TO); open axes, no grid. Figures read the
+  Supplementary tables, not the TSVs.
 - **Math symbols:** prefer LaTeX macros (`$\ge$`, `$\le$`, `$\times$`) over literal Unicode — a
   literal `≥` in the Supplement broke the `pdflatex` build.
 - **No em dashes in prose.** Do not use em dashes (`—` or LaTeX `---`) in manuscript text. Recast
@@ -126,3 +147,10 @@ pandoc-based chapter→LaTeX workflow (which is also why some labels look auto-g
 `\ref{fig:met-page-14-cropped-jpg}`). They are not part of the current workflow — do not
 resurrect or rely on them. The `page_*_cropped.*` images are cropped source scans used for some
 method figures.
+
+## Common rules (shared by all papers)
+
+The common rules for all papers are in `../../CLAUDE.md` (`/Users/ythuang/Desktop/Paper/CLAUDE.md`). Read it before
+editing a manuscript. It lists the writing guideline file for each section (abstract, Introduction, Results,
+Discussion, Methods) and says to update a guideline when the author corrects text written with it. If a
+common rule conflicts with a rule in this file, this file takes priority.

@@ -1,0 +1,41 @@
+subset	platform	variant_type	method	n	precision	recall	f1	delta_f1	n_improved	n_drop_gt_0_01
+all	ONT	INDEL	ClairS-TO raw PASS	40	0.2317	0.1812	0.1916			
+all	ONT	INDEL	DeepSomatic-TO raw PASS	40	0.1961	0.2104	0.187			
+all	ONT	INDEL	LongPhase-TO(ClairS-TO)	40	0.2869	0.2122	0.2265	0.0349	33	3
+all	ONT	INDEL	LongPhase-TO(DeepSomatic-TO)	40	0.2937	0.1835	0.2076	0.0206	35	2
+all	ONT	INDEL	LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)	40	0.4233	0.1787	0.234	0.047	38	2
+all	ONT	SNV	ClairS-TO raw PASS	40	0.5492	0.599	0.5509			
+all	ONT	SNV	DeepSomatic-TO raw PASS	40	0.4683	0.7173	0.5467			
+all	ONT	SNV	LongPhase-TO(ClairS-TO)	40	0.6963	0.5946	0.6232	0.0723	35	1
+all	ONT	SNV	LongPhase-TO(DeepSomatic-TO)	40	0.6594	0.6412	0.6331	0.0864	37	2
+all	ONT	SNV	LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)	40	0.7041	0.6358	0.6522	0.1054	38	1
+all	PacBio	INDEL	ClairS-TO raw PASS	30	0.2765	0.2287	0.2416			
+all	PacBio	INDEL	DeepSomatic-TO raw PASS	30	0.27	0.3367	0.2829			
+all	PacBio	INDEL	LongPhase-TO(ClairS-TO)	30	0.3891	0.2239	0.2703	0.0287	27	2
+all	PacBio	INDEL	LongPhase-TO(DeepSomatic-TO)	30	0.4189	0.2882	0.3266	0.0436	25	2
+all	PacBio	INDEL	LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)	30	0.6226	0.2746	0.3679	0.085	28	2
+all	PacBio	SNV	ClairS-TO raw PASS	30	0.5457	0.6667	0.5775			
+all	PacBio	SNV	DeepSomatic-TO raw PASS	30	0.5011	0.8296	0.5982			
+all	PacBio	SNV	LongPhase-TO(ClairS-TO)	30	0.722	0.663	0.6733	0.0958	28	1
+all	PacBio	SNV	LongPhase-TO(DeepSomatic-TO)	30	0.7044	0.7382	0.7035	0.1053	25	2
+all	PacBio	SNV	LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)	30	0.7306	0.7314	0.7152	0.117	26	2
+excluding HCC1395	ONT	INDEL	ClairS-TO raw PASS	30	0.2283	0.179	0.1853			
+excluding HCC1395	ONT	INDEL	DeepSomatic-TO raw PASS	30	0.1611	0.1464	0.1347			
+excluding HCC1395	ONT	INDEL	LongPhase-TO(ClairS-TO)	30	0.2852	0.2064	0.2197	0.0344	25	2
+excluding HCC1395	ONT	INDEL	LongPhase-TO(DeepSomatic-TO)	30	0.2535	0.1287	0.1533	0.0186	25	2
+excluding HCC1395	ONT	INDEL	LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)	30	0.374	0.1253	0.1742	0.0395	28	2
+excluding HCC1395	ONT	SNV	ClairS-TO raw PASS	30	0.5425	0.6117	0.5469			
+excluding HCC1395	ONT	SNV	DeepSomatic-TO raw PASS	30	0.4617	0.7291	0.5395			
+excluding HCC1395	ONT	SNV	LongPhase-TO(ClairS-TO)	30	0.6891	0.6079	0.6255	0.0787	27	1
+excluding HCC1395	ONT	SNV	LongPhase-TO(DeepSomatic-TO)	30	0.6541	0.657	0.6362	0.0967	27	2
+excluding HCC1395	ONT	SNV	LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)	30	0.6975	0.6514	0.6558	0.1163	28	1
+excluding HCC1395	PacBio	INDEL	ClairS-TO raw PASS	25	0.2752	0.2313	0.241			
+excluding HCC1395	PacBio	INDEL	DeepSomatic-TO raw PASS	25	0.253	0.294	0.2533			
+excluding HCC1395	PacBio	INDEL	LongPhase-TO(ClairS-TO)	25	0.3843	0.2256	0.2693	0.0284	22	2
+excluding HCC1395	PacBio	INDEL	LongPhase-TO(DeepSomatic-TO)	25	0.3972	0.2496	0.2925	0.0392	20	2
+excluding HCC1395	PacBio	INDEL	LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)	25	0.5991	0.2402	0.333	0.0796	23	2
+excluding HCC1395	PacBio	SNV	ClairS-TO raw PASS	25	0.5353	0.6669	0.5674			
+excluding HCC1395	PacBio	SNV	DeepSomatic-TO raw PASS	25	0.488	0.8209	0.5805			
+excluding HCC1395	PacBio	SNV	LongPhase-TO(ClairS-TO)	25	0.7075	0.6614	0.6642	0.0967	23	1
+excluding HCC1395	PacBio	SNV	LongPhase-TO(DeepSomatic-TO)	25	0.6902	0.7301	0.6901	0.1096	20	2
+excluding HCC1395	PacBio	SNV	LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)	25	0.7152	0.7232	0.7016	0.1212	21	2

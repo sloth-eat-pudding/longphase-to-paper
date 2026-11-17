@@ -1,0 +1,10 @@
+# LaTeX build by-products (keep .aux and .bbl: paper.tex reads Supplementary.aux via xr-hyper)
+*.log
+*.blg
+*.out
+*.toc
+*.lot
+*.lof
+*.synctex.gz
+__pycache__/
+*.pyc
