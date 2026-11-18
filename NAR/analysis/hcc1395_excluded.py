@@ -1,13 +1,12 @@
 """Mean precision/recall/F1 per platform, variant type and method, with and without the HCC1395 datasets
 (the triplet-graph models were fitted on HCC1395_HKU at 0.6). Source: Revision_2026-11/metrics_snv_indel_ONT_PacBio.tsv.
-HCC1937_UCSC_dedup is left out (the paper uses the with-duplicate-reads set). Writes hcc1395_excluded.tsv."""
+HCC1937_UCSC_with_duplicate_reads is left out (the paper uses the dedup set). LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN) is not used. Writes hcc1395_excluded.tsv."""
 import csv, os
 from collections import defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, '..', '..', 'Revision_2026-11', 'metrics_snv_indel_ONT_PacBio.tsv')
-rows = [r for r in csv.DictReader(open(SRC), delimiter='\t') if r['dataset'] != 'HCC1937_UCSC_dedup']
-BASE = {'LongPhase-TO(ClairS-TO)': 'ClairS-TO raw PASS', 'LongPhase-TO(DeepSomatic-TO)': 'DeepSomatic-TO raw PASS',
-        'LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)': 'DeepSomatic-TO raw PASS'}
+rows = [r for r in csv.DictReader(open(SRC), delimiter='\t') if r['dataset'] != 'HCC1937_UCSC_with_duplicate_reads' and 'ClairS-TO PoN' not in r['method']]
+BASE = {'LongPhase-TO(ClairS-TO)': 'ClairS-TO raw PASS', 'LongPhase-TO(DeepSomatic-TO)': 'DeepSomatic-TO raw PASS'}
 out = []
 for subset, keep in [('all', lambda d: True), ('excluding HCC1395', lambda d: not d.startswith('HCC1395'))]:
     agg = defaultdict(list)
