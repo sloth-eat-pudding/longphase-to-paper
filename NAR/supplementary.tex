@@ -119,17 +119,17 @@ The fraction-dependent profile observed for the default model was reproduced. Re
 
 Every model used by the triplet-graph recalibration was fitted once on nanopore data and then held fixed: the linear (indel) and third-order polynomial (SNV) predictors were trained on the HCC1395\_HKU mixture at 0.6 tumor DNA fraction, and the site-level decision thresholds ($S_H>0.8$ and $L/(L+N)\ge0.2$) were calibrated on the same sample. To test whether this haplotype-based recalibration depends on the sequencing platform, we applied the identical models and thresholds to six PacBio HiFi datasets (Supplementary Table~\ref{tab:pacbio-datasets}), using the same \emph{in silico} dilution design spanning 20--100\% tumor DNA fraction. Five of these cell lines (HCC1395, HCC1937, HCC1954, H1437 and H2009) belong to the PacBio Revio tumor-normal cohort assembled for DeepSomatic, four of them obtained here from the CASTLE release and HCC1395 from the public PacBio Revio 2023Q2 release. COLO829 is an independent PacBio Revio benchmark from the same public release. The panel is therefore not the complete DeepSomatic cohort, which also includes Hs578T.
 
-Every LongPhase-TO model was held off-platform. Both somatic callers were run with their PacBio HiFi models, so that the baselines against which recalibration is measured are platform-matched, whereas LongPhase-TO was run in its nanopore mode so that the nanopore-fitted triplet-graph coefficients were applied under exactly the settings in which they were trained. No coefficient was refitted and no threshold was retuned for PacBio. The estimation of tumor DNA fraction and ploidy has no trained coefficients and is assessed in the following subsection. The experiment therefore measures transfer of the trained models alone, against callers that carry no comparable platform handicap.
+Every LongPhase-TO model was held off-platform. Both somatic callers were run with their PacBio HiFi models, so that the baselines against which recalibration is measured are platform-matched, whereas LongPhase-TO was run with the same command as on the nanopore panel, so that the nanopore-fitted triplet-graph coefficients were applied unchanged. No coefficient was refitted and no threshold was retuned for PacBio. The estimation of tumor DNA fraction and ploidy has no trained coefficients and is assessed in the following subsection. The experiment therefore measures transfer of the trained models alone, against callers that carry no comparable platform handicap.
 
-Recalibration improved PacBio HiFi somatic calls to a degree comparable with nanopore. DeepSomatic-TO values are from the configuration with the ClairS-TO normal panels. Averaged over the six datasets and five DNA-fraction levels, mean SNV F1 rose from 0.58 to 0.67 for ClairS-TO and from 0.60 to 0.72 for DeepSomatic-TO, improving 28 and 26 of 30 individual points, respectively (Supplementary Figure~\ref{fig:pacbio-snv-recalibration}). Mean indel F1 rose from 0.24 to 0.27 for ClairS-TO and from 0.28 to 0.37 for DeepSomatic-TO, improving 27 and 28 of 30 points (Supplementary Figure~\ref{fig:pacbio-indel-recalibration}). The gain was precision-driven, as on nanopore. For SNVs, mean precision rose by 0.18 for ClairS-TO at unchanged recall and by 0.23 for DeepSomatic-TO at a recall cost of 0.10. Indels followed the same pattern, with precision gains of 0.11 and 0.35 and recall costs of 0.01 and 0.06. DeepSomatic-TO recall decreased at all 30 points in both variant classes, whereas its precision increased at all 30. Per-mixture precision, recall and F1 for every caller and configuration are given in Supplementary Tables~\ref{tab:pacbio_somatic_snv} and~\ref{tab:pacbio_somatic_indel}.
+Recalibration improved PacBio HiFi somatic calls to a degree comparable with nanopore. Averaged over the six datasets and five DNA-fraction levels, mean SNV F1 rose from 0.58 to 0.67 for ClairS-TO and from 0.60 to 0.70 for DeepSomatic-TO, improving 28 and 24 of 30 individual points, respectively (Supplementary Figure~\ref{fig:pacbio-snv-recalibration}). Mean indel F1 rose from 0.24 to 0.27 for ClairS-TO and from 0.28 to 0.33 for DeepSomatic-TO, improving 27 and 25 of 30 points (Supplementary Figure~\ref{fig:pacbio-indel-recalibration}). The gain was precision-driven, as on nanopore. For SNVs, mean precision rose by 0.18 for ClairS-TO at unchanged recall and by 0.20 for DeepSomatic-TO at a recall cost of 0.09. Indels followed the same pattern, with precision gains of 0.11 and 0.15 and recall costs of 0.01 and 0.05. DeepSomatic-TO recall decreased at all 30 points in both variant classes, whereas its precision increased at 29 of 30 SNV points and at all 30 indel points. Per-mixture precision, recall and F1 for every caller and configuration are given in Supplementary Tables~\ref{tab:pacbio_somatic_snv} and~\ref{tab:pacbio_somatic_indel}.
 
-The dependence on tumor DNA fraction also reproduced the nanopore pattern. Mean SNV F1 gains were largest at low-to-intermediate fraction, reaching $+0.12$, $+0.13$ and $+0.13$ for ClairS-TO and $+0.13$, $+0.15$ and $+0.16$ for DeepSomatic-TO at fractions of 0.2, 0.4 and 0.6, and were smallest at 1.0 ($+0.01$ and $+0.03$). Restricted to mixtures below 1.0, mean SNV F1 increased by 0.12 for ClairS-TO and 0.14 for DeepSomatic-TO, with 23 and 21 of 24 points improved. HCC1954, the most difficult genome in the nanopore panel, again showed the largest gains. At 0.8 DNA fraction its SNV F1 rose from 0.36 to 0.66 for ClairS-TO and from 0.35 to 0.73 for DeepSomatic-TO, close to the nanopore values of 0.33 to 0.61 and 0.32 to 0.69.
+The dependence on tumor DNA fraction also reproduced the nanopore pattern. Mean SNV F1 gains were largest at low-to-intermediate fraction, reaching $+0.12$, $+0.13$ and $+0.13$ for ClairS-TO and $+0.12$, $+0.15$ and $+0.15$ for DeepSomatic-TO at fractions of 0.2, 0.4 and 0.6, and were smallest at 1.0 ($+0.01$ and 0.00). Restricted to mixtures below 1.0, mean SNV F1 increased by 0.12 for ClairS-TO and 0.13 for DeepSomatic-TO, with 23 and 21 of 24 points improved. HCC1954, the most difficult genome in the nanopore panel, again showed the largest gains. At 0.8 DNA fraction its SNV F1 rose from 0.36 to 0.66 for ClairS-TO and from 0.35 to 0.72 for DeepSomatic-TO, close to the nanopore values of 0.33 to 0.61 and 0.32 to 0.65.
 
-Recalibration lowered F1 by more than 0.01 only in H1437 and H2009 at 0.8 or 1.0 DNA fraction. The largest decrease was for DeepSomatic-TO in H2009 at 0.8, where SNV F1 fell from 0.87 to 0.81 and indel F1 from 0.50 to 0.44. In near-pure samples the variant allele frequencies of heterozygous somatic and germline variants converge (Supplementary Figure~\ref{fig:app-page-41-cropped-jpg}). In the pure samples, most true variants that recalibration removed were homozygous calls outside the LOH segments of LongPhase-TO (Supplementary Results, Section~\ref{supp:qual-threshold}). The coefficients were not refitted on PacBio HiFi data, because this analysis measured transfer without retraining. The haplotype evidence used by the triplet graph transferred across sequencing chemistries.
+Recalibration lowered F1 by more than 0.01 only in H1437 and H2009 at 0.8 or 1.0 DNA fraction. The largest decrease was for DeepSomatic-TO in H2009 at 0.8, where SNV F1 fell from 0.87 to 0.81 and indel F1 from 0.50 to 0.43. In near-pure samples the variant allele frequencies of heterozygous somatic and germline variants converge (Supplementary Figure~\ref{fig:app-page-41-cropped-jpg}). In the pure samples, most true variants that recalibration removed were homozygous calls outside the LOH segments of LongPhase-TO (Supplementary Results, Section~\ref{supp:qual-threshold}). The coefficients were not refitted on PacBio HiFi data, because this analysis measured transfer without retraining. The haplotype evidence used by the triplet graph transferred across sequencing chemistries.
 
 \subsection{Recalibration outperforms QUAL-threshold filtering except for near-pure DeepSomatic-TO calls}\label{supp:qual-threshold}
 
-A simpler alternative to recalibration is to raise the QUAL threshold of the somatic caller. We compared each LongPhase-TO configuration with the precision--recall curve of its own input caller. Each curve kept the FILTER=PASS calls with QUAL at or above one of 50 thresholds, the 0th to 98th percentiles of the QUAL values of the PASS calls of that mixture and variant class. The comparison covered the eight nanopore and six PacBio HiFi cell-line datasets at five tumor DNA fractions, with the truth sets and exact-allele matching of the main benchmark. For nanopore HCC1937, the mixtures rebuilt from deduplicated reads were used.
+A simpler alternative to recalibration is to raise the QUAL threshold of the somatic caller. We compared LongPhase-TO with ClairS-TO input and with DeepSomatic-TO input against the precision--recall curve of its own input caller. Each curve kept the FILTER=PASS calls with QUAL at or above one of 50 thresholds, the 0th to 98th percentiles of the QUAL values of the PASS calls of that mixture and variant class. The comparison covered the eight nanopore and six PacBio HiFi cell-line datasets at five tumor DNA fractions, with the truth sets and exact-allele matching of the main benchmark. For nanopore HCC1937, the mixtures rebuilt from deduplicated reads were used.
 
 With ClairS-TO input, LongPhase-TO lay above the QUAL curve in all 70 mixtures for both SNVs and indels (Supplementary Figure~\ref{fig:qual-threshold-pr}). In 60 SNV and 51 indel mixtures, its precision was higher than the precision of every QUAL threshold. At 0.2 to 0.6 DNA fraction, its F1 also exceeded the best F1 of any QUAL threshold of the same mixture in all 42 SNV and 42 indel comparisons, although this per-mixture threshold was chosen with the truth set.
 
@@ -153,7 +153,13 @@ The whole-genome-duplicated HCC1954 genome did not reduce the accuracy of LongPh
 
 \subsection{Somatic variant recalibration and LOH detection}\label{supplementary-methods-for-somatic-variant-analysis}
 
-The following methods provide additional details on empirical threshold calibration, directional-clipping interval definition and regression-calibrated triplet-graph recalibration of somatic variant candidates.
+The following methods provide additional details on germline labels and optional normal panels, empirical threshold calibration, directional-clipping interval definition and regression-calibrated triplet-graph recalibration of somatic variant candidates.
+
+\subsubsection{Germline labels and optional normal panels}\label{supp:pon-panels}
+
+LongPhase-TO reads the FILTER field of the input VCF. Records with FILTER=PASS are somatic candidates. Records labeled PON, NonSomatic or GERMLINE are treated as germline and are excluded from somatic classification. ClairS-TO labels the candidates that match four germline and normal-panel resources distributed with the tool. These are the 1000 Genomes panel of normals, CoLoRSdb GRCh38 v1.1.0, dbSNP build 138 non-somatic sites and gnomAD r2.1. The gnomAD and CoLoRSdb releases are pre-filtered to sites with allele frequency $\ge 0.001$. DeepSomatic-TO labels germline candidates with its own model and its default panel of normals.
+
+LongPhase-TO can also screen candidates against user-supplied panels. A panel given with the option \texttt{--pon-file} is matched by genomic position, and a panel given with \texttt{--strict-pon-file} is matched by position and alternate allele. Candidates that match either panel are treated as germline. The benchmarks of this study did not use these options.
 
 \subsubsection{Empirical calibration of LOH detection thresholds}\label{methodology-for-loss-of-heterozygosity-loh-detection}
 
@@ -215,7 +221,7 @@ The OR combines alternative candidate-level evidence routes. It does not replace
 \subsection{Methylation-aware recalibration of somatic variants}
 \label{app:methylation-recalibration}
 
-Long-read platforms report 5-methylcytosine (5mC) status per read, allowing the CpG methylation neighborhood of each candidate to be examined at single-read resolution. When the input alignments carry 5mC tags, LongPhase-TO performs an additional recalibration of the somatic candidates retained by the triplet-graph model, and when methylation calls are absent, the step is skipped and the triplet-graph output is returned unchanged. The rationale is developmental: a somatic variant arises post-zygotically within a tumor subpopulation that carries a characteristic CpG methylation state, whereas admixed normal cells retain the germline state. Consequently, reads carrying the somatic alternate allele tend to share a single methylation state (methylation-``pure''), whereas reads carrying the reference allele are a mixture of tumor- and normal-derived molecules and are therefore methylation-``mixed''. Germline variants, which segregate in both compartments, yield methylation heterogeneity on both alleles, and sequencing or alignment artifacts produce no reproducible allelic asymmetry. This module is applied to both somatic SNV and indel candidates, and the accompanying schematics illustrate the indel case.
+Long-read platforms report 5-methylcytosine (5mC) status per read, allowing the CpG methylation neighborhood of each candidate to be examined at single-read resolution. LongPhase-TO provides an optional additional recalibration of the somatic candidates retained by the triplet-graph model. The step is off by default and is enabled with the option \texttt{--methyl-xgb}. It requires alignments with 5mC tags and runs only when the tumor DNA fraction is 0.7 or lower. Otherwise, the triplet-graph output is returned unchanged. The main benchmarks of this study did not use this step. The rationale is developmental: a somatic variant arises post-zygotically within a tumor subpopulation that carries a characteristic CpG methylation state, whereas admixed normal cells retain the germline state. Consequently, reads carrying the somatic alternate allele tend to share a single methylation state (methylation-``pure''), whereas reads carrying the reference allele are a mixture of tumor- and normal-derived molecules and are therefore methylation-``mixed''. Germline variants, which segregate in both compartments, yield methylation heterogeneity on both alleles, and sequencing or alignment artifacts produce no reproducible allelic asymmetry. This module is applied to both somatic SNV and indel candidates, and the accompanying schematics illustrate the indel case.
 
 For each candidate, reads are partitioned by the allele they carry at the candidate locus, reference-allele reads and alternate-allele reads, and the CpG sites falling within a symmetric window of \(\pm d\) base pairs around the candidate position (\(d=2{,}000\) by default) are analyzed. Ten features are computed and grouped into three complementary views of the local methylation pattern (Supplementary Figure~\ref{fig:met-methylation-overview}).
 
@@ -272,7 +278,7 @@ where $y_i$ is the scaled major copy number, and the amplitude of the minor copy
 
 \subsubsection{Use of the DNA fraction in phasing}
 
-The thresholds of 0.7 for the methylation-aware recalibration and 0.9 for the refinement pass are fixed in the code. A DNA fraction given with the option \texttt{--purity} replaces the estimate.
+The thresholds of 0.7 for the optional methylation-aware recalibration and 0.9 for the refinement pass are fixed in the code. A DNA fraction given with the option \texttt{--purity} replaces the estimate.
 
 \subsubsection{Settings used in this study}
 
@@ -313,6 +319,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
      & Refit range & $1.75\psi$ to $2.25\psi$ & fixed \\
      & Step enabled & yes & \texttt{--disable-purple-scale-correction} \\
     Use in phasing & Methylation-aware recalibration & $f \le 0.7$ & fixed \\
+     & Methylation-aware recalibration enabled & no & \texttt{--methyl-xgb} \\
      & Refinement pass & $f > 0.9$ & fixed \\
     \bottomrule
   \end{tabular}
@@ -343,7 +350,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
 \begin{figure}
   \centering
   \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{figures/supp_recal_ont_snv.pdf}}
-  \caption[Somatic SNV recalibration on nanopore data]{Somatic SNV recalibration on nanopore data. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO SNV calling, with LongPhase-TO recalibration (solid colored lines) and alone (gray dashed lines, open circles for ClairS-TO and open squares for DeepSomatic-TO), for the eight nanopore cell-line datasets across tumor DNA fractions from 20\% to 100\%. DeepSomatic-TO with LongPhase-TO uses the ClairS-TO normal panels. Per-mixture values are given in Supplementary Table~\ref{tab:somatic_purity}.}\label{fig:recal-ont-snv}
+  \caption[Somatic SNV recalibration on nanopore data]{Somatic SNV recalibration on nanopore data. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO SNV calling, with LongPhase-TO recalibration (solid colored lines) and alone (gray dashed lines, open circles for ClairS-TO and open squares for DeepSomatic-TO), for the eight nanopore cell-line datasets across tumor DNA fractions from 20\% to 100\%. Per-mixture values are given in Supplementary Table~\ref{tab:somatic_purity}.}\label{fig:recal-ont-snv}
 \end{figure}
 
 \begin{figure}
@@ -356,7 +363,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
 \begin{figure}
   \centering
   \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{figures/supp_recal_ont_indel.pdf}}
-  \caption[Somatic indel recalibration on nanopore data]{Somatic indel recalibration on nanopore data. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO indel calling, with LongPhase-TO recalibration (solid colored lines) and alone (gray dashed lines, open circles for ClairS-TO and open squares for DeepSomatic-TO), for the eight nanopore cell-line datasets across tumor DNA fractions from 20\% to 100\%. DeepSomatic-TO with LongPhase-TO uses the ClairS-TO normal panels. Per-mixture values are given in Supplementary Table~\ref{tab:somatic_indel_purity}.}\label{fig:recal-ont-indel}
+  \caption[Somatic indel recalibration on nanopore data]{Somatic indel recalibration on nanopore data. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO indel calling, with LongPhase-TO recalibration (solid colored lines) and alone (gray dashed lines, open circles for ClairS-TO and open squares for DeepSomatic-TO), for the eight nanopore cell-line datasets across tumor DNA fractions from 20\% to 100\%. Per-mixture values are given in Supplementary Table~\ref{tab:somatic_indel_purity}.}\label{fig:recal-ont-indel}
 \end{figure}
 
 \begin{figure}
@@ -374,13 +381,13 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
 \begin{figure}
   \centering
   \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{figures/supp_recal_pacbio_snv.pdf}}
-  \caption[Somatic SNV recalibration transfers to PacBio HiFi]{Somatic SNV recalibration transfers to PacBio HiFi. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO SNV calling, with LongPhase-TO recalibration (solid colored lines) and alone (gray dashed lines, open circles for ClairS-TO and open squares for DeepSomatic-TO), for the six PacBio HiFi cell-line datasets across tumor DNA fractions from 20\% to 100\%. DeepSomatic-TO with LongPhase-TO uses the ClairS-TO normal panels. Both callers were run with their PacBio HiFi models, whereas the triplet-graph coefficients and site-level thresholds were those fitted on nanopore data (HCC1395\_HKU at 0.6 tumor DNA fraction) and were applied without refitting. Recalibration raised mean SNV F1 from 0.58 to 0.67 for ClairS-TO and from 0.60 to 0.72 for DeepSomatic-TO, improving 28 and 26 of 30 points. Per-mixture values are given in Supplementary Table~\ref{tab:pacbio_somatic_snv}.}\label{fig:pacbio-snv-recalibration}
+  \caption[Somatic SNV recalibration transfers to PacBio HiFi]{Somatic SNV recalibration transfers to PacBio HiFi. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO SNV calling, with LongPhase-TO recalibration (solid colored lines) and alone (gray dashed lines, open circles for ClairS-TO and open squares for DeepSomatic-TO), for the six PacBio HiFi cell-line datasets across tumor DNA fractions from 20\% to 100\%. Both callers were run with their PacBio HiFi models, whereas the triplet-graph coefficients and site-level thresholds were those fitted on nanopore data (HCC1395\_HKU at 0.6 tumor DNA fraction) and were applied without refitting. Recalibration raised mean SNV F1 from 0.58 to 0.67 for ClairS-TO and from 0.60 to 0.72 for DeepSomatic-TO, improving 28 and 26 of 30 points. Per-mixture values are given in Supplementary Table~\ref{tab:pacbio_somatic_snv}.}\label{fig:pacbio-snv-recalibration}
 \end{figure}
 
 \begin{figure}
   \centering
   \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{figures/supp_recal_pacbio_indel.pdf}}
-  \caption[Somatic indel recalibration transfers to PacBio HiFi]{Somatic indel recalibration transfers to PacBio HiFi. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO indel calling, with LongPhase-TO recalibration (solid colored lines) and alone (gray dashed lines, open circles for ClairS-TO and open squares for DeepSomatic-TO), for the six PacBio HiFi cell-line datasets across tumor DNA fractions from 20\% to 100\%. DeepSomatic-TO with LongPhase-TO uses the ClairS-TO normal panels. Both callers were run with their PacBio HiFi models, whereas the triplet-graph coefficients and site-level thresholds were those fitted on nanopore data (HCC1395\_HKU at 0.6 tumor DNA fraction) and were applied without refitting. Recalibration raised mean indel F1 from 0.24 to 0.27 for ClairS-TO and from 0.28 to 0.37 for DeepSomatic-TO, improving 27 and 28 of 30 points. Per-mixture values are given in Supplementary Table~\ref{tab:pacbio_somatic_indel}.}\label{fig:pacbio-indel-recalibration}
+  \caption[Somatic indel recalibration transfers to PacBio HiFi]{Somatic indel recalibration transfers to PacBio HiFi. F1-score, precision and recall of ClairS-TO and DeepSomatic-TO indel calling, with LongPhase-TO recalibration (solid colored lines) and alone (gray dashed lines, open circles for ClairS-TO and open squares for DeepSomatic-TO), for the six PacBio HiFi cell-line datasets across tumor DNA fractions from 20\% to 100\%. Both callers were run with their PacBio HiFi models, whereas the triplet-graph coefficients and site-level thresholds were those fitted on nanopore data (HCC1395\_HKU at 0.6 tumor DNA fraction) and were applied without refitting. Recalibration raised mean indel F1 from 0.24 to 0.27 for ClairS-TO and from 0.28 to 0.33 for DeepSomatic-TO, improving 27 and 25 of 30 points. Per-mixture values are given in Supplementary Table~\ref{tab:pacbio_somatic_indel}.}\label{fig:pacbio-indel-recalibration}
 \end{figure}
 
 \begin{figure}
@@ -392,13 +399,13 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
 \begin{figure}
   \centering
   \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{figures/supp_tdf_ploidy_by_platform.pdf}}
-  \caption[Tumor DNA fraction and ploidy by sequencing platform]{Tumor DNA fraction and ploidy by sequencing platform. (a) Estimated against expected tumor DNA fraction for ASCAT (T+N), ASCAT (TO), PURPLE (TO) and LongPhase-TO. The nanopore panel shows the eight cell-line dilution series and the five HG008 mixtures (open symbols). The PacBio HiFi panel shows the six cell-line dilution series. ASCAT was not run on HG008. The diagonal indicates the ideal prediction ($y=x$), and the numbers give the mean absolute error of each method on that platform. ASCAT and PURPLE purities were converted to DNA fraction with each tool's fitted ploidy. (b) Estimated against reference ploidy for PURPLE (TO) and LongPhase-TO in all 75 runs of both platforms. The reference is the published ploidy of each cell line and the NIST mean total copy number (1.47) for HG008. The line and band mark the reference $\pm 0.2$. LongPhase-TO values are from the DeepSomatic-TO configuration with the ClairS-TO normal panels. Per-mixture values are given in Supplementary Tables~\ref{tab:tumor-purity}, \ref{tab:pacbio-tumor-purity}, \ref{tab:ploidy-accuracy} and~\ref{tab:hg008}.}\label{fig:pacbio-tdf}
+  \caption[Tumor DNA fraction and ploidy by sequencing platform]{Tumor DNA fraction and ploidy by sequencing platform. (a) Estimated against expected tumor DNA fraction for ASCAT (T+N), ASCAT (TO), PURPLE (TO) and LongPhase-TO. The nanopore panel shows the eight cell-line dilution series and the five HG008 mixtures (open symbols). The PacBio HiFi panel shows the six cell-line dilution series. ASCAT was not run on HG008. The diagonal indicates the ideal prediction ($y=x$), and the numbers give the mean absolute error of each method on that platform. ASCAT and PURPLE purities were converted to DNA fraction with each tool's fitted ploidy. (b) Estimated against reference ploidy for PURPLE (TO) and LongPhase-TO in all 75 runs of both platforms. The reference is the published ploidy of each cell line and the NIST mean total copy number (1.47) for HG008. The line and band mark the reference $\pm 0.2$. LongPhase-TO values are from the DeepSomatic-TO configuration. Per-mixture values are given in Supplementary Tables~\ref{tab:tumor-purity}, \ref{tab:pacbio-tumor-purity}, \ref{tab:ploidy-accuracy} and~\ref{tab:hg008}.}\label{fig:pacbio-tdf}
 \end{figure}
 
 \begin{figure}
   \centering
   \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{figures/supp_tdf_per_dataset.pdf}}
-  \caption[Tumor DNA fraction of each dataset]{Tumor DNA fraction of each dataset. Each panel shows the estimated against the expected tumor DNA fraction of one dataset for ASCAT (T+N), ASCAT (TO), PURPLE (TO) and LongPhase-TO. The left block shows the nine nanopore datasets (eight cell-line dilution series and the five HG008 mixtures), and the right block shows the six PacBio HiFi cell-line dilution series. The COLO829 and HCC1395 replicates from different sequencing centers are shown in separate panels. ASCAT was not run on HG008. The diagonal indicates the ideal prediction ($y=x$). ASCAT and PURPLE purities were converted to DNA fraction with each tool's fitted ploidy. LongPhase-TO values are from the DeepSomatic-TO configuration with the ClairS-TO normal panels. Per-mixture values are given in Supplementary Tables~\ref{tab:tumor-purity}, \ref{tab:pacbio-tumor-purity} and~\ref{tab:hg008}.}\label{fig:tdf-per-dataset}
+  \caption[Tumor DNA fraction of each dataset]{Tumor DNA fraction of each dataset. Each panel shows the estimated against the expected tumor DNA fraction of one dataset for ASCAT (T+N), ASCAT (TO), PURPLE (TO) and LongPhase-TO. The left block shows the nine nanopore datasets (eight cell-line dilution series and the five HG008 mixtures), and the right block shows the six PacBio HiFi cell-line dilution series. The COLO829 and HCC1395 replicates from different sequencing centers are shown in separate panels. ASCAT was not run on HG008. The diagonal indicates the ideal prediction ($y=x$). ASCAT and PURPLE purities were converted to DNA fraction with each tool's fitted ploidy. LongPhase-TO values are from the DeepSomatic-TO configuration. Per-mixture values are given in Supplementary Tables~\ref{tab:tumor-purity}, \ref{tab:pacbio-tumor-purity} and~\ref{tab:hg008}.}\label{fig:tdf-per-dataset}
 \end{figure}
 
 \begin{figure}
@@ -428,7 +435,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
 \begin{figure}
   \centering
   \pandocbounded{\includegraphics[width=\textwidth,keepaspectratio]{methylation_overview.png}}
-  \caption[Methylation-aware recalibration overview]{Overview of methylation-aware recalibration of somatic variant candidates. When the input alignments carry 5-methylcytosine (5mC) tags, reads spanning each candidate are partitioned by the allele they carry at the candidate locus (reference, ``G'', or alternate, e.g.\ ``GT''), and the CpG sites within a symmetric window of $\pm d$ base pairs are analyzed at single-read resolution (methylated, red ``M'', and unmethylated, cyan ``U''). Ten features are computed across three complementary views: allelic methylation coverage (per-site methylated-read counts on each allele), joint haplotype methylation proportions (per-site classification of each allele as methylation-pure or methylation-mixed), and methylation-cloud geometry (per-site allele methylation ratios and the geometry of their centroid, with kernel-density clouds shown for somatic, germline and artifact indels in HCC1395\_NYGC at 0.6 tumor DNA fraction). A gradient-boosted decision-tree classifier (XGBoost) uses these features to label each candidate as a somatic variant, germline variant or sequencing artifact, retaining only candidates classified as somatic.}\label{fig:met-methylation-overview}
+  \caption[Methylation-aware recalibration overview]{Overview of the optional methylation-aware recalibration of somatic variant candidates. When the input alignments carry 5-methylcytosine (5mC) tags, reads spanning each candidate are partitioned by the allele they carry at the candidate locus (reference, ``G'', or alternate, e.g.\ ``GT''), and the CpG sites within a symmetric window of $\pm d$ base pairs are analyzed at single-read resolution (methylated, red ``M'', and unmethylated, cyan ``U''). Ten features are computed across three complementary views: allelic methylation coverage (per-site methylated-read counts on each allele), joint haplotype methylation proportions (per-site classification of each allele as methylation-pure or methylation-mixed), and methylation-cloud geometry (per-site allele methylation ratios and the geometry of their centroid, with kernel-density clouds shown for somatic, germline and artifact indels in HCC1395\_NYGC at 0.6 tumor DNA fraction). A gradient-boosted decision-tree classifier (XGBoost) uses these features to label each candidate as a somatic variant, germline variant or sequencing artifact, retaining only candidates classified as somatic.}\label{fig:met-methylation-overview}
 \end{figure}
 
 \begin{figure}
@@ -526,7 +533,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
     \draw[flow] (threshold) -| node[pos=0.25, above, font=\small] {No} (retain);
     \draw[flow] (threshold) -| node[pos=0.25, above, font=\small] {Yes} (repeat);
   \end{tikzpicture}
-  \caption[Conditional second phasing pass]{Conditional second phasing pass for high-DNA-fraction samples. Somatic variant recalibration and arm-level LOH detection are completed before the initial LOH-aware phasing pass. When the resulting tumor DNA fraction estimate exceeds 0.9, variants not marked by the normal-panel resources are treated as somatic and phasing is repeated once using the existing LOH map. Otherwise, the initial phasing result is retained. The tumor DNA fraction is not re-estimated.}\label{fig:app-page-42-cropped-jpg}
+  \caption[Conditional second phasing pass]{Conditional second phasing pass for high-DNA-fraction samples. Somatic variant recalibration and arm-level LOH detection are completed before the initial LOH-aware phasing pass. When the resulting tumor DNA fraction estimate exceeds 0.9, variants not labeled as germline by the caller are treated as somatic and phasing is repeated once using the existing LOH map. Otherwise, the initial phasing result is retained. The tumor DNA fraction is not re-estimated.}\label{fig:app-page-42-cropped-jpg}
 \end{figure}
 
 % The former haplotype-imbalance and tumor-DNA-fraction model schematics are
@@ -690,163 +697,163 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   COLO829\_ONT & 1 & ClairS-TO & 0.674 & 0.799 & 0.731 \\
   COLO829\_ONT & 1 & ClairS-TO+LongPhase-TO & 0.666 & 0.808 & 0.730 \\
   COLO829\_ONT & 1 & DeepSomatic-TO & 0.501 & 0.844 & 0.629 \\
-  COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.627 & 0.813 & 0.708 \\
+  COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.541 & 0.816 & 0.651 \\
   COLO829\_ONT & 0.8 & ClairS-TO & 0.651 & 0.790 & 0.714 \\
   COLO829\_ONT & 0.8 & ClairS-TO+LongPhase-TO & 0.853 & 0.680 & 0.757 \\
   COLO829\_ONT & 0.8 & DeepSomatic-TO & 0.481 & 0.849 & 0.614 \\
-  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.812 & 0.648 & 0.721 \\
+  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.727 & 0.651 & 0.687 \\
   COLO829\_ONT & 0.6 & ClairS-TO & 0.623 & 0.764 & 0.686 \\
   COLO829\_ONT & 0.6 & ClairS-TO+LongPhase-TO & 0.842 & 0.750 & 0.793 \\
   COLO829\_ONT & 0.6 & DeepSomatic-TO & 0.466 & 0.842 & 0.600 \\
-  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.812 & 0.759 & 0.785 \\
+  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.736 & 0.762 & 0.749 \\
   COLO829\_ONT & 0.4 & ClairS-TO & 0.576 & 0.659 & 0.615 \\
   COLO829\_ONT & 0.4 & ClairS-TO+LongPhase-TO & 0.808 & 0.667 & 0.731 \\
   COLO829\_ONT & 0.4 & DeepSomatic-TO & 0.445 & 0.797 & 0.571 \\
-  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.786 & 0.731 & 0.757 \\
+  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.708 & 0.734 & 0.721 \\
   COLO829\_ONT & 0.2 & ClairS-TO & 0.392 & 0.326 & 0.356 \\
   COLO829\_ONT & 0.2 & ClairS-TO+LongPhase-TO & 0.660 & 0.352 & 0.459 \\
   COLO829\_ONT & 0.2 & DeepSomatic-TO & 0.373 & 0.604 & 0.461 \\
-  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.711 & 0.547 & 0.618 \\
+  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.630 & 0.549 & 0.587 \\
   COLO829\_NYGC & 1 & ClairS-TO & 0.682 & 0.817 & 0.744 \\
   COLO829\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.677 & 0.830 & 0.746 \\
   COLO829\_NYGC & 1 & DeepSomatic-TO & 0.543 & 0.857 & 0.665 \\
-  COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.650 & 0.830 & 0.729 \\
+  COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.566 & 0.834 & 0.674 \\
   COLO829\_NYGC & 0.8 & ClairS-TO & 0.659 & 0.809 & 0.726 \\
   COLO829\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.857 & 0.652 & 0.741 \\
   COLO829\_NYGC & 0.8 & DeepSomatic-TO & 0.514 & 0.863 & 0.644 \\
-  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.843 & 0.603 & 0.703 \\
+  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.761 & 0.606 & 0.675 \\
   COLO829\_NYGC & 0.6 & ClairS-TO & 0.632 & 0.782 & 0.699 \\
   COLO829\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.851 & 0.697 & 0.766 \\
   COLO829\_NYGC & 0.6 & DeepSomatic-TO & 0.494 & 0.853 & 0.625 \\
-  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.828 & 0.676 & 0.744 \\
+  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.753 & 0.679 & 0.714 \\
   COLO829\_NYGC & 0.4 & ClairS-TO & 0.588 & 0.680 & 0.631 \\
   COLO829\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.817 & 0.627 & 0.710 \\
   COLO829\_NYGC & 0.4 & DeepSomatic-TO & 0.471 & 0.813 & 0.596 \\
-  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.798 & 0.658 & 0.721 \\
+  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.726 & 0.661 & 0.692 \\
   COLO829\_NYGC & 0.2 & ClairS-TO & 0.405 & 0.339 & 0.369 \\
   COLO829\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.674 & 0.331 & 0.444 \\
   COLO829\_NYGC & 0.2 & DeepSomatic-TO & 0.394 & 0.620 & 0.482 \\
-  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.720 & 0.489 & 0.582 \\
+  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.639 & 0.491 & 0.555 \\
   H1437\_UCSC & 1 & ClairS-TO & 0.770 & 0.588 & 0.667 \\
   H1437\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.768 & 0.596 & 0.671 \\
   H1437\_UCSC & 1 & DeepSomatic-TO & 0.680 & 0.620 & 0.649 \\
-  H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.733 & 0.596 & 0.658 \\
+  H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.694 & 0.604 & 0.646 \\
   H1437\_UCSC & 0.8 & ClairS-TO & 0.728 & 0.558 & 0.632 \\
   H1437\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.874 & 0.530 & 0.660 \\
   H1437\_UCSC & 0.8 & DeepSomatic-TO & 0.624 & 0.620 & 0.622 \\
-  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.844 & 0.520 & 0.643 \\
+  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.829 & 0.526 & 0.644 \\
   H1437\_UCSC & 0.6 & ClairS-TO & 0.721 & 0.533 & 0.613 \\
   H1437\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.834 & 0.556 & 0.667 \\
   H1437\_UCSC & 0.6 & DeepSomatic-TO & 0.603 & 0.607 & 0.605 \\
-  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.837 & 0.564 & 0.674 \\
+  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.822 & 0.571 & 0.674 \\
   H1437\_UCSC & 0.4 & ClairS-TO & 0.730 & 0.483 & 0.581 \\
   H1437\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.808 & 0.501 & 0.619 \\
   H1437\_UCSC & 0.4 & DeepSomatic-TO & 0.584 & 0.570 & 0.577 \\
-  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.824 & 0.532 & 0.647 \\
+  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.808 & 0.539 & 0.647 \\
   H1437\_UCSC & 0.2 & ClairS-TO & 0.836 & 0.278 & 0.417 \\
   H1437\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.724 & 0.308 & 0.432 \\
   H1437\_UCSC & 0.2 & DeepSomatic-TO & 0.515 & 0.436 & 0.472 \\
-  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.781 & 0.404 & 0.533 \\
+  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.763 & 0.409 & 0.532 \\
   H2009\_UCSC & 1 & ClairS-TO & 0.912 & 0.913 & 0.912 \\
   H2009\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.910 & 0.915 & 0.912 \\
   H2009\_UCSC & 1 & DeepSomatic-TO & 0.861 & 0.938 & 0.898 \\
-  H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.887 & 0.892 & 0.890 \\
+  H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.868 & 0.902 & 0.885 \\
   H2009\_UCSC & 0.8 & ClairS-TO & 0.884 & 0.905 & 0.895 \\
   H2009\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.944 & 0.831 & 0.884 \\
   H2009\_UCSC & 0.8 & DeepSomatic-TO & 0.824 & 0.946 & 0.881 \\
-  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.923 & 0.803 & 0.859 \\
+  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.916 & 0.812 & 0.861 \\
   H2009\_UCSC & 0.6 & ClairS-TO & 0.855 & 0.885 & 0.870 \\
   H2009\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.922 & 0.879 & 0.900 \\
   H2009\_UCSC & 0.6 & DeepSomatic-TO & 0.808 & 0.938 & 0.868 \\
-  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.913 & 0.872 & 0.892 \\
+  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.906 & 0.881 & 0.893 \\
   H2009\_UCSC & 0.4 & ClairS-TO & 0.830 & 0.783 & 0.805 \\
   H2009\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.905 & 0.796 & 0.847 \\
   H2009\_UCSC & 0.4 & DeepSomatic-TO & 0.797 & 0.899 & 0.845 \\
-  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.906 & 0.837 & 0.870 \\
+  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.898 & 0.846 & 0.871 \\
   H2009\_UCSC & 0.2 & ClairS-TO & 0.696 & 0.376 & 0.488 \\
   H2009\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.839 & 0.413 & 0.553 \\
   H2009\_UCSC & 0.2 & DeepSomatic-TO & 0.720 & 0.616 & 0.664 \\
-  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.867 & 0.545 & 0.669 \\
+  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.856 & 0.550 & 0.670 \\
   HCC1395\_HKU & 1 & ClairS-TO & 0.708 & 0.719 & 0.714 \\
   HCC1395\_HKU & 1 & ClairS-TO+LongPhase-TO & 0.700 & 0.725 & 0.712 \\
   HCC1395\_HKU & 1 & DeepSomatic-TO & 0.567 & 0.763 & 0.650 \\
-  HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.654 & 0.725 & 0.687 \\
+  HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.597 & 0.732 & 0.657 \\
   HCC1395\_HKU & 0.8 & ClairS-TO & 0.640 & 0.631 & 0.635 \\
   HCC1395\_HKU & 0.8 & ClairS-TO+LongPhase-TO & 0.790 & 0.664 & 0.721 \\
   HCC1395\_HKU & 0.8 & DeepSomatic-TO & 0.507 & 0.753 & 0.606 \\
-  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.748 & 0.648 & 0.695 \\
+  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.705 & 0.654 & 0.678 \\
   HCC1395\_HKU & 0.6 & ClairS-TO & 0.642 & 0.613 & 0.627 \\
   HCC1395\_HKU & 0.6 & ClairS-TO+LongPhase-TO & 0.746 & 0.651 & 0.696 \\
   HCC1395\_HKU & 0.6 & DeepSomatic-TO & 0.483 & 0.733 & 0.582 \\
-  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.733 & 0.665 & 0.697 \\
+  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.687 & 0.671 & 0.679 \\
   HCC1395\_HKU & 0.4 & ClairS-TO & 0.568 & 0.521 & 0.543 \\
   HCC1395\_HKU & 0.4 & ClairS-TO+LongPhase-TO & 0.700 & 0.538 & 0.609 \\
   HCC1395\_HKU & 0.4 & DeepSomatic-TO & 0.459 & 0.673 & 0.546 \\
-  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.715 & 0.608 & 0.657 \\
+  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.667 & 0.613 & 0.639 \\
   HCC1395\_HKU & 0.2 & ClairS-TO & 0.332 & 0.243 & 0.280 \\
   HCC1395\_HKU & 0.2 & ClairS-TO+LongPhase-TO & 0.538 & 0.267 & 0.357 \\
   HCC1395\_HKU & 0.2 & DeepSomatic-TO & 0.371 & 0.465 & 0.413 \\
-  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.632 & 0.406 & 0.494 \\
+  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.576 & 0.409 & 0.478 \\
   HCC1395\_NYGC & 1 & ClairS-TO & 0.712 & 0.728 & 0.720 \\
   HCC1395\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.708 & 0.731 & 0.719 \\
   HCC1395\_NYGC & 1 & DeepSomatic-TO & 0.605 & 0.786 & 0.684 \\
-  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.681 & 0.758 & 0.717 \\
+  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.625 & 0.766 & 0.688 \\
   HCC1395\_NYGC & 0.8 & ClairS-TO & 0.647 & 0.710 & 0.677 \\
   HCC1395\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.833 & 0.613 & 0.707 \\
   HCC1395\_NYGC & 0.8 & DeepSomatic-TO & 0.536 & 0.773 & 0.633 \\
-  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.813 & 0.584 & 0.680 \\
+  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.773 & 0.589 & 0.669 \\
   HCC1395\_NYGC & 0.6 & ClairS-TO & 0.588 & 0.666 & 0.625 \\
   HCC1395\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.796 & 0.612 & 0.692 \\
   HCC1395\_NYGC & 0.6 & DeepSomatic-TO & 0.508 & 0.749 & 0.606 \\
-  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.799 & 0.609 & 0.692 \\
+  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.759 & 0.615 & 0.679 \\
   HCC1395\_NYGC & 0.4 & ClairS-TO & 0.529 & 0.544 & 0.536 \\
   HCC1395\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.759 & 0.512 & 0.612 \\
   HCC1395\_NYGC & 0.4 & DeepSomatic-TO & 0.484 & 0.689 & 0.568 \\
-  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.784 & 0.556 & 0.650 \\
+  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.740 & 0.560 & 0.638 \\
   HCC1395\_NYGC & 0.2 & ClairS-TO & 0.324 & 0.234 & 0.272 \\
   HCC1395\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.613 & 0.234 & 0.339 \\
   HCC1395\_NYGC & 0.2 & DeepSomatic-TO & 0.362 & 0.437 & 0.396 \\
-  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.681 & 0.329 & 0.444 \\
-  HCC1937\_UCSC & 1 & ClairS-TO & 0.483 & 0.748 & 0.587 \\
-  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.487 & 0.761 & 0.594 \\
-  HCC1937\_UCSC & 1 & DeepSomatic-TO & 0.379 & 0.834 & 0.521 \\
-  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.453 & 0.806 & 0.580 \\
-  HCC1937\_UCSC & 0.8 & ClairS-TO & 0.409 & 0.692 & 0.514 \\
-  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.701 & 0.681 & 0.691 \\
-  HCC1937\_UCSC & 0.8 & DeepSomatic-TO & 0.312 & 0.791 & 0.448 \\
-  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.647 & 0.705 & 0.675 \\
-  HCC1937\_UCSC & 0.6 & ClairS-TO & 0.338 & 0.608 & 0.434 \\
-  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.625 & 0.630 & 0.627 \\
-  HCC1937\_UCSC & 0.6 & DeepSomatic-TO & 0.275 & 0.724 & 0.399 \\
-  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.607 & 0.674 & 0.639 \\
-  HCC1937\_UCSC & 0.4 & ClairS-TO & 0.268 & 0.454 & 0.337 \\
-  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.541 & 0.481 & 0.509 \\
-  HCC1937\_UCSC & 0.4 & DeepSomatic-TO & 0.228 & 0.589 & 0.329 \\
-  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.535 & 0.542 & 0.538 \\
-  HCC1937\_UCSC & 0.2 & ClairS-TO & 0.128 & 0.184 & 0.151 \\
-  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.348 & 0.215 & 0.266 \\
-  HCC1937\_UCSC & 0.2 & DeepSomatic-TO & 0.131 & 0.309 & 0.184 \\
-  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.366 & 0.267 & 0.308 \\
+  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.625 & 0.332 & 0.433 \\
+  HCC1937\_UCSC & 1 & ClairS-TO & 0.507 & 0.767 & 0.611 \\
+  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.513 & 0.783 & 0.620 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO & 0.420 & 0.882 & 0.569 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.445 & 0.868 & 0.588 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO & 0.425 & 0.710 & 0.532 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.725 & 0.692 & 0.708 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO & 0.344 & 0.845 & 0.488 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.677 & 0.743 & 0.709 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO & 0.351 & 0.634 & 0.452 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.640 & 0.653 & 0.646 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO & 0.305 & 0.785 & 0.439 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.637 & 0.743 & 0.686 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO & 0.283 & 0.482 & 0.357 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.557 & 0.510 & 0.532 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO & 0.257 & 0.657 & 0.370 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.558 & 0.619 & 0.587 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO & 0.141 & 0.204 & 0.167 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.367 & 0.233 & 0.285 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO & 0.162 & 0.381 & 0.227 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.400 & 0.341 & 0.368 \\
   HCC1954\_UCSC & 1 & ClairS-TO & 0.248 & 0.799 & 0.379 \\
   HCC1954\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.254 & 0.830 & 0.389 \\
   HCC1954\_UCSC & 1 & DeepSomatic-TO & 0.214 & 0.888 & 0.345 \\
-  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.257 & 0.870 & 0.397 \\
+  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.221 & 0.880 & 0.353 \\
   HCC1954\_UCSC & 0.8 & ClairS-TO & 0.218 & 0.718 & 0.334 \\
   HCC1954\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.522 & 0.730 & 0.609 \\
   HCC1954\_UCSC & 0.8 & DeepSomatic-TO & 0.196 & 0.854 & 0.319 \\
-  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.590 & 0.772 & 0.669 \\
+  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.551 & 0.780 & 0.646 \\
   HCC1954\_UCSC & 0.6 & ClairS-TO & 0.175 & 0.577 & 0.269 \\
   HCC1954\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.446 & 0.613 & 0.516 \\
   HCC1954\_UCSC & 0.6 & DeepSomatic-TO & 0.179 & 0.782 & 0.292 \\
-  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.551 & 0.719 & 0.624 \\
+  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.512 & 0.727 & 0.601 \\
   HCC1954\_UCSC & 0.4 & ClairS-TO & 0.117 & 0.364 & 0.177 \\
   HCC1954\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.338 & 0.405 & 0.368 \\
   HCC1954\_UCSC & 0.4 & DeepSomatic-TO & 0.147 & 0.619 & 0.237 \\
-  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.485 & 0.563 & 0.521 \\
+  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.446 & 0.569 & 0.500 \\
   HCC1954\_UCSC & 0.2 & ClairS-TO & 0.048 & 0.140 & 0.072 \\
   HCC1954\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.178 & 0.168 & 0.173 \\
   HCC1954\_UCSC & 0.2 & DeepSomatic-TO & 0.087 & 0.347 & 0.139 \\
-  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.331 & 0.306 & 0.318 \\
+  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.297 & 0.309 & 0.303 \\
 \end{longtable}
 }
 
@@ -870,163 +877,163 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   COLO829\_ONT & 1 & ClairS-TO & 0.154 & 0.226 & 0.183 \\
   COLO829\_ONT & 1 & ClairS-TO+LongPhase-TO & 0.127 & 0.300 & 0.178 \\
   COLO829\_ONT & 1 & DeepSomatic-TO & 0.072 & 0.115 & 0.088 \\
-  COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.165 & 0.108 & 0.130 \\
+  COLO829\_ONT & 1 & DeepSomatic-TO+LongPhase-TO & 0.078 & 0.112 & 0.092 \\
   COLO829\_ONT & 0.8 & ClairS-TO & 0.154 & 0.210 & 0.178 \\
   COLO829\_ONT & 0.8 & ClairS-TO+LongPhase-TO & 0.225 & 0.190 & 0.206 \\
   COLO829\_ONT & 0.8 & DeepSomatic-TO & 0.080 & 0.135 & 0.100 \\
-  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.280 & 0.084 & 0.130 \\
+  COLO829\_ONT & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.142 & 0.087 & 0.108 \\
   COLO829\_ONT & 0.6 & ClairS-TO & 0.111 & 0.148 & 0.127 \\
   COLO829\_ONT & 0.6 & ClairS-TO+LongPhase-TO & 0.223 & 0.181 & 0.199 \\
   COLO829\_ONT & 0.6 & DeepSomatic-TO & 0.074 & 0.131 & 0.095 \\
-  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.355 & 0.106 & 0.163 \\
+  COLO829\_ONT & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.167 & 0.112 & 0.134 \\
   COLO829\_ONT & 0.4 & ClairS-TO & 0.056 & 0.075 & 0.064 \\
   COLO829\_ONT & 0.4 & ClairS-TO+LongPhase-TO & 0.125 & 0.099 & 0.110 \\
   COLO829\_ONT & 0.4 & DeepSomatic-TO & 0.056 & 0.101 & 0.072 \\
-  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.310 & 0.091 & 0.141 \\
+  COLO829\_ONT & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.139 & 0.094 & 0.112 \\
   COLO829\_ONT & 0.2 & ClairS-TO & 0.005 & 0.006 & 0.005 \\
   COLO829\_ONT & 0.2 & ClairS-TO+LongPhase-TO & 0.015 & 0.011 & 0.013 \\
   COLO829\_ONT & 0.2 & DeepSomatic-TO & 0.025 & 0.044 & 0.032 \\
-  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.175 & 0.041 & 0.066 \\
+  COLO829\_ONT & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.064 & 0.042 & 0.051 \\
   COLO829\_NYGC & 1 & ClairS-TO & 0.177 & 0.243 & 0.205 \\
   COLO829\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.141 & 0.324 & 0.197 \\
   COLO829\_NYGC & 1 & DeepSomatic-TO & 0.044 & 0.114 & 0.063 \\
-  COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.139 & 0.108 & 0.121 \\
+  COLO829\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.047 & 0.112 & 0.066 \\
   COLO829\_NYGC & 0.8 & ClairS-TO & 0.149 & 0.206 & 0.173 \\
   COLO829\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.213 & 0.208 & 0.210 \\
   COLO829\_NYGC & 0.8 & DeepSomatic-TO & 0.052 & 0.145 & 0.076 \\
-  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.267 & 0.092 & 0.137 \\
+  COLO829\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.085 & 0.094 & 0.090 \\
   COLO829\_NYGC & 0.6 & ClairS-TO & 0.113 & 0.162 & 0.133 \\
   COLO829\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.189 & 0.183 & 0.186 \\
   COLO829\_NYGC & 0.6 & DeepSomatic-TO & 0.045 & 0.137 & 0.068 \\
-  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.285 & 0.107 & 0.155 \\
+  COLO829\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.092 & 0.110 & 0.100 \\
   COLO829\_NYGC & 0.4 & ClairS-TO & 0.051 & 0.073 & 0.060 \\
   COLO829\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.104 & 0.098 & 0.100 \\
   COLO829\_NYGC & 0.4 & DeepSomatic-TO & 0.035 & 0.110 & 0.053 \\
-  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.259 & 0.085 & 0.128 \\
+  COLO829\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.076 & 0.087 & 0.081 \\
   COLO829\_NYGC & 0.2 & ClairS-TO & 0.004 & 0.006 & 0.005 \\
   COLO829\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.011 & 0.009 & 0.010 \\
   COLO829\_NYGC & 0.2 & DeepSomatic-TO & 0.013 & 0.041 & 0.019 \\
-  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.106 & 0.030 & 0.047 \\
+  COLO829\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.028 & 0.033 & 0.030 \\
   H1437\_UCSC & 1 & ClairS-TO & 0.569 & 0.279 & 0.375 \\
   H1437\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.521 & 0.331 & 0.405 \\
   H1437\_UCSC & 1 & DeepSomatic-TO & 0.304 & 0.110 & 0.162 \\
-  H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.449 & 0.104 & 0.169 \\
+  H1437\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.310 & 0.108 & 0.161 \\
   H1437\_UCSC & 0.8 & ClairS-TO & 0.527 & 0.233 & 0.323 \\
   H1437\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.636 & 0.211 & 0.317 \\
   H1437\_UCSC & 0.8 & DeepSomatic-TO & 0.319 & 0.135 & 0.190 \\
-  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.645 & 0.096 & 0.167 \\
+  H1437\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.501 & 0.100 & 0.166 \\
   H1437\_UCSC & 0.6 & ClairS-TO & 0.504 & 0.170 & 0.254 \\
   H1437\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.607 & 0.199 & 0.300 \\
   H1437\_UCSC & 0.6 & DeepSomatic-TO & 0.288 & 0.132 & 0.181 \\
-  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.634 & 0.116 & 0.196 \\
+  H1437\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.499 & 0.119 & 0.192 \\
   H1437\_UCSC & 0.4 & ClairS-TO & 0.307 & 0.073 & 0.117 \\
   H1437\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.378 & 0.103 & 0.162 \\
   H1437\_UCSC & 0.4 & DeepSomatic-TO & 0.218 & 0.095 & 0.132 \\
-  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.554 & 0.087 & 0.150 \\
+  H1437\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.415 & 0.090 & 0.148 \\
   H1437\_UCSC & 0.2 & ClairS-TO & 0.146 & 0.008 & 0.014 \\
   H1437\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.055 & 0.011 & 0.019 \\
   H1437\_UCSC & 0.2 & DeepSomatic-TO & 0.061 & 0.023 & 0.033 \\
-  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.232 & 0.022 & 0.040 \\
+  H1437\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.135 & 0.022 & 0.038 \\
   H2009\_UCSC & 1 & ClairS-TO & 0.764 & 0.570 & 0.653 \\
   H2009\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.725 & 0.645 & 0.682 \\
   H2009\_UCSC & 1 & DeepSomatic-TO & 0.477 & 0.185 & 0.267 \\
-  H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.632 & 0.176 & 0.276 \\
+  H2009\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.483 & 0.181 & 0.263 \\
   H2009\_UCSC & 0.8 & ClairS-TO & 0.721 & 0.467 & 0.567 \\
   H2009\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.811 & 0.416 & 0.550 \\
   H2009\_UCSC & 0.8 & DeepSomatic-TO & 0.500 & 0.227 & 0.312 \\
-  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.783 & 0.169 & 0.278 \\
+  H2009\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.667 & 0.172 & 0.274 \\
   H2009\_UCSC & 0.6 & ClairS-TO & 0.613 & 0.319 & 0.419 \\
   H2009\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.761 & 0.352 & 0.482 \\
   H2009\_UCSC & 0.6 & DeepSomatic-TO & 0.454 & 0.218 & 0.295 \\
-  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.769 & 0.189 & 0.303 \\
+  H2009\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.648 & 0.192 & 0.297 \\
   H2009\_UCSC & 0.4 & ClairS-TO & 0.400 & 0.152 & 0.221 \\
   H2009\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.582 & 0.192 & 0.288 \\
   H2009\_UCSC & 0.4 & DeepSomatic-TO & 0.356 & 0.160 & 0.221 \\
-  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.688 & 0.146 & 0.241 \\
+  H2009\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.570 & 0.149 & 0.236 \\
   H2009\_UCSC & 0.2 & ClairS-TO & 0.053 & 0.015 & 0.023 \\
   H2009\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.136 & 0.024 & 0.041 \\
   H2009\_UCSC & 0.2 & DeepSomatic-TO & 0.092 & 0.034 & 0.050 \\
-  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.309 & 0.030 & 0.055 \\
+  H2009\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.193 & 0.030 & 0.053 \\
   HCC1395\_HKU & 1 & ClairS-TO & 0.376 & 0.357 & 0.366 \\
   HCC1395\_HKU & 1 & ClairS-TO+LongPhase-TO & 0.299 & 0.441 & 0.356 \\
   HCC1395\_HKU & 1 & DeepSomatic-TO & 0.376 & 0.536 & 0.442 \\
-  HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.534 & 0.509 & 0.521 \\
+  HCC1395\_HKU & 1 & DeepSomatic-TO+LongPhase-TO & 0.403 & 0.523 & 0.455 \\
   HCC1395\_HKU & 0.8 & ClairS-TO & 0.326 & 0.256 & 0.287 \\
   HCC1395\_HKU & 0.8 & ClairS-TO+LongPhase-TO & 0.410 & 0.325 & 0.362 \\
   HCC1395\_HKU & 0.8 & DeepSomatic-TO & 0.341 & 0.515 & 0.410 \\
-  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.632 & 0.419 & 0.504 \\
+  HCC1395\_HKU & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.476 & 0.428 & 0.451 \\
   HCC1395\_HKU & 0.6 & ClairS-TO & 0.294 & 0.175 & 0.220 \\
   HCC1395\_HKU & 0.6 & ClairS-TO+LongPhase-TO & 0.358 & 0.238 & 0.286 \\
   HCC1395\_HKU & 0.6 & DeepSomatic-TO & 0.293 & 0.453 & 0.355 \\
-  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.637 & 0.380 & 0.476 \\
+  HCC1395\_HKU & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.462 & 0.388 & 0.421 \\
   HCC1395\_HKU & 0.4 & ClairS-TO & 0.109 & 0.066 & 0.082 \\
   HCC1395\_HKU & 0.4 & ClairS-TO+LongPhase-TO & 0.175 & 0.104 & 0.131 \\
   HCC1395\_HKU & 0.4 & DeepSomatic-TO & 0.207 & 0.317 & 0.251 \\
-  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.548 & 0.272 & 0.363 \\
+  HCC1395\_HKU & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.358 & 0.277 & 0.312 \\
   HCC1395\_HKU & 0.2 & ClairS-TO & 0.007 & 0.005 & 0.006 \\
   HCC1395\_HKU & 0.2 & ClairS-TO+LongPhase-TO & 0.021 & 0.011 & 0.015 \\
   HCC1395\_HKU & 0.2 & DeepSomatic-TO & 0.077 & 0.100 & 0.087 \\
-  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.279 & 0.082 & 0.127 \\
+  HCC1395\_HKU & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.136 & 0.082 & 0.103 \\
   HCC1395\_NYGC & 1 & ClairS-TO & 0.434 & 0.401 & 0.417 \\
   HCC1395\_NYGC & 1 & ClairS-TO+LongPhase-TO & 0.371 & 0.472 & 0.415 \\
   HCC1395\_NYGC & 1 & DeepSomatic-TO & 0.464 & 0.630 & 0.534 \\
-  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.643 & 0.586 & 0.613 \\
+  HCC1395\_NYGC & 1 & DeepSomatic-TO+LongPhase-TO & 0.506 & 0.615 & 0.555 \\
   HCC1395\_NYGC & 0.8 & ClairS-TO & 0.403 & 0.328 & 0.362 \\
   HCC1395\_NYGC & 0.8 & ClairS-TO+LongPhase-TO & 0.511 & 0.330 & 0.401 \\
   HCC1395\_NYGC & 0.8 & DeepSomatic-TO & 0.426 & 0.578 & 0.491 \\
-  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.759 & 0.426 & 0.546 \\
+  HCC1395\_NYGC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.611 & 0.434 & 0.508 \\
   HCC1395\_NYGC & 0.6 & ClairS-TO & 0.299 & 0.220 & 0.253 \\
   HCC1395\_NYGC & 0.6 & ClairS-TO+LongPhase-TO & 0.470 & 0.247 & 0.323 \\
   HCC1395\_NYGC & 0.6 & DeepSomatic-TO & 0.348 & 0.496 & 0.409 \\
-  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.697 & 0.384 & 0.495 \\
+  HCC1395\_NYGC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.549 & 0.390 & 0.456 \\
   HCC1395\_NYGC & 0.4 & ClairS-TO & 0.134 & 0.093 & 0.110 \\
   HCC1395\_NYGC & 0.4 & ClairS-TO+LongPhase-TO & 0.267 & 0.114 & 0.159 \\
   HCC1395\_NYGC & 0.4 & DeepSomatic-TO & 0.258 & 0.341 & 0.294 \\
-  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.634 & 0.257 & 0.366 \\
+  HCC1395\_NYGC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.449 & 0.267 & 0.335 \\
   HCC1395\_NYGC & 0.2 & ClairS-TO & 0.011 & 0.007 & 0.009 \\
   HCC1395\_NYGC & 0.2 & ClairS-TO+LongPhase-TO & 0.038 & 0.014 & 0.021 \\
   HCC1395\_NYGC & 0.2 & DeepSomatic-TO & 0.092 & 0.103 & 0.097 \\
-  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.351 & 0.075 & 0.123 \\
-  HCC1937\_UCSC & 1 & ClairS-TO & 0.272 & 0.413 & 0.328 \\
-  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.209 & 0.521 & 0.298 \\
-  HCC1937\_UCSC & 1 & DeepSomatic-TO & 0.219 & 0.378 & 0.277 \\
-  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.297 & 0.357 & 0.325 \\
-  HCC1937\_UCSC & 0.8 & ClairS-TO & 0.285 & 0.391 & 0.330 \\
-  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.403 & 0.395 & 0.399 \\
-  HCC1937\_UCSC & 0.8 & DeepSomatic-TO & 0.246 & 0.432 & 0.313 \\
-  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.458 & 0.331 & 0.384 \\
-  HCC1937\_UCSC & 0.6 & ClairS-TO & 0.240 & 0.320 & 0.275 \\
-  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.442 & 0.367 & 0.401 \\
-  HCC1937\_UCSC & 0.6 & DeepSomatic-TO & 0.224 & 0.417 & 0.292 \\
-  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.533 & 0.382 & 0.445 \\
-  HCC1937\_UCSC & 0.4 & ClairS-TO & 0.117 & 0.160 & 0.135 \\
-  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.255 & 0.204 & 0.227 \\
-  HCC1937\_UCSC & 0.4 & DeepSomatic-TO & 0.162 & 0.309 & 0.212 \\
-  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.472 & 0.283 & 0.354 \\
-  HCC1937\_UCSC & 0.2 & ClairS-TO & 0.017 & 0.024 & 0.020 \\
-  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.054 & 0.044 & 0.048 \\
-  HCC1937\_UCSC & 0.2 & DeepSomatic-TO & 0.063 & 0.113 & 0.081 \\
-  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.262 & 0.093 & 0.137 \\
+  HCC1395\_NYGC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.195 & 0.075 & 0.108 \\
+  HCC1937\_UCSC & 1 & ClairS-TO & 0.326 & 0.419 & 0.367 \\
+  HCC1937\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.277 & 0.537 & 0.365 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO & 0.342 & 0.417 & 0.376 \\
+  HCC1937\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.349 & 0.410 & 0.377 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO & 0.313 & 0.402 & 0.352 \\
+  HCC1937\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.471 & 0.415 & 0.441 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO & 0.322 & 0.459 & 0.378 \\
+  HCC1937\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.496 & 0.350 & 0.410 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO & 0.254 & 0.329 & 0.287 \\
+  HCC1937\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.454 & 0.374 & 0.410 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO & 0.277 & 0.441 & 0.340 \\
+  HCC1937\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.508 & 0.389 & 0.441 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO & 0.138 & 0.183 & 0.157 \\
+  HCC1937\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.295 & 0.231 & 0.259 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO & 0.190 & 0.324 & 0.240 \\
+  HCC1937\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.399 & 0.305 & 0.346 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO & 0.015 & 0.021 & 0.017 \\
+  HCC1937\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.042 & 0.032 & 0.037 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO & 0.074 & 0.126 & 0.093 \\
+  HCC1937\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.185 & 0.113 & 0.140 \\
   HCC1954\_UCSC & 1 & ClairS-TO & 0.165 & 0.212 & 0.186 \\
   HCC1954\_UCSC & 1 & ClairS-TO+LongPhase-TO & 0.171 & 0.288 & 0.214 \\
   HCC1954\_UCSC & 1 & DeepSomatic-TO & 0.145 & 0.135 & 0.140 \\
-  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.217 & 0.128 & 0.161 \\
+  HCC1954\_UCSC & 1 & DeepSomatic-TO+LongPhase-TO & 0.148 & 0.133 & 0.140 \\
   HCC1954\_UCSC & 0.8 & ClairS-TO & 0.100 & 0.128 & 0.112 \\
   HCC1954\_UCSC & 0.8 & ClairS-TO+LongPhase-TO & 0.256 & 0.167 & 0.202 \\
   HCC1954\_UCSC & 0.8 & DeepSomatic-TO & 0.113 & 0.104 & 0.109 \\
-  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.400 & 0.088 & 0.145 \\
+  HCC1954\_UCSC & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.277 & 0.091 & 0.137 \\
   HCC1954\_UCSC & 0.6 & ClairS-TO & 0.052 & 0.067 & 0.058 \\
   HCC1954\_UCSC & 0.6 & ClairS-TO+LongPhase-TO & 0.139 & 0.089 & 0.109 \\
   HCC1954\_UCSC & 0.6 & DeepSomatic-TO & 0.080 & 0.075 & 0.077 \\
-  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.318 & 0.067 & 0.110 \\
+  HCC1954\_UCSC & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.204 & 0.069 & 0.103 \\
   HCC1954\_UCSC & 0.4 & ClairS-TO & 0.014 & 0.019 & 0.016 \\
   HCC1954\_UCSC & 0.4 & ClairS-TO+LongPhase-TO & 0.042 & 0.028 & 0.033 \\
   HCC1954\_UCSC & 0.4 & DeepSomatic-TO & 0.040 & 0.037 & 0.038 \\
-  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.177 & 0.033 & 0.056 \\
+  HCC1954\_UCSC & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.109 & 0.035 & 0.053 \\
   HCC1954\_UCSC & 0.2 & ClairS-TO & 0.002 & 0.003 & 0.002 \\
   HCC1954\_UCSC & 0.2 & ClairS-TO+LongPhase-TO & 0.006 & 0.004 & 0.005 \\
   HCC1954\_UCSC & 0.2 & DeepSomatic-TO & 0.009 & 0.009 & 0.009 \\
-  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.047 & 0.009 & 0.014 \\
+  HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.028 & 0.009 & 0.013 \\
 \end{longtable}
 }
 
@@ -1037,7 +1044,8 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   {Incremental effect of methylation-aware recalibration on somatic SNV and indel
   calling, for the five datasets with 5-methylcytosine calls available. Fraction is the
   tumor DNA fraction. LP-TO denotes LongPhase-TO, (hap) is haplotype-aware
-  recalibration alone and (hap+5mC) adds the methylation-aware step.}
+  recalibration alone and (hap+5mC) adds the optional methylation-aware step. These runs are
+  separate from the main benchmark, which did not use the methylation-aware step.}
   \label{tab:methylation_recalibration}\\
   \toprule
   Sample & Type & Fraction & Variant caller & Precision & Recall & F1-score \\
@@ -1383,7 +1391,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   COLO829\_NYGC & 0.800 & 0.851 & 0.868 & 0.804 & 0.781 & 0.781 \\
   COLO829\_NYGC & 1.000 & 0.994 & 0.976 & 0.419 & 0.994 & 0.994 \\
   \addlinespace
-  HCC1395\_HKU & 0.200 & 1.000 & 1.000 & 0.348 & 0.204 & 0.201 \\
+  HCC1395\_HKU & 0.200 & 1.000 & 1.000 & 0.348 & 0.204 & 0.204 \\
   HCC1395\_HKU & 0.400 & 0.459 & 0.972 & 0.399 & 0.388 & 0.388 \\
   HCC1395\_HKU & 0.600 & 0.652 & 0.670 & 0.596 & 0.587 & 0.587 \\
   HCC1395\_HKU & 0.800 & 0.822 & 0.838 & 0.788 & 0.763 & 0.763 \\
@@ -1402,12 +1410,12 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   H1437\_UCSC & 1.000 & 1.000 & 0.956 & 0.994 & 1.000 & 1.000 \\
   \addlinespace
   H2009\_UCSC & 0.210 & 0.247 & 0.977 & 0.237 & 0.211 & 0.211 \\
-  H2009\_UCSC & 0.400 & 0.443 & 0.934 & 0.407 & 0.397 & 0.399 \\
+  H2009\_UCSC & 0.400 & 0.443 & 0.934 & 0.407 & 0.397 & 0.397 \\
   H2009\_UCSC & 0.600 & 0.640 & 0.706 & 0.600 & 0.591 & 0.591 \\
   H2009\_UCSC & 0.800 & 0.826 & 0.874 & 0.792 & 0.773 & 0.773 \\
   H2009\_UCSC & 1.000 & 0.992 & 0.982 & 0.925 & 0.992 & 0.992 \\
   \addlinespace
-  HCC1937\_UCSC & 0.188 & 1.000 & 1.000 & 0.399 & 0.305 & 0.306 \\
+  HCC1937\_UCSC & 0.188 & 1.000 & 1.000 & 0.399 & 0.305 & 0.321 \\
   HCC1937\_UCSC & 0.395 & 1.000 & 1.000 & 0.604 & 0.419 & 0.419 \\
   HCC1937\_UCSC & 0.600 & 0.575 & n.a. & 0.623 & 0.609 & 0.609 \\
   HCC1937\_UCSC & 0.800 & 0.784 & 0.795 & 0.799 & 0.782 & 0.789 \\
@@ -1473,128 +1481,128 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   HCC1395\_PacBio & 0.2 & ClairS-TO & 0.436 & 0.376 & 0.403 \\
   HCC1395\_PacBio & 0.2 & ClairS-TO+LongPhase-TO & 0.742 & 0.416 & 0.533 \\
   HCC1395\_PacBio & 0.2 & DeepSomatic-TO & 0.510 & 0.720 & 0.597 \\
-  HCC1395\_PacBio & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.827 & 0.622 & 0.710 \\
+  HCC1395\_PacBio & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.793 & 0.627 & 0.700 \\
   HCC1395\_PacBio & 0.4 & ClairS-TO & 0.566 & 0.631 & 0.597 \\
   HCC1395\_PacBio & 0.4 & ClairS-TO+LongPhase-TO & 0.814 & 0.643 & 0.718 \\
   HCC1395\_PacBio & 0.4 & DeepSomatic-TO & 0.548 & 0.855 & 0.668 \\
-  HCC1395\_PacBio & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.838 & 0.754 & 0.794 \\
+  HCC1395\_PacBio & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.809 & 0.761 & 0.784 \\
   HCC1395\_PacBio & 0.6 & ClairS-TO & 0.605 & 0.731 & 0.662 \\
   HCC1395\_PacBio & 0.6 & ClairS-TO+LongPhase-TO & 0.832 & 0.725 & 0.775 \\
   HCC1395\_PacBio & 0.6 & DeepSomatic-TO & 0.558 & 0.907 & 0.691 \\
-  HCC1395\_PacBio & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.835 & 0.800 & 0.818 \\
+  HCC1395\_PacBio & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.809 & 0.808 & 0.808 \\
   HCC1395\_PacBio & 0.8 & ClairS-TO & 0.650 & 0.779 & 0.709 \\
   HCC1395\_PacBio & 0.8 & ClairS-TO+LongPhase-TO & 0.852 & 0.730 & 0.786 \\
   HCC1395\_PacBio & 0.8 & DeepSomatic-TO & 0.568 & 0.934 & 0.707 \\
-  HCC1395\_PacBio & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.829 & 0.765 & 0.795 \\
+  HCC1395\_PacBio & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.805 & 0.771 & 0.788 \\
   HCC1395\_PacBio & 1 & ClairS-TO & 0.730 & 0.811 & 0.769 \\
   HCC1395\_PacBio & 1 & ClairS-TO+LongPhase-TO & 0.731 & 0.841 & 0.782 \\
   HCC1395\_PacBio & 1 & DeepSomatic-TO & 0.650 & 0.949 & 0.772 \\
-  HCC1395\_PacBio & 1 & DeepSomatic-TO+LongPhase-TO & 0.708 & 0.919 & 0.800 \\
+  HCC1395\_PacBio & 1 & DeepSomatic-TO+LongPhase-TO & 0.661 & 0.928 & 0.772 \\
   \addlinespace
   COLO829\_PacBio & 0.2 & ClairS-TO & 0.497 & 0.540 & 0.517 \\
   COLO829\_PacBio & 0.2 & ClairS-TO+LongPhase-TO & 0.742 & 0.561 & 0.639 \\
   COLO829\_PacBio & 0.2 & DeepSomatic-TO & 0.441 & 0.816 & 0.573 \\
-  COLO829\_PacBio & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.722 & 0.705 & 0.713 \\
+  COLO829\_PacBio & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.672 & 0.708 & 0.689 \\
   COLO829\_PacBio & 0.4 & ClairS-TO & 0.597 & 0.774 & 0.674 \\
   COLO829\_PacBio & 0.4 & ClairS-TO+LongPhase-TO & 0.810 & 0.751 & 0.780 \\
   COLO829\_PacBio & 0.4 & DeepSomatic-TO & 0.465 & 0.875 & 0.607 \\
-  COLO829\_PacBio & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.753 & 0.775 & 0.764 \\
+  COLO829\_PacBio & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.704 & 0.778 & 0.739 \\
   COLO829\_PacBio & 0.6 & ClairS-TO & 0.628 & 0.826 & 0.713 \\
   COLO829\_PacBio & 0.6 & ClairS-TO+LongPhase-TO & 0.843 & 0.781 & 0.811 \\
   COLO829\_PacBio & 0.6 & DeepSomatic-TO & 0.475 & 0.885 & 0.619 \\
-  COLO829\_PacBio & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.771 & 0.771 & 0.771 \\
+  COLO829\_PacBio & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.721 & 0.775 & 0.747 \\
   COLO829\_PacBio & 0.8 & ClairS-TO & 0.652 & 0.835 & 0.732 \\
   COLO829\_PacBio & 0.8 & ClairS-TO+LongPhase-TO & 0.864 & 0.713 & 0.781 \\
   COLO829\_PacBio & 0.8 & DeepSomatic-TO & 0.489 & 0.883 & 0.630 \\
-  COLO829\_PacBio & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.787 & 0.673 & 0.725 \\
+  COLO829\_PacBio & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.731 & 0.676 & 0.702 \\
   COLO829\_PacBio & 1 & ClairS-TO & 0.680 & 0.838 & 0.751 \\
   COLO829\_PacBio & 1 & ClairS-TO+LongPhase-TO & 0.672 & 0.845 & 0.749 \\
   COLO829\_PacBio & 1 & DeepSomatic-TO & 0.524 & 0.866 & 0.653 \\
-  COLO829\_PacBio & 1 & DeepSomatic-TO+LongPhase-TO & 0.622 & 0.832 & 0.712 \\
+  COLO829\_PacBio & 1 & DeepSomatic-TO+LongPhase-TO & 0.544 & 0.836 & 0.659 \\
   \addlinespace
   HCC1954\_CASTLE & 0.2 & ClairS-TO & 0.055 & 0.160 & 0.082 \\
   HCC1954\_CASTLE & 0.2 & ClairS-TO+LongPhase-TO & 0.232 & 0.203 & 0.217 \\
   HCC1954\_CASTLE & 0.2 & DeepSomatic-TO & 0.148 & 0.601 & 0.237 \\
-  HCC1954\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.561 & 0.523 & 0.542 \\
+  HCC1954\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.532 & 0.528 & 0.530 \\
   HCC1954\_CASTLE & 0.4 & ClairS-TO & 0.144 & 0.464 & 0.220 \\
   HCC1954\_CASTLE & 0.4 & ClairS-TO+LongPhase-TO & 0.435 & 0.517 & 0.473 \\
   HCC1954\_CASTLE & 0.4 & DeepSomatic-TO & 0.196 & 0.843 & 0.318 \\
-  HCC1954\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.634 & 0.749 & 0.687 \\
+  HCC1954\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.608 & 0.756 & 0.674 \\
   HCC1954\_CASTLE & 0.6 & ClairS-TO & 0.201 & 0.686 & 0.311 \\
   HCC1954\_CASTLE & 0.6 & ClairS-TO+LongPhase-TO & 0.521 & 0.711 & 0.601 \\
   HCC1954\_CASTLE & 0.6 & DeepSomatic-TO & 0.209 & 0.910 & 0.340 \\
-  HCC1954\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.652 & 0.812 & 0.723 \\
+  HCC1954\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.627 & 0.822 & 0.711 \\
   HCC1954\_CASTLE & 0.8 & ClairS-TO & 0.234 & 0.801 & 0.362 \\
   HCC1954\_CASTLE & 0.8 & ClairS-TO+LongPhase-TO & 0.572 & 0.787 & 0.662 \\
   HCC1954\_CASTLE & 0.8 & DeepSomatic-TO & 0.214 & 0.927 & 0.347 \\
-  HCC1954\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.660 & 0.814 & 0.729 \\
+  HCC1954\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.635 & 0.824 & 0.717 \\
   HCC1954\_CASTLE & 1 & ClairS-TO & 0.258 & 0.849 & 0.396 \\
   HCC1954\_CASTLE & 1 & ClairS-TO+LongPhase-TO & 0.262 & 0.876 & 0.403 \\
   HCC1954\_CASTLE & 1 & DeepSomatic-TO & 0.229 & 0.923 & 0.367 \\
-  HCC1954\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.271 & 0.905 & 0.417 \\
+  HCC1954\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.234 & 0.916 & 0.373 \\
   \addlinespace
   HCC1937\_CASTLE & 0.2 & ClairS-TO & 0.199 & 0.310 & 0.242 \\
   HCC1937\_CASTLE & 0.2 & ClairS-TO+LongPhase-TO & 0.483 & 0.348 & 0.405 \\
   HCC1937\_CASTLE & 0.2 & DeepSomatic-TO & 0.271 & 0.658 & 0.384 \\
-  HCC1937\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.599 & 0.566 & 0.582 \\
+  HCC1937\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.579 & 0.572 & 0.575 \\
   HCC1937\_CASTLE & 0.4 & ClairS-TO & 0.312 & 0.559 & 0.401 \\
   HCC1937\_CASTLE & 0.4 & ClairS-TO+LongPhase-TO & 0.620 & 0.578 & 0.598 \\
   HCC1937\_CASTLE & 0.4 & DeepSomatic-TO & 0.318 & 0.832 & 0.460 \\
-  HCC1937\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.643 & 0.728 & 0.683 \\
+  HCC1937\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.627 & 0.735 & 0.676 \\
   HCC1937\_CASTLE & 0.6 & ClairS-TO & 0.364 & 0.682 & 0.474 \\
   HCC1937\_CASTLE & 0.6 & ClairS-TO+LongPhase-TO & 0.677 & 0.685 & 0.681 \\
   HCC1937\_CASTLE & 0.6 & DeepSomatic-TO & 0.332 & 0.898 & 0.485 \\
-  HCC1937\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.652 & 0.786 & 0.713 \\
+  HCC1937\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.637 & 0.793 & 0.706 \\
   HCC1937\_CASTLE & 0.8 & ClairS-TO & 0.426 & 0.757 & 0.546 \\
   HCC1937\_CASTLE & 0.8 & ClairS-TO+LongPhase-TO & 0.731 & 0.717 & 0.724 \\
   HCC1937\_CASTLE & 0.8 & DeepSomatic-TO & 0.343 & 0.925 & 0.501 \\
-  HCC1937\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.649 & 0.761 & 0.700 \\
+  HCC1937\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.635 & 0.767 & 0.695 \\
   HCC1937\_CASTLE & 1 & ClairS-TO & 0.523 & 0.808 & 0.635 \\
   HCC1937\_CASTLE & 1 & ClairS-TO+LongPhase-TO & 0.531 & 0.846 & 0.652 \\
   HCC1937\_CASTLE & 1 & DeepSomatic-TO & 0.425 & 0.930 & 0.583 \\
-  HCC1937\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.475 & 0.910 & 0.624 \\
+  HCC1937\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.438 & 0.917 & 0.593 \\
   \addlinespace
   H2009\_CASTLE & 0.2 & ClairS-TO & 0.767 & 0.547 & 0.639 \\
   H2009\_CASTLE & 0.2 & ClairS-TO+LongPhase-TO & 0.891 & 0.590 & 0.710 \\
   H2009\_CASTLE & 0.2 & DeepSomatic-TO & 0.800 & 0.880 & 0.838 \\
-  H2009\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.909 & 0.768 & 0.833 \\
+  H2009\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.905 & 0.776 & 0.836 \\
   H2009\_CASTLE & 0.4 & ClairS-TO & 0.840 & 0.853 & 0.846 \\
   H2009\_CASTLE & 0.4 & ClairS-TO+LongPhase-TO & 0.920 & 0.839 & 0.878 \\
   H2009\_CASTLE & 0.4 & DeepSomatic-TO & 0.806 & 0.951 & 0.873 \\
-  H2009\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.907 & 0.851 & 0.878 \\
+  H2009\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.902 & 0.860 & 0.881 \\
   H2009\_CASTLE & 0.6 & ClairS-TO & 0.854 & 0.908 & 0.880 \\
   H2009\_CASTLE & 0.6 & ClairS-TO+LongPhase-TO & 0.928 & 0.871 & 0.898 \\
   H2009\_CASTLE & 0.6 & DeepSomatic-TO & 0.800 & 0.958 & 0.872 \\
-  H2009\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.898 & 0.850 & 0.873 \\
+  H2009\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.894 & 0.860 & 0.876 \\
   H2009\_CASTLE & 0.8 & ClairS-TO & 0.878 & 0.914 & 0.895 \\
   H2009\_CASTLE & 0.8 & ClairS-TO+LongPhase-TO & 0.943 & 0.796 & 0.863 \\
   H2009\_CASTLE & 0.8 & DeepSomatic-TO & 0.797 & 0.953 & 0.868 \\
-  H2009\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.886 & 0.747 & 0.810 \\
+  H2009\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.882 & 0.755 & 0.814 \\
   H2009\_CASTLE & 1 & ClairS-TO & 0.912 & 0.917 & 0.915 \\
   H2009\_CASTLE & 1 & ClairS-TO+LongPhase-TO & 0.910 & 0.922 & 0.916 \\
   H2009\_CASTLE & 1 & DeepSomatic-TO & 0.833 & 0.924 & 0.876 \\
-  H2009\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.850 & 0.852 & 0.851 \\
+  H2009\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.833 & 0.861 & 0.847 \\
   \addlinespace
   H1437\_CASTLE & 0.2 & ClairS-TO & 0.551 & 0.351 & 0.429 \\
   H1437\_CASTLE & 0.2 & ClairS-TO+LongPhase-TO & 0.780 & 0.378 & 0.510 \\
   H1437\_CASTLE & 0.2 & DeepSomatic-TO & 0.581 & 0.564 & 0.573 \\
-  H1437\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.810 & 0.492 & 0.613 \\
+  H1437\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.802 & 0.498 & 0.615 \\
   H1437\_CASTLE & 0.4 & ClairS-TO & 0.651 & 0.529 & 0.584 \\
   H1437\_CASTLE & 0.4 & ClairS-TO+LongPhase-TO & 0.832 & 0.526 & 0.645 \\
   H1437\_CASTLE & 0.4 & DeepSomatic-TO & 0.604 & 0.622 & 0.613 \\
-  H1437\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.821 & 0.551 & 0.660 \\
+  H1437\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.814 & 0.558 & 0.662 \\
   H1437\_CASTLE & 0.6 & ClairS-TO & 0.675 & 0.576 & 0.622 \\
   H1437\_CASTLE & 0.6 & ClairS-TO+LongPhase-TO & 0.848 & 0.558 & 0.673 \\
   H1437\_CASTLE & 0.6 & DeepSomatic-TO & 0.609 & 0.636 & 0.622 \\
-  H1437\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.821 & 0.560 & 0.666 \\
+  H1437\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.814 & 0.566 & 0.668 \\
   H1437\_CASTLE & 0.8 & ClairS-TO & 0.709 & 0.589 & 0.643 \\
   H1437\_CASTLE & 0.8 & ClairS-TO+LongPhase-TO & 0.870 & 0.524 & 0.654 \\
   H1437\_CASTLE & 0.8 & DeepSomatic-TO & 0.613 & 0.639 & 0.626 \\
-  H1437\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.810 & 0.502 & 0.620 \\
+  H1437\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.803 & 0.508 & 0.622 \\
   H1437\_CASTLE & 1 & ClairS-TO & 0.773 & 0.598 & 0.674 \\
   H1437\_CASTLE & 1 & ClairS-TO+LongPhase-TO & 0.772 & 0.609 & 0.681 \\
   H1437\_CASTLE & 1 & DeepSomatic-TO & 0.678 & 0.623 & 0.649 \\
-  H1437\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.715 & 0.600 & 0.653 \\
+  H1437\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.682 & 0.608 & 0.643 \\
 \end{longtable}
 }
 
@@ -1619,128 +1627,128 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   HCC1395\_PacBio & 0.2 & ClairS-TO & 0.020 & 0.014 & 0.017 \\
   HCC1395\_PacBio & 0.2 & ClairS-TO+LongPhase-TO & 0.052 & 0.016 & 0.024 \\
   HCC1395\_PacBio & 0.2 & DeepSomatic-TO & 0.114 & 0.173 & 0.137 \\
-  HCC1395\_PacBio & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.561 & 0.144 & 0.229 \\
+  HCC1395\_PacBio & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.256 & 0.149 & 0.188 \\
   HCC1395\_PacBio & 0.4 & ClairS-TO & 0.135 & 0.103 & 0.117 \\
   HCC1395\_PacBio & 0.4 & ClairS-TO+LongPhase-TO & 0.302 & 0.105 & 0.156 \\
   HCC1395\_PacBio & 0.4 & DeepSomatic-TO & 0.275 & 0.479 & 0.349 \\
-  HCC1395\_PacBio & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.755 & 0.393 & 0.517 \\
+  HCC1395\_PacBio & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.499 & 0.414 & 0.453 \\
   HCC1395\_PacBio & 0.6 & ClairS-TO & 0.317 & 0.248 & 0.279 \\
   HCC1395\_PacBio & 0.6 & ClairS-TO+LongPhase-TO & 0.569 & 0.243 & 0.341 \\
   HCC1395\_PacBio & 0.6 & DeepSomatic-TO & 0.369 & 0.627 & 0.465 \\
-  HCC1395\_PacBio & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.807 & 0.498 & 0.616 \\
+  HCC1395\_PacBio & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.624 & 0.529 & 0.573 \\
   HCC1395\_PacBio & 0.8 & ClairS-TO & 0.448 & 0.330 & 0.380 \\
   HCC1395\_PacBio & 0.8 & ClairS-TO+LongPhase-TO & 0.681 & 0.306 & 0.422 \\
   HCC1395\_PacBio & 0.8 & DeepSomatic-TO & 0.460 & 0.706 & 0.557 \\
-  HCC1395\_PacBio & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.826 & 0.522 & 0.640 \\
+  HCC1395\_PacBio & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.683 & 0.568 & 0.620 \\
   HCC1395\_PacBio & 1 & ClairS-TO & 0.494 & 0.383 & 0.431 \\
   HCC1395\_PacBio & 1 & ClairS-TO+LongPhase-TO & 0.462 & 0.406 & 0.432 \\
   HCC1395\_PacBio & 1 & DeepSomatic-TO & 0.560 & 0.766 & 0.647 \\
-  HCC1395\_PacBio & 1 & DeepSomatic-TO+LongPhase-TO & 0.751 & 0.675 & 0.711 \\
+  HCC1395\_PacBio & 1 & DeepSomatic-TO+LongPhase-TO & 0.575 & 0.747 & 0.650 \\
   \addlinespace
   COLO829\_PacBio & 0.2 & ClairS-TO & 0.012 & 0.017 & 0.014 \\
   COLO829\_PacBio & 0.2 & ClairS-TO+LongPhase-TO & 0.030 & 0.015 & 0.020 \\
   COLO829\_PacBio & 0.2 & DeepSomatic-TO & 0.042 & 0.128 & 0.063 \\
-  COLO829\_PacBio & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.301 & 0.106 & 0.156 \\
+  COLO829\_PacBio & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.107 & 0.108 & 0.107 \\
   COLO829\_PacBio & 0.4 & ClairS-TO & 0.090 & 0.138 & 0.109 \\
   COLO829\_PacBio & 0.4 & ClairS-TO+LongPhase-TO & 0.233 & 0.133 & 0.169 \\
   COLO829\_PacBio & 0.4 & DeepSomatic-TO & 0.080 & 0.246 & 0.120 \\
-  COLO829\_PacBio & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.490 & 0.208 & 0.292 \\
+  COLO829\_PacBio & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.196 & 0.212 & 0.203 \\
   COLO829\_PacBio & 0.6 & ClairS-TO & 0.153 & 0.231 & 0.184 \\
   COLO829\_PacBio & 0.6 & ClairS-TO+LongPhase-TO & 0.360 & 0.231 & 0.281 \\
   COLO829\_PacBio & 0.6 & DeepSomatic-TO & 0.091 & 0.268 & 0.136 \\
-  COLO829\_PacBio & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.576 & 0.222 & 0.321 \\
+  COLO829\_PacBio & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.226 & 0.228 & 0.227 \\
   COLO829\_PacBio & 0.8 & ClairS-TO & 0.188 & 0.269 & 0.221 \\
   COLO829\_PacBio & 0.8 & ClairS-TO+LongPhase-TO & 0.381 & 0.229 & 0.286 \\
   COLO829\_PacBio & 0.8 & DeepSomatic-TO & 0.091 & 0.236 & 0.132 \\
-  COLO829\_PacBio & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.508 & 0.159 & 0.243 \\
+  COLO829\_PacBio & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.180 & 0.164 & 0.172 \\
   COLO829\_PacBio & 1 & ClairS-TO & 0.206 & 0.289 & 0.241 \\
   COLO829\_PacBio & 1 & ClairS-TO+LongPhase-TO & 0.194 & 0.334 & 0.246 \\
   COLO829\_PacBio & 1 & DeepSomatic-TO & 0.071 & 0.169 & 0.100 \\
-  COLO829\_PacBio & 1 & DeepSomatic-TO+LongPhase-TO & 0.230 & 0.160 & 0.189 \\
+  COLO829\_PacBio & 1 & DeepSomatic-TO+LongPhase-TO & 0.078 & 0.166 & 0.106 \\
   \addlinespace
   HCC1954\_CASTLE & 0.2 & ClairS-TO & 0.002 & 0.004 & 0.003 \\
   HCC1954\_CASTLE & 0.2 & ClairS-TO+LongPhase-TO & 0.006 & 0.004 & 0.005 \\
   HCC1954\_CASTLE & 0.2 & DeepSomatic-TO & 0.013 & 0.019 & 0.015 \\
-  HCC1954\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.094 & 0.016 & 0.027 \\
+  HCC1954\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.045 & 0.017 & 0.025 \\
   HCC1954\_CASTLE & 0.4 & ClairS-TO & 0.018 & 0.027 & 0.021 \\
   HCC1954\_CASTLE & 0.4 & ClairS-TO+LongPhase-TO & 0.050 & 0.028 & 0.036 \\
   HCC1954\_CASTLE & 0.4 & DeepSomatic-TO & 0.070 & 0.107 & 0.084 \\
-  HCC1954\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.354 & 0.090 & 0.143 \\
+  HCC1954\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.203 & 0.094 & 0.128 \\
   HCC1954\_CASTLE & 0.6 & ClairS-TO & 0.064 & 0.093 & 0.076 \\
   HCC1954\_CASTLE & 0.6 & ClairS-TO+LongPhase-TO & 0.192 & 0.104 & 0.135 \\
   HCC1954\_CASTLE & 0.6 & DeepSomatic-TO & 0.128 & 0.197 & 0.155 \\
-  HCC1954\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.561 & 0.162 & 0.251 \\
+  HCC1954\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.361 & 0.175 & 0.236 \\
   HCC1954\_CASTLE & 0.8 & ClairS-TO & 0.129 & 0.182 & 0.151 \\
   HCC1954\_CASTLE & 0.8 & ClairS-TO+LongPhase-TO & 0.347 & 0.194 & 0.249 \\
   HCC1954\_CASTLE & 0.8 & DeepSomatic-TO & 0.175 & 0.254 & 0.207 \\
-  HCC1954\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.682 & 0.199 & 0.308 \\
+  HCC1954\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.447 & 0.216 & 0.291 \\
   HCC1954\_CASTLE & 1 & ClairS-TO & 0.193 & 0.269 & 0.225 \\
   HCC1954\_CASTLE & 1 & ClairS-TO+LongPhase-TO & 0.196 & 0.322 & 0.244 \\
   HCC1954\_CASTLE & 1 & DeepSomatic-TO & 0.190 & 0.261 & 0.219 \\
-  HCC1954\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.318 & 0.234 & 0.269 \\
+  HCC1954\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.193 & 0.258 & 0.221 \\
   \addlinespace
   HCC1937\_CASTLE & 0.2 & ClairS-TO & 0.018 & 0.025 & 0.021 \\
   HCC1937\_CASTLE & 0.2 & ClairS-TO+LongPhase-TO & 0.039 & 0.024 & 0.029 \\
   HCC1937\_CASTLE & 0.2 & DeepSomatic-TO & 0.104 & 0.252 & 0.147 \\
-  HCC1937\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.483 & 0.217 & 0.300 \\
+  HCC1937\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.261 & 0.220 & 0.239 \\
   HCC1937\_CASTLE & 0.4 & ClairS-TO & 0.134 & 0.188 & 0.156 \\
   HCC1937\_CASTLE & 0.4 & ClairS-TO+LongPhase-TO & 0.300 & 0.189 & 0.232 \\
   HCC1937\_CASTLE & 0.4 & DeepSomatic-TO & 0.219 & 0.521 & 0.308 \\
-  HCC1937\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.704 & 0.440 & 0.541 \\
+  HCC1937\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.468 & 0.454 & 0.461 \\
   HCC1937\_CASTLE & 0.6 & ClairS-TO & 0.245 & 0.320 & 0.278 \\
   HCC1937\_CASTLE & 0.6 & ClairS-TO+LongPhase-TO & 0.477 & 0.296 & 0.365 \\
   HCC1937\_CASTLE & 0.6 & DeepSomatic-TO & 0.282 & 0.615 & 0.387 \\
-  HCC1937\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.747 & 0.483 & 0.587 \\
+  HCC1937\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.542 & 0.497 & 0.518 \\
   HCC1937\_CASTLE & 0.8 & ClairS-TO & 0.323 & 0.375 & 0.347 \\
   HCC1937\_CASTLE & 0.8 & ClairS-TO+LongPhase-TO & 0.553 & 0.312 & 0.399 \\
   HCC1937\_CASTLE & 0.8 & DeepSomatic-TO & 0.364 & 0.614 & 0.457 \\
-  HCC1937\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.780 & 0.426 & 0.551 \\
+  HCC1937\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.581 & 0.444 & 0.503 \\
   HCC1937\_CASTLE & 1 & ClairS-TO & 0.350 & 0.423 & 0.383 \\
   HCC1937\_CASTLE & 1 & ClairS-TO+LongPhase-TO & 0.329 & 0.449 & 0.380 \\
   HCC1937\_CASTLE & 1 & DeepSomatic-TO & 0.409 & 0.516 & 0.457 \\
-  HCC1937\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.658 & 0.489 & 0.561 \\
+  HCC1937\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.414 & 0.504 & 0.455 \\
   \addlinespace
   H2009\_CASTLE & 0.2 & ClairS-TO & 0.096 & 0.030 & 0.046 \\
   H2009\_CASTLE & 0.2 & ClairS-TO+LongPhase-TO & 0.200 & 0.033 & 0.056 \\
   H2009\_CASTLE & 0.2 & DeepSomatic-TO & 0.283 & 0.174 & 0.216 \\
-  H2009\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.698 & 0.154 & 0.253 \\
+  H2009\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.476 & 0.155 & 0.234 \\
   H2009\_CASTLE & 0.4 & ClairS-TO & 0.468 & 0.230 & 0.308 \\
   H2009\_CASTLE & 0.4 & ClairS-TO+LongPhase-TO & 0.663 & 0.230 & 0.341 \\
   H2009\_CASTLE & 0.4 & DeepSomatic-TO & 0.505 & 0.429 & 0.464 \\
-  H2009\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.847 & 0.373 & 0.518 \\
+  H2009\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.705 & 0.380 & 0.493 \\
   H2009\_CASTLE & 0.6 & ClairS-TO & 0.677 & 0.436 & 0.530 \\
   H2009\_CASTLE & 0.6 & ClairS-TO+LongPhase-TO & 0.838 & 0.397 & 0.539 \\
   H2009\_CASTLE & 0.6 & DeepSomatic-TO & 0.579 & 0.499 & 0.536 \\
-  H2009\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.881 & 0.404 & 0.554 \\
+  H2009\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.767 & 0.415 & 0.539 \\
   H2009\_CASTLE & 0.8 & ClairS-TO & 0.776 & 0.579 & 0.663 \\
   H2009\_CASTLE & 0.8 & ClairS-TO+LongPhase-TO & 0.886 & 0.444 & 0.592 \\
   H2009\_CASTLE & 0.8 & DeepSomatic-TO & 0.601 & 0.431 & 0.502 \\
-  H2009\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.906 & 0.288 & 0.438 \\
+  H2009\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.757 & 0.300 & 0.429 \\
   H2009\_CASTLE & 1 & ClairS-TO & 0.791 & 0.633 & 0.703 \\
   H2009\_CASTLE & 1 & ClairS-TO+LongPhase-TO & 0.776 & 0.675 & 0.722 \\
   H2009\_CASTLE & 1 & DeepSomatic-TO & 0.571 & 0.295 & 0.389 \\
-  H2009\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.807 & 0.271 & 0.405 \\
+  H2009\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.579 & 0.286 & 0.383 \\
   \addlinespace
   H1437\_CASTLE & 0.2 & ClairS-TO & 0.029 & 0.013 & 0.017 \\
   H1437\_CASTLE & 0.2 & ClairS-TO+LongPhase-TO & 0.063 & 0.014 & 0.023 \\
   H1437\_CASTLE & 0.2 & DeepSomatic-TO & 0.097 & 0.113 & 0.104 \\
-  H1437\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.459 & 0.095 & 0.157 \\
+  H1437\_CASTLE & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.262 & 0.098 & 0.143 \\
   H1437\_CASTLE & 0.4 & ClairS-TO & 0.281 & 0.141 & 0.188 \\
   H1437\_CASTLE & 0.4 & ClairS-TO+LongPhase-TO & 0.473 & 0.144 & 0.221 \\
   H1437\_CASTLE & 0.4 & DeepSomatic-TO & 0.239 & 0.255 & 0.246 \\
-  H1437\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.680 & 0.216 & 0.328 \\
+  H1437\_CASTLE & 0.4 & DeepSomatic-TO+LongPhase-TO & 0.486 & 0.224 & 0.307 \\
   H1437\_CASTLE & 0.6 & ClairS-TO & 0.457 & 0.243 & 0.317 \\
   H1437\_CASTLE & 0.6 & ClairS-TO+LongPhase-TO & 0.675 & 0.234 & 0.348 \\
   H1437\_CASTLE & 0.6 & DeepSomatic-TO & 0.329 & 0.295 & 0.311 \\
-  H1437\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.758 & 0.236 & 0.360 \\
+  H1437\_CASTLE & 0.6 & DeepSomatic-TO+LongPhase-TO & 0.580 & 0.246 & 0.346 \\
   H1437\_CASTLE & 0.8 & ClairS-TO & 0.574 & 0.297 & 0.391 \\
   H1437\_CASTLE & 0.8 & ClairS-TO+LongPhase-TO & 0.754 & 0.239 & 0.363 \\
   H1437\_CASTLE & 0.8 & DeepSomatic-TO & 0.386 & 0.257 & 0.308 \\
-  H1437\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.799 & 0.174 & 0.285 \\
+  H1437\_CASTLE & 0.8 & DeepSomatic-TO+LongPhase-TO & 0.606 & 0.182 & 0.280 \\
   H1437\_CASTLE & 1 & ClairS-TO & 0.609 & 0.333 & 0.430 \\
   H1437\_CASTLE & 1 & ClairS-TO+LongPhase-TO & 0.593 & 0.366 & 0.453 \\
   H1437\_CASTLE & 1 & DeepSomatic-TO & 0.407 & 0.200 & 0.268 \\
-  H1437\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.660 & 0.184 & 0.287 \\
+  H1437\_CASTLE & 1 & DeepSomatic-TO+LongPhase-TO & 0.410 & 0.197 & 0.266 \\
 \end{longtable}
 }
 
@@ -1814,7 +1822,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   HCC1937\_CASTLE & 0.800 & 0.801 & 0.806 & 0.793 & 0.780 & 0.780 \\
   HCC1937\_CASTLE & 1.000 & 0.995 & 0.935 & 0.619 & 0.995 & 0.995 \\
   \addlinespace
-  H2009\_CASTLE & 0.200 & 1.000 & 1.000 & 0.364 & 0.193 & 0.207 \\
+  H2009\_CASTLE & 0.200 & 1.000 & 1.000 & 0.364 & 0.193 & 0.206 \\
   H2009\_CASTLE & 0.400 & 0.384 & 0.395 & 0.399 & 0.399 & 0.399 \\
   H2009\_CASTLE & 0.600 & 0.584 & 0.597 & 0.600 & 0.591 & 0.591 \\
   H2009\_CASTLE & 0.800 & 0.791 & 0.798 & 0.790 & 0.773 & 0.773 \\
@@ -1832,7 +1840,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
 \begin{small}
 \begin{longtable}{@{}llccccc@{}}
   \caption[Tumor ploidy estimates]%
-  {Per-mixture tumor ploidy estimated by PURPLE (TO) and LongPhase-TO on both platforms, against the published consensus ploidy of each cell line. An estimate within 0.2 of the published value counts as correct. LongPhase-TO values are from the DeepSomatic-TO configuration with the ClairS-TO normal panels. An asterisk marks runs changed by the ploidy scale correction.}
+  {Per-mixture tumor ploidy estimated by PURPLE (TO) and LongPhase-TO on both platforms, against the published consensus ploidy of each cell line. An estimate within 0.2 of the published value counts as correct. LongPhase-TO values are from the DeepSomatic-TO configuration. An asterisk marks runs changed by the ploidy scale correction.}
   \label{tab:ploidy-accuracy}\\
   \toprule
   Dataset & Platform & Fraction & Published & PURPLE (TO) & LongPhase-TO \\
@@ -1863,12 +1871,12 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   H1437\_UCSC & ONT & 1.0 & 2.90 & 3.25 & 2.84 \\
   \addlinespace
   H2009\_UCSC & ONT & 0.2 & 2.40 & 2.34 & 2.44 \\
-  H2009\_UCSC & ONT & 0.4 & 2.40 & 2.34 & 2.36 \\
+  H2009\_UCSC & ONT & 0.4 & 2.40 & 2.34 & 2.34 \\
   H2009\_UCSC & ONT & 0.6 & 2.40 & 2.36 & 2.36 \\
   H2009\_UCSC & ONT & 0.8 & 2.40 & 2.40 & 2.40 \\
   H2009\_UCSC & ONT & 1.0 & 2.40 & 2.76 & 2.44 \\
   \addlinespace
-  HCC1395\_HKU & ONT & 0.2 & 2.85 & 4.55 & 2.64 \\
+  HCC1395\_HKU & ONT & 0.2 & 2.85 & 4.55 & 2.70 \\
   HCC1395\_HKU & ONT & 0.4 & 2.85 & 2.82 & 2.82 \\
   HCC1395\_HKU & ONT & 0.6 & 2.85 & 2.84 & 2.84 \\
   HCC1395\_HKU & ONT & 0.8 & 2.85 & 2.90 & 2.90 \\
@@ -1904,7 +1912,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   H1437\_CASTLE & PacBio HiFi & 0.8 & 2.90 & 2.82 & 2.82 \\
   H1437\_CASTLE & PacBio HiFi & 1.0 & 2.90 & 3.25 & 2.82 \\
   \addlinespace
-  H2009\_CASTLE & PacBio HiFi & 0.2 & 2.40 & 4.30 & 2.38 \\
+  H2009\_CASTLE & PacBio HiFi & 0.2 & 2.40 & 4.30 & 2.36 \\
   H2009\_CASTLE & PacBio HiFi & 0.4 & 2.40 & 2.36 & 2.36 \\
   H2009\_CASTLE & PacBio HiFi & 0.6 & 2.40 & 2.36 & 2.36 \\
   H2009\_CASTLE & PacBio HiFi & 0.8 & 2.40 & 2.38 & 2.40 \\
@@ -1954,6 +1962,7 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   \end{tabular}
 \end{table}
 % <<< revision tables
+
 
 
 \begin{table}[htbp]
@@ -2082,24 +2091,23 @@ version: v1.0.0 (\url{https://github.com/CCU-Bioinformatics-Lab/longphase-to})
 \label{supp:longphaseto}
 \begin{verbatim}
   # CALLER = clairs_to_ss, clairs_to_ssrs or deepsomatic_to
-  # platform preset: --ont (nanopore) or --pb (PacBio HiFi)
-  # --ont was used throughout this study
   # add --loh to write the detected LOH segments as a BED file
-  # k = --somaticConnectAdjacent (default 6)
-  # d = --methyl-window (default 2000 bp); both left at defaults
+  # k = --somaticConnectAdjacent (default 6), left at default
+  # optional: --pon-file / --strict-pon-file add user-supplied normal panels
+  # (not used in the benchmarks; the germline labels of the caller were used)
+  # add --methyl-xgb to enable the optional methylation-aware recalibration
+  # (off by default, not used in the main benchmarks)
+  # d = --methyl-window (default 2000 bp)
   longphase-to phase \
   -b ${TUMOR_BAM} \
   -r ${REF} \
   -s ${VCF} \
   -t ${THREADS} \
   --caller ${CALLER} \
-  --pon-file ${PON_FILE} \
-  --strict-pon-file ${STRICT_PON_FILE} \
-  --ont \
   -o ${OUTPUT}
 \end{verbatim}
 
-\noindent LongPhase-TO provides a \texttt{--pb} preset for PacBio HiFi input. In the cross-platform analysis (Supplementary Figures~\ref{fig:pacbio-snv-recalibration} and~\ref{fig:pacbio-indel-recalibration}), the PacBio HiFi datasets were nevertheless processed with \texttt{--ont}, so that the nanopore-trained triplet-graph models were applied under exactly the settings in which they were fitted. ClairS-TO and DeepSomatic-TO were run with their PacBio HiFi models on the same data, so the somatic recalibration was evaluated off its training platform. This isolates the transfer of the trained models from any effect of the platform preset, and the resulting accuracy is therefore a lower bound on what \texttt{--pb} would provide.
+\noindent LongPhase-TO has no platform-specific setting. In the cross-platform analysis (Supplementary Figures~\ref{fig:pacbio-snv-recalibration} and~\ref{fig:pacbio-indel-recalibration}), the PacBio HiFi datasets were processed with the same command and the same nanopore-trained triplet-graph models. ClairS-TO and DeepSomatic-TO were run with their PacBio HiFi models on the same data, so the somatic recalibration was evaluated off its training platform.
 
 \subsubsection{LongPhase}
 version: v1.7.3 (\url{https://github.com/twolinin/longphase})

@@ -113,6 +113,17 @@ The eight benchmark datasets are consistent across scripts: `COLO829_ONT`, `COLO
   "Purity" stays an internal fit parameter: it may appear in Methods equations as the fitted
   parameter (the conversion to DNA fraction), never as a reported LongPhase-TO output.
   The ONT indel raw-caller rows keep the published values (author decision, 2026-11-16).
+  **DeepSomatic-TO + LongPhase-TO = `LongPhase-TO(DeepSomatic-TO)` (author decision, 2026-11-18)**: the
+  DeepSomatic-TO VCF (its own default PoN filtering on) given to LongPhase-TO as is, with no extra databases.
+  Never use the `LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)` rows (the four ClairS-TO databases mix their
+  effect with the LongPhase-TO effect). This applies to every figure, table, number and caption, including
+  the DNA fraction and ploidy results. The benchmarks used only the germline labels of the callers
+  (FILTER PON/NonSomatic/GERMLINE); `--pon-file`/`--strict-pon-file` are optional and were not used, so never
+  write that LongPhase-TO itself screens against the four ClairS-TO databases (author decision, 2026-11-18).
+  **Methylation-aware recalibration is optional and off by default** (`--methyl-xgb`, author decision,
+  2026-11-18). The main benchmarks did not use it. Keep its Methods, Results paragraph and Supplement
+  (figures, table) as an optional module evaluated in separate runs. LongPhase-TO has no platform preset
+  in use: `--ont`/`--pb` have no effect since commit a0281ee, so do not show them in LongPhase-TO commands.
   **LOH coverage fraction λ = 0.8 for all samples** (author decision, 2026-11-17): the release default
   (commit 401d586). The `Revision_2026-11/` cell-line TSVs were made at λ = 0.9 (a032938); replace their
   numbers with the λ = 0.8 export when the student delivers it. HG008 figures and Fig 4(c) use HG008 at 0.8.

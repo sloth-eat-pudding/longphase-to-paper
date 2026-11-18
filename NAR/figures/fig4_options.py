@@ -50,7 +50,7 @@ for p in pts:
     p['level'] = min(LEVELS, key=lambda v: abs(v - p['expected'])); p['err'] = abs(p['estimate'] - p['expected'])
 
 pl = [r for r in tsv(os.path.join(REV, 'ploidy_accuracy_ONT_PacBio.tsv'))
-      if r['method'] == 'LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)' and 'dedup' not in r['dataset']]
+      if r['method'] == 'LongPhase-TO(DeepSomatic-TO)' and 'dedup' not in r['dataset']]
 LINES = ['COLO829', 'H1437', 'H2009', 'HCC1395', 'HCC1937', 'HCC1954']
 hg = tsv(os.path.join(REV, 'hg008_ONT_cn_loh.tsv'))
 HG = {m: sorted([r for r in hg if r['method'].startswith(m[:6])], key=lambda r: float(r['truth_tdf']))

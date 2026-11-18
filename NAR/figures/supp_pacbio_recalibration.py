@@ -3,7 +3,7 @@
 Source: ../../Revision_2026-11/metrics_snv_indel_ONT_PacBio.tsv (platform PacBio).
 Rows: F1, precision, recall. Style follows Figure 3(b): ClairS-TO blue, DeepSomatic-TO orange,
 caller alone = dashed line with open markers, caller + LongPhase-TO = solid line with filled markers.
-DeepSomatic-TO + LongPhase-TO = the DeepSomatic-TO + ClairS-TO PoN configuration (as in the main text).
+DeepSomatic-TO + LongPhase-TO = LongPhase-TO(DeepSomatic-TO), no ClairS-TO PoN (as in the main text).
 Dataset suffix _CMH in the TSV is shown as _CASTLE. Writes drafts/supp_pacbio_{snv,indel}_recalibration_draft.png.
 """
 import csv, os
@@ -23,7 +23,7 @@ plt.rcParams.update({'font.family': 'Arial', 'font.size': 6.5, 'axes.edgecolor':
 SERIES = [('ClairS-TO raw PASS', 'ClairS-TO', C_CS, (0, (3, 2)), 'o', 'white'),
           ('LongPhase-TO(ClairS-TO)', 'ClairS-TO + LongPhase-TO', C_CS, '-', 'o', C_CS),
           ('DeepSomatic-TO raw PASS', 'DeepSomatic-TO', C_DS, (0, (3, 2)), 's', 'white'),
-          ('LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)', 'DeepSomatic-TO + LongPhase-TO', C_DS, '-', 's', C_DS)]
+          ('LongPhase-TO(DeepSomatic-TO)', 'DeepSomatic-TO + LongPhase-TO', C_DS, '-', 's', C_DS)]
 DS = ['COLO829_PacBio', 'H1437_CMH', 'H2009_CMH', 'HCC1395_PacBio', 'HCC1937_CMH', 'HCC1954_CMH']
 ROWS = [('f1', 'F1-score'), ('precision', 'Precision'), ('recall', 'Recall')]
 T = [0.2, 0.4, 0.6, 0.8, 1.0]

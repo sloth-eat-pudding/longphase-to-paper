@@ -1,7 +1,7 @@
 """Supplementary Figure (draft): estimated against expected DNA fraction, one panel per dataset (option 3 style).
 
 Data from fig4ab_merged.py (same sources as Figure 4 and Supplementary Figure S6).
-LongPhase-TO = DeepSomatic-TO + ClairS-TO PoN configuration (the configuration of Figure 4).
+LongPhase-TO = LongPhase-TO(DeepSomatic-TO), no ClairS-TO PoN (the configuration of Figure 4).
 Compact 3 x 5 grid: left block = 9 nanopore datasets (3 x 3), right block = 6 PacBio HiFi datasets (3 x 2).
 Dataset names sit inside each panel (bottom right, an area that no data point uses). Writes drafts/supp_tdf_per_cellline_draft.png.
 """

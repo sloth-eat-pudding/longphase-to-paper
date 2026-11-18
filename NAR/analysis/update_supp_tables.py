@@ -1,9 +1,10 @@
 """Write the revision (a032938) LongPhase-TO numbers into the Supplementary tables of NAR/supplementary.tex.
 
-Only LongPhase-TO values change. Raw-caller rows, ASCAT and PURPLE columns keep the published values.
+Only LongPhase-TO values change. Raw-caller rows, ASCAT and PURPLE columns keep the published values,
+except the ONT HCC1937 somatic rows, which all come from the deduplicated set (HCC1937_UCSC_dedup).
   - Somatic tables (ONT SNV/indel, PacBio SNV/indel): rows 'ClairS-TO+LongPhase-TO' and
-    'DeepSomatic-TO+LongPhase-TO' (= DeepSomatic-TO + ClairS-TO PoN on both platforms).
-  - Per-mixture TDF tables: columns LP-TO (C) and LP-TO (D) (D = DeepSomatic-TO + ClairS-TO PoN).
+    'DeepSomatic-TO+LongPhase-TO' (= LongPhase-TO(DeepSomatic-TO): DeepSomatic-TO VCF as is, no ClairS-TO PoN; author decision 2026-11-18).
+  - Per-mixture TDF tables: columns LP-TO (C) and LP-TO (D) (D = LongPhase-TO(DeepSomatic-TO), no ClairS-TO PoN).
   - tab:tdf-mae-by-fraction and tab:tdf-accuracy-summary: the LongPhase-TO rows are recomputed from the
     per-mixture tables (expected fraction = the table's Expected column), with the same definitions.
 Source: ../../Revision_2026-11/. Run: python update_supp_tables.py  (edits ../supplementary.tex in place).
@@ -13,7 +14,7 @@ import csv, os, re
 HERE = os.path.dirname(os.path.abspath(__file__))
 REV = os.path.join(HERE, '..', '..', 'Revision_2026-11')
 SUPP = os.path.join(HERE, '..', 'supplementary.tex')
-LP_C, LP_D = 'LongPhase-TO(ClairS-TO)', 'LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)'
+LP_C, LP_D = 'LongPhase-TO(ClairS-TO)', 'LongPhase-TO(DeepSomatic-TO)'
 
 
 def tsv(name):
@@ -21,8 +22,8 @@ def tsv(name):
 
 
 def ds_name(platform, d):
-    if platform == 'ONT':
-        return 'HCC1937_UCSC_with_duplicate_reads' if d == 'HCC1937_UCSC' else d
+    if platform == 'ONT':   # somatic tables: ONT HCC1937 = the deduplicated set (author decision)
+        return 'HCC1937_UCSC_dedup' if d == 'HCC1937_UCSC' else d
     return d.replace('_CASTLE', '_CMH')
 
 
@@ -46,7 +47,12 @@ for label, plat, vt in [('tab:somatic_purity', 'ONT', 'SNV'), ('tab:somatic_inde
     lines = s[i:j].split('\n')
     for k, l in enumerate(lines):
         c = [x.strip() for x in l.rstrip().rstrip('\\').split('&')]
-        if len(c) == 6 and c[2] in ('ClairS-TO+LongPhase-TO', 'DeepSomatic-TO+LongPhase-TO'):
+        raw_hcc1937 = plat == 'ONT' and c[0] == 'HCC1937\\_UCSC' and len(c) == 6 and c[2] in ('ClairS-TO', 'DeepSomatic-TO')
+        if raw_hcc1937:   # dedup set has no published raw values: take the raw-caller rows of the TSV
+            r = M[(plat, 'HCC1937_UCSC_dedup', float(c[1]), vt, c[2] + ' raw PASS')]
+            lines[k] = '  ' + ' & '.join(c[:3] + ['%.3f' % float(r[x]) for x in ('precision', 'recall', 'f1')]) + ' \\\\'
+            n_som += 1
+        elif len(c) == 6 and c[2] in ('ClairS-TO+LongPhase-TO', 'DeepSomatic-TO+LongPhase-TO'):
             r = M[(plat, ds_name(plat, c[0].replace('\\_', '_')), float(c[1]), vt, LP_C if c[2].startswith('ClairS') else LP_D)]
             lines[k] = '  ' + ' & '.join(c[:3] + ['%.3f' % float(r[x]) for x in ('precision', 'recall', 'f1')]) + ' \\\\'
             n_som += 1
@@ -67,7 +73,7 @@ for label, plat in [('tab:tumor-purity', 'ONT'), ('tab:pacbio-tumor-purity', 'Pa
             d = c[0].replace('\\_', '_'); exp = float(c[1])
             cand = [x for x in TD[plat] if x['dataset'] == TMAP[plat].get(d, d)]
             r = min(cand, key=lambda x: abs(float(x['simulated_tdf']) - exp))
-            c[5] = '%.3f' % float(r['clairs_to_longphase_to_tdf']); c[6] = '%.3f' % float(r['deepsomatic_to_pon_longphase_to_tdf'])
+            c[5] = '%.3f' % float(r['clairs_to_longphase_to_tdf']); c[6] = '%.3f' % float(r['deepsomatic_to_longphase_to_tdf'])
             lines[k] = '  ' + ' & '.join(c) + ' \\\\'
             mix[plat].append((d, exp, {'C': float(c[5]), 'D': float(c[6])}))
     s = s[:i] + '\n'.join(lines) + s[j:]

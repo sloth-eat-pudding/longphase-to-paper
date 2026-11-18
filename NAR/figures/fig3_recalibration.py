@@ -2,7 +2,7 @@
 
 Source: the somatic tables of ../supplementary.tex, so that figures and tables show the same values:
   tab:somatic_purity, tab:somatic_indel_purity (nanopore), tab:pacbio_somatic_snv, tab:pacbio_somatic_indel (PacBio HiFi).
-DeepSomatic-TO + LongPhase-TO = the DeepSomatic-TO + ClairS-TO PoN configuration (as in the tables).
+DeepSomatic-TO + LongPhase-TO = LongPhase-TO(DeepSomatic-TO), no ClairS-TO PoN (as in the tables).
 Style (author choice, 2026-11-17, "gray before, color after"): caller alone = gray dashed line with open markers
 (circle = ClairS-TO, square = DeepSomatic-TO); caller + LongPhase-TO = solid line, ClairS-TO navy #3B4992,
 DeepSomatic-TO red #EE0000 (AAAS). Open axes (left and bottom only), no grid.

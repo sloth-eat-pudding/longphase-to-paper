@@ -1,13 +1,13 @@
 """Write two new Supplementary tables (ploidy accuracy, HG008) into ../supplementary.tex after tab:pacbio-tumor-purity.
 Sources: ../../Revision_2026-11/ploidy_accuracy_ONT_PacBio.tsv and hg008_ONT_cn_loh.tsv.
-LongPhase-TO = DeepSomatic-TO + ClairS-TO PoN configuration. HCC1937 ONT = with-duplicate-reads set.
+LongPhase-TO = LongPhase-TO(DeepSomatic-TO), no ClairS-TO PoN (author decision 2026-11-18). HCC1937 ONT = with-duplicate-reads set.
 Idempotent: replaces the block between the two marker comments if present."""
 import csv, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 REV = os.path.join(HERE, '..', '..', 'Revision_2026-11'); SUPP = os.path.join(HERE, '..', 'supplementary.tex')
 tsv = lambda n: list(csv.DictReader((l for l in open(os.path.join(REV, n)) if not l.startswith('#')), delimiter='\t'))
 NAME = lambda d: d.replace('_CMH', '_CASTLE').replace('_with_duplicate_reads', '').replace('_', '\\_')
-P = [r for r in tsv('ploidy_accuracy_ONT_PacBio.tsv') if r['method'] == 'LongPhase-TO(DeepSomatic-TO+ClairS-TO PoN)' and 'dedup' not in r['dataset']]
+P = [r for r in tsv('ploidy_accuracy_ONT_PacBio.tsv') if r['method'] == 'LongPhase-TO(DeepSomatic-TO)' and 'dedup' not in r['dataset']]
 rows, last = [], None
 for r in P:
     d = NAME(r['dataset'])
@@ -19,7 +19,7 @@ for r in P:
 t1 = r"""\begin{small}
 \begin{longtable}{@{}llccccc@{}}
   \caption[Tumor ploidy estimates]%
-  {Per-mixture tumor ploidy estimated by PURPLE (TO) and LongPhase-TO on both platforms, against the published consensus ploidy of each cell line. An estimate within 0.2 of the published value counts as correct. LongPhase-TO values are from the DeepSomatic-TO configuration with the ClairS-TO normal panels. An asterisk marks runs changed by the ploidy scale correction.}
+  {Per-mixture tumor ploidy estimated by PURPLE (TO) and LongPhase-TO on both platforms, against the published consensus ploidy of each cell line. An estimate within 0.2 of the published value counts as correct. LongPhase-TO values are from the DeepSomatic-TO configuration. An asterisk marks runs changed by the ploidy scale correction.}
   \label{tab:ploidy-accuracy}\\
   \toprule
   Dataset & Platform & Fraction & Published & PURPLE (TO) & LongPhase-TO \\
