@@ -39,10 +39,10 @@ rows = [
     ("HCC1395_NYGC", "LongPhase-TO (ClairS-TO)",       26501707),
     ("HCC1395_NYGC", "LongPhase-TO (DeepSomatic-TO)",   29068243),
     
-    ("HCC1937_UCSC", "ASCAT (T+N)",                    2214193),
-    ("HCC1937_UCSC", "ASCAT (TO)",                     20879693),
-    ("HCC1937_UCSC", "LongPhase-TO (ClairS-TO)",       40921298),
-    ("HCC1937_UCSC", "LongPhase-TO (DeepSomatic-TO)",   43800261),
+    ("HCC1937_UCSC", "ASCAT (T+N)",                    2956625),
+    ("HCC1937_UCSC", "ASCAT (TO)",                     21700269),
+    ("HCC1937_UCSC", "LongPhase-TO (ClairS-TO)",       36048849),
+    ("HCC1937_UCSC", "LongPhase-TO (DeepSomatic-TO)",   31417017),
     
     # ASCAT (T+N) missing for HCC1954_UCSC; use NaN to indicate missing
     ("HCC1954_UCSC", "ASCAT (T+N)",                    np.nan),

@@ -633,6 +633,95 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
 \end{table}
 
 \begin{table}[htbp]
+  \centering
+  \caption[Phasing accuracy on HG008]%
+  {Phasing accuracy of the HG008 nanopore mixtures against the phased germline benchmark of HG008-N (dipcall on the GIAB HG008-N v6.3 assembly, heterozygous SNVs of chromosomes 1 to 22 inside the confidence regions). The switch error rate is the percentage of adjacent phased SNV pairs whose relative phase disagrees with the benchmark. Phase blocks are intersected with the benchmark phase blocks. The phase-correct N50 is the N50 of the blocks after each block is split at every switch error.}
+  \label{tab:hg008-phasing}
+  \begin{tabular}{@{}llrr@{}}
+    \toprule
+    Expected fraction & Phasing tool & Switch error rate (\%) & Phase-correct N50 (Mb) \\
+    \midrule
+    0.202 & HapCUT2 & 0.340 & 0.96 \\
+    0.202 & WhatsHap & 0.301 & 0.92 \\
+    0.202 & LongPhase & 0.068 & 1.89 \\
+    0.202 & LongPhase-TO & 0.083 & 2.25 \\
+    \addlinespace
+    0.404 & HapCUT2 & 0.262 & 1.30 \\
+    0.404 & WhatsHap & 0.235 & 1.29 \\
+    0.404 & LongPhase & 0.056 & 2.27 \\
+    0.404 & LongPhase-TO & 0.067 & 2.73 \\
+    \addlinespace
+    0.605 & HapCUT2 & 0.249 & 1.38 \\
+    0.605 & WhatsHap & 0.212 & 1.46 \\
+    0.605 & LongPhase & 0.049 & 2.68 \\
+    0.605 & LongPhase-TO & 0.058 & 3.32 \\
+    \addlinespace
+    0.803 & HapCUT2 & 0.273 & 1.29 \\
+    0.803 & WhatsHap & 0.216 & 1.38 \\
+    0.803 & LongPhase & 0.053 & 2.51 \\
+    0.803 & LongPhase-TO & 0.060 & 3.14 \\
+    \addlinespace
+    1.000 & HapCUT2 & 0.477 & 0.67 \\
+    1.000 & WhatsHap & 0.360 & 0.68 \\
+    1.000 & LongPhase & 0.103 & 1.11 \\
+    1.000 & LongPhase-TO & 0.096 & 2.56 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Phasing concordance with the matched normal]%
+  {Concordance of the tumor phasing of the eight nanopore cell-line datasets (tumor DNA fraction 1.0) with the LongPhase phasing of the matched-normal reads. The switch discordance rate is the percentage of adjacent phased SNV pairs whose relative phase disagrees with the matched-normal phasing. The phase-correct N50 is the N50 of the tumor blocks after each block is split at every switch discordance.}
+  \label{tab:phase-concordance}
+  \begin{tabular}{@{}llrr@{}}
+    \toprule
+    Sample & Phasing tool & Switch discordance rate (\%) & Phase-correct N50 (Mb) \\
+    \midrule
+    COLO829\_ONT & HapCUT2 & 0.222 & 1.25 \\
+    COLO829\_ONT & WhatsHap & 0.176 & 1.24 \\
+    COLO829\_ONT & LongPhase & 0.083 & 2.56 \\
+    COLO829\_ONT & LongPhase-TO & 0.063 & 3.50 \\
+    \addlinespace
+    COLO829\_NYGC & HapCUT2 & 0.271 & 0.39 \\
+    COLO829\_NYGC & WhatsHap & 0.209 & 0.40 \\
+    COLO829\_NYGC & LongPhase & 0.098 & 0.52 \\
+    COLO829\_NYGC & LongPhase-TO & 0.066 & 0.78 \\
+    \addlinespace
+    H1437\_UCSC & HapCUT2 & 0.224 & 1.70 \\
+    H1437\_UCSC & WhatsHap & 0.180 & 1.57 \\
+    H1437\_UCSC & LongPhase & 0.080 & 2.78 \\
+    H1437\_UCSC & LongPhase-TO & 0.061 & 3.94 \\
+    \addlinespace
+    H2009\_UCSC & HapCUT2 & 0.257 & 1.42 \\
+    H2009\_UCSC & WhatsHap & 0.197 & 1.50 \\
+    H2009\_UCSC & LongPhase & 0.088 & 3.21 \\
+    H2009\_UCSC & LongPhase-TO & 0.066 & 3.84 \\
+    \addlinespace
+    HCC1395\_HKU & HapCUT2 & 0.398 & 0.79 \\
+    HCC1395\_HKU & WhatsHap & 0.334 & 0.82 \\
+    HCC1395\_HKU & LongPhase & 0.155 & 1.07 \\
+    HCC1395\_HKU & LongPhase-TO & 0.125 & 2.00 \\
+    \addlinespace
+    HCC1395\_NYGC & HapCUT2 & 0.434 & 0.21 \\
+    HCC1395\_NYGC & WhatsHap & 0.324 & 0.21 \\
+    HCC1395\_NYGC & LongPhase & 0.245 & 0.24 \\
+    HCC1395\_NYGC & LongPhase-TO & 0.145 & 0.62 \\
+    \addlinespace
+    HCC1937\_UCSC & HapCUT2 & 0.378 & 1.01 \\
+    HCC1937\_UCSC & WhatsHap & 0.262 & 1.09 \\
+    HCC1937\_UCSC & LongPhase & 0.084 & 1.41 \\
+    HCC1937\_UCSC & LongPhase-TO & 0.085 & 3.82 \\
+    \addlinespace
+    HCC1954\_UCSC & HapCUT2 & 0.176 & 1.73 \\
+    HCC1954\_UCSC & WhatsHap & 0.161 & 1.75 \\
+    HCC1954\_UCSC & LongPhase & 0.048 & 3.31 \\
+    HCC1954\_UCSC & LongPhase-TO & 0.054 & 3.13 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
   \centering\footnotesize
   \caption[Loss of heterozygosity summary metrics]%
   {Loss of heterozygosity (LOH) summary metrics across samples and methods. Entries marked n.a.\ indicate that the method returned no estimate.}
@@ -1036,6 +1125,69 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   HCC1954\_UCSC & 0.2 & DeepSomatic-TO+LongPhase-TO & 0.028 & 0.009 & 0.013 \\
 \end{longtable}
 }
+
+\begin{table}[htbp]
+  \centering
+  \caption[Somatic SNV and indel calling on HG008]%
+  {Somatic SNV and indel calling performance on the HG008 nanopore mixtures against the NIST HG008-T somatic small-variant draft benchmark v0.4 (inside its benchmark regions). Fraction is the expected tumor DNA fraction. Calls of ClairS-TO and DeepSomatic-TO with FILTER PASS were scored.}
+  \label{tab:hg008-somatic}
+  \small
+  \begin{tabular}{@{}lllccc@{}}
+    \toprule
+    Variant & Fraction & Variant caller & Precision & Recall & F1-score \\
+    \midrule
+    SNV & 0.202 & ClairS-TO & 0.174 & 0.453 & 0.251 \\
+    SNV & 0.202 & ClairS-TO+LongPhase-TO & 0.335 & 0.498 & 0.401 \\
+    SNV & 0.202 & DeepSomatic-TO & 0.154 & 0.725 & 0.254 \\
+    SNV & 0.202 & DeepSomatic-TO+LongPhase-TO & 0.306 & 0.663 & 0.419 \\
+    \addlinespace
+    SNV & 0.404 & ClairS-TO & 0.266 & 0.775 & 0.396 \\
+    SNV & 0.404 & ClairS-TO+LongPhase-TO & 0.470 & 0.790 & 0.590 \\
+    SNV & 0.404 & DeepSomatic-TO & 0.183 & 0.871 & 0.303 \\
+    SNV & 0.404 & DeepSomatic-TO+LongPhase-TO & 0.381 & 0.815 & 0.519 \\
+    \addlinespace
+    SNV & 0.605 & ClairS-TO & 0.285 & 0.843 & 0.426 \\
+    SNV & 0.605 & ClairS-TO+LongPhase-TO & 0.521 & 0.830 & 0.640 \\
+    SNV & 0.605 & DeepSomatic-TO & 0.190 & 0.891 & 0.313 \\
+    SNV & 0.605 & DeepSomatic-TO+LongPhase-TO & 0.418 & 0.820 & 0.554 \\
+    \addlinespace
+    SNV & 0.803 & ClairS-TO & 0.308 & 0.849 & 0.452 \\
+    SNV & 0.803 & ClairS-TO+LongPhase-TO & 0.549 & 0.734 & 0.628 \\
+    SNV & 0.803 & DeepSomatic-TO & 0.199 & 0.889 & 0.326 \\
+    SNV & 0.803 & DeepSomatic-TO+LongPhase-TO & 0.422 & 0.690 & 0.524 \\
+    \addlinespace
+    SNV & 1.000 & ClairS-TO & 0.341 & 0.853 & 0.487 \\
+    SNV & 1.000 & ClairS-TO+LongPhase-TO & 0.332 & 0.850 & 0.478 \\
+    SNV & 1.000 & DeepSomatic-TO & 0.220 & 0.876 & 0.351 \\
+    SNV & 1.000 & DeepSomatic-TO+LongPhase-TO & 0.243 & 0.840 & 0.377 \\
+    \addlinespace
+    Indel & 0.202 & ClairS-TO & 0.012 & 0.002 & 0.003 \\
+    Indel & 0.202 & ClairS-TO+LongPhase-TO & 0.027 & 0.004 & 0.007 \\
+    Indel & 0.202 & DeepSomatic-TO & 0.034 & 0.012 & 0.018 \\
+    Indel & 0.202 & DeepSomatic-TO+LongPhase-TO & 0.056 & 0.010 & 0.017 \\
+    \addlinespace
+    Indel & 0.404 & ClairS-TO & 0.141 & 0.025 & 0.043 \\
+    Indel & 0.404 & ClairS-TO+LongPhase-TO & 0.211 & 0.034 & 0.058 \\
+    Indel & 0.404 & DeepSomatic-TO & 0.089 & 0.031 & 0.046 \\
+    Indel & 0.404 & DeepSomatic-TO+LongPhase-TO & 0.155 & 0.028 & 0.048 \\
+    \addlinespace
+    Indel & 0.605 & ClairS-TO & 0.277 & 0.054 & 0.090 \\
+    Indel & 0.605 & ClairS-TO+LongPhase-TO & 0.355 & 0.063 & 0.107 \\
+    Indel & 0.605 & DeepSomatic-TO & 0.105 & 0.035 & 0.052 \\
+    Indel & 0.605 & DeepSomatic-TO+LongPhase-TO & 0.181 & 0.030 & 0.052 \\
+    \addlinespace
+    Indel & 0.803 & ClairS-TO & 0.336 & 0.069 & 0.115 \\
+    Indel & 0.803 & ClairS-TO+LongPhase-TO & 0.343 & 0.064 & 0.107 \\
+    Indel & 0.803 & DeepSomatic-TO & 0.105 & 0.029 & 0.045 \\
+    Indel & 0.803 & DeepSomatic-TO+LongPhase-TO & 0.140 & 0.018 & 0.032 \\
+    \addlinespace
+    Indel & 1.000 & ClairS-TO & 0.333 & 0.075 & 0.123 \\
+    Indel & 1.000 & ClairS-TO+LongPhase-TO & 0.228 & 0.093 & 0.132 \\
+    Indel & 1.000 & DeepSomatic-TO & 0.075 & 0.020 & 0.032 \\
+    Indel & 1.000 & DeepSomatic-TO+LongPhase-TO & 0.079 & 0.019 & 0.031 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \FloatBarrier
 {\footnotesize
@@ -1888,11 +2040,11 @@ All analyses used the values in Supplementary Table~\ref{tab:tdf-parameters}. Th
   HCC1395\_NYGC & ONT & 0.8 & 2.85 & 2.90 & 2.94 \\
   HCC1395\_NYGC & ONT & 1.0 & 2.85 & 3.50 & 2.88 \\
   \addlinespace
-  HCC1937\_UCSC & ONT & 0.2 & 4.20 & 4.45 & 4.30 \\
-  HCC1937\_UCSC & ONT & 0.4 & 4.20 & 6.20 & 2.26 \\
-  HCC1937\_UCSC & ONT & 0.6 & 4.20 & 2.20 & 4.30$^{*}$ \\
-  HCC1937\_UCSC & ONT & 0.8 & 4.20 & 2.24 & 4.40$^{*}$ \\
-  HCC1937\_UCSC & ONT & 1.0 & 4.20 & 2.66 & 4.35$^{*}$ \\
+  HCC1937\_UCSC & ONT & 0.2 & 4.20 & 4.35 & 3.90 \\
+  HCC1937\_UCSC & ONT & 0.4 & 4.20 & 2.24 & 2.26 \\
+  HCC1937\_UCSC & ONT & 0.6 & 4.20 & 2.18 & 4.30$^{*}$ \\
+  HCC1937\_UCSC & ONT & 0.8 & 4.20 & 2.22 & 4.35$^{*}$ \\
+  HCC1937\_UCSC & ONT & 1.0 & 4.20 & 3.15 & 4.25$^{*}$ \\
   \addlinespace
   HCC1954\_UCSC & ONT & 0.2 & 4.40 & 4.25 & 3.45 \\
   HCC1954\_UCSC & ONT & 0.4 & 4.40 & 4.55 & 4.55 \\
